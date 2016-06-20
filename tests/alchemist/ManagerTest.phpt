@@ -121,7 +121,9 @@ class ManagerTest extends TestCase {
   public function testRemoveProject() {
     Assert::noError(function() {
       $this->manager->createProject('foo');
-      $this->manager->removeProject('foo');
+      $result = $this->manager->removeProject('foo');
+      $expectedResult = [[]];
+      Assert::equal($expectedResult, $result);
     });
   }
 

@@ -48,16 +48,20 @@ class Manager {
    * @return void
    */
   public function removeProject($projectName) {
+    $result = [];
+
     // get project dir
     $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
 
     // check if project exists
     if(!file_exists($projectDir)) {
-      throw new \Exception("Project '$projectDir' does not exist and can not be removed.");
+      throw new \Exception("Project '$projectName' does not exist and can not be removed.");
     }
 
     // remove project (actually)
-    Console::execute("rm -rf $projectDir");
+    $result[] = Console::execute("rm -rf $projectDir");
+
+    return $result;
   }
 
   /**
