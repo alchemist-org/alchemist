@@ -1,0 +1,41 @@
+{
+  "name": "alchemist/alchemist",
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://github.com/alchemist-org/alchemist",
+  "authors": [
+    {
+      "name": "Lukáš Drahník",
+      "email": "ldrahnik@gmail.com",
+      "homepage": "http://ldrahnik.com"
+    }
+  ],
+  "support": {
+    "email": "ldrahnik@gmail.com",
+    "issues": "https://github.com/Alchemist-org/Alchemist/issues"
+  },
+  "require": {
+    "php": ">=5.6.0",
+    "nette/neon": "dev-master",
+    "nette/di": "dev-master",
+    "nette/robot-loader": "dev-master",
+    "symfony/console": "dev-master",
+    "curl/curl": "dev-master",
+    "ldrahnik/url-matcher": "dev-master"
+  },
+  "require-dev": {
+    "nette/tester": "@dev"
+  },
+  "bin": [
+    "bin/alchemist"
+  ],
+  "minimum-stability": "dev",
+  "suggest": {
+    "ext-tokenizer": ""
+  },
+  "autoload": {
+    "psr-4": {
+      "Alchemist\\": "src/"
+    }
+  }
+}

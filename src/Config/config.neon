@@ -1,0 +1,18 @@
+services:
+
+  - Alchemist\Manager
+  - Alchemist\Configurator
+  - Alchemist\TemplateLoader
+
+  application:
+     class: Symfony\Component\Console\Application
+     setup:
+        - addCommands([
+            @createProjectCommand,
+            @removeProjectCommand
+        ])
+
+  createProjectCommand:
+      class: Alchemist\Console\Command\CreateProjectCommand
+  removeProjectCommand:
+      class: Alchemist\Console\Command\RemoveProjectCommand

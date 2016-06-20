@@ -1,0 +1,5 @@
+before_create:
+
+after_create:
+  - mkdir <projects-dir>/<project-name>/www
+  - echo "Project '<project-name>' was successfully created."
