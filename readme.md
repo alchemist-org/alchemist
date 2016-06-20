@@ -1,6 +1,8 @@
 ALCHEMIST
 ===========
 
+[![Build Status](https://travis-ci.org/alchemist-org/alchemist.svg?branch=master)](https://travis-ci.org/alchemist-org/alchemist)
+
 ##Requirements
 
 Check [composer.json](https://github.com/alchemist-org/alchemist/blob/master/composer.json) for dependencies.
