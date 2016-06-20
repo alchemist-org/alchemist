@@ -22,8 +22,7 @@ $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 
 ###Set up
 
-Set up your `projects-dir` in [config.neon](https://github.com/alchemist-org/alchemist/blob/master/src/Config/config.neon),
-eventually `templates` folder and default `template` to use.
+Create `config.local.neon` and set up your `projects-dir`, eventually folder with `templates` and default `template` to use.
 
 ###Create project
 
