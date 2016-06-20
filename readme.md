@@ -9,7 +9,7 @@ Check [composer.json](https://github.com/alchemist-org/alchemist/blob/master/com
 
 ##Installation
 
-Install and make temporary or permanently (put the alias row to ~.bashrc) global alias:
+Install and make temporary or permanently (put the alias row to ~.bash_aliases or ~.bashrc) global alias:
 
 ```sh
 $ git clone https://github.com/alchemist-org/alchemist.git <alchemist/location>
