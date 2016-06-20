@@ -28,7 +28,7 @@ class Config extends Object {
       'projects-dir' => null  #required ['projects location']
     ),
     'core' => array(
-      'template' => null,   #optional ['default is template not set']
+      'template' => null,   #optional ['by default is template not set']
       'templates' => null   #optional ['templates folder is required when is needed']
     )
   );

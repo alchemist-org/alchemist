@@ -18,7 +18,12 @@ $ composer install
 $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 ```
 
-##Commands
+##Usage
+
+###Set up
+
+Set up your `projects-dir` in [config.neon](https://github.com/alchemist-org/alchemist/blob/master/src/Config/config.neon),
+eventually `templates` folder and default `template` to use.
 
 ###Create project
 
