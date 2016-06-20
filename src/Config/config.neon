@@ -1,7 +1,7 @@
 services:
 
   - Alchemist\Manager
-  - Alchemist\Configurator
+  - Alchemist\Configurator('./config.local.neon')
   - Alchemist\TemplateLoader
 
   application:

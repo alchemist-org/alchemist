@@ -53,7 +53,7 @@ class Manager {
 
     // check if project exists
     if(!file_exists($projectDir)) {
-      throw new \Exception("Project '$projectName' does not exist and can not be removed.");
+      throw new \Exception("Project '$projectDir' does not exist and can not be removed.");
     }
 
     // remove project (actually)
@@ -75,20 +75,24 @@ class Manager {
    * @param string|null $templateName
    * @param array $parameters
    *
+   * @return array
+   *
    * @throws \Exception
    */
   public function createProject(
     $projectName,
-    $templateName = null,
+    $templateName = Template::DEFAULT_TEMPLATE,
     array $parameters = array()
   ) {
     $result = [];
 
-    // use template, default or own
-    $templateName = $templateName ? $templateName : $this->configurator->getConfig()->getTemplate();
+    // use default template
+    if($templateName == Template::DEFAULT_TEMPLATE) {
+      $templateName = $this->configurator->getConfig()->getTemplate();
+    }
 
     // load template
-    $template = $this->templateLoader->getTemplate($templateName, $parameters);
+    $template = $templateName ? $this->templateLoader->getTemplate($templateName, $parameters) : null;
 
     // load projectDir
     $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
@@ -100,17 +104,28 @@ class Manager {
     }
 
     // replacement parameters
-    $replacementParameters = $template->getParameters();
-    $replacementParameters['project-name'] = $projectName;
+    if($template) {
+      $replacementParameters = $template->getParameters();
+      $replacementParameters['project-name'] = $projectName;
+    }
 
     // run before_create
-    $result[self::BEFORE_CREATE] = $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters);
+    if($template) {
+      $result[self::BEFORE_CREATE] = $this->runScript($template->getScript(self::BEFORE_CREATE),
+        $replacementParameters);
+    } else {
+      $result[self::BEFORE_CREATE] = [];
+    }
 
     // create project (actually)
     $result[self::CREATE] = Console::execute("mkdir $projectDir");
 
     // run after create
-    $result[self::AFTER_CREATE] = $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters);
+    if($template) {
+      $result[self::AFTER_CREATE] = $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters);
+    } else {
+      $result[self::AFTER_CREATE] = [];
+    }
 
     return $result;
   }

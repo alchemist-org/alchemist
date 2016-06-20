@@ -72,7 +72,7 @@ class Configurator {
    */
   private function loadConfigData() {
     if(!file_exists($this->configFile)) {
-      throw new \Exception("Config file $this->configFile does not exist.");
+      throw new \Exception("Config file '$this->configFile' does not exist.");
     }
 
     $contents = file_get_contents($this->configFile);

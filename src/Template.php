@@ -33,6 +33,9 @@ class Template {
     'after_create' => array()
   );
 
+  /** @var string */
+  const DEFAULT_TEMPLATE = 'default';
+
   /**
    * Template constructor.
    *

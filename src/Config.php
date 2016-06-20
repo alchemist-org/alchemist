@@ -37,6 +37,9 @@ class Config extends Object {
    * @param array $config
    */
   public function __construct(array $config) {
+    if(!isset($config['parameters']) || !isset($config['parameters']['projects-dir'])) {
+      throw new \Exception("Config parameter 'projects-dir' is required.");
+    }
     $this->config = Arrays::merge($this->default, $config);
   }
 
@@ -45,16 +48,10 @@ class Config extends Object {
   }
 
   public function getTemplates() {
-    if(!isset($this->config['core']['templates'])) {
-      throw new \Exception("Config parameter 'templates' is required.");
-    }
     return $this->config['core']['templates'];
   }
 
   public function getProjectsDir() {
-    if(!isset($this->config['parameters']['projects-dir'])) {
-      throw new \Exception("Config parameter 'projects-dir' is required.");
-    }
     return $this->config['parameters']['projects-dir'];
   }
 

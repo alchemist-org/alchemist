@@ -14,6 +14,7 @@ namespace Tests;
 use Alchemist\Config;
 use Alchemist\Configurator;
 use Alchemist\Manager;
+use Alchemist\Template;
 use Nette\DI\Container;
 use Tester\Assert;
 use Tester\TestCase;
@@ -70,19 +71,50 @@ class ManagerTest extends TestCase {
     Assert::noError(function() use ($projectName) {
       $result = $this->manager->createProject('foo');
       $expectedResult = [
-        'before_create' => [],
-        'create' => [],
-        'after_create' => [
+        Manager::BEFORE_CREATE => [],
+        Manager::CREATE => [],
+        Manager::AFTER_CREATE => [
           0 => [],
           1 => [
             0 => "Project '$projectName' was successfully created."
           ]
         ]
       ];
-      Assert::equal($expectedResult[Manager::BEFORE_CREATE], $result[Manager::BEFORE_CREATE]);
-      Assert::equal($expectedResult[Manager::CREATE], $result[Manager::CREATE]);
-      Assert::equal($expectedResult[Manager::AFTER_CREATE],$result[Manager::AFTER_CREATE]);
+      Assert::equal($expectedResult, $result);
       Assert::true(file_exists(self::PROJECTS_DIR.DIRECTORY_SEPARATOR.$projectName.DIRECTORY_SEPARATOR.'www'));
+    });
+  }
+
+  public function testCreateProjectSetDefaultTemplateConst() {
+    $projectName = 'foo';
+    Assert::noError(function() use ($projectName) {
+      $result = $this->manager->createProject('foo', Template::DEFAULT_TEMPLATE);
+      $expectedResult = [
+        Manager::BEFORE_CREATE => [],
+        Manager::CREATE => [],
+        Manager::AFTER_CREATE => [
+          0 => [],
+          1 => [
+            0 => "Project '$projectName' was successfully created."
+          ]
+        ]
+      ];
+      Assert::equal($expectedResult, $result);
+      Assert::true(file_exists(self::PROJECTS_DIR.DIRECTORY_SEPARATOR.$projectName.DIRECTORY_SEPARATOR.'www'));
+    });
+  }
+
+  public function testCreateProjectSetNoTemplate() {
+    $projectName = 'foo';
+    Assert::noError(function() use ($projectName) {
+      $result = $this->manager->createProject('foo', null);
+      $expectedResult = [
+        Manager::BEFORE_CREATE => [],
+        Manager::CREATE => [],
+        Manager::AFTER_CREATE => []
+      ];
+      Assert::equal($expectedResult, $result);
+      Assert::false(file_exists(self::PROJECTS_DIR.DIRECTORY_SEPARATOR.$projectName.DIRECTORY_SEPARATOR.'www'));
     });
   }
 
