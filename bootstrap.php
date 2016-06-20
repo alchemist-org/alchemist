@@ -15,8 +15,7 @@ require __DIR__.'/vendor/autoload.php';
 
 $logDir = __DIR__.'/log';
 $tempDir = __DIR__.'/temp';
-$config = __DIR__.'/system/application/config/config.neon';
-$localConfig = __DIR__.'/system/application/config/config.local.neon';
+$config = __DIR__.'/src/Config/config.neon';
 
 // container
 $containerLoader = new ContainerLoader($tempDir);
