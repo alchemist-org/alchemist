@@ -76,7 +76,7 @@ class Manager {
 
   /**
    * @param string $projectName
-   * @param string|null $templateName
+   * @param string|Template::DEFAULT_TEMPLATE|null $templateName
    * @param array $parameters
    *
    * @return array
