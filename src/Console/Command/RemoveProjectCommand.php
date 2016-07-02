@@ -40,6 +40,9 @@ class RemoveProjectCommand extends Command {
   protected function configure() {
     $this
       ->setName('remove-project')
+        ->setAliases(array(
+            'remove'
+        ))
       ->setDescription('Remove project')
       ->setDefinition(array(
         new InputArgument('name', InputArgument::REQUIRED, 'project name')
