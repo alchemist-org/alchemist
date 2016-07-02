@@ -10,6 +10,7 @@
  */
 
 namespace Alchemist;
+use Alchemist\Utils\Arrays;
 
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
@@ -31,6 +32,9 @@ class Manager {
   /** @var string */
   const CREATE = 'create';
 
+  /** @var string */
+  const CREATE_ORIGIN_SOURCE = 'create_origin_source';
+
   /**
    * Manager constructor.
    *
@@ -45,7 +49,7 @@ class Manager {
   /**
    * @param string $projectName
    *
-   * @return void
+   * @return array
    */
   public function removeProject($projectName) {
     $result = [];
@@ -92,8 +96,11 @@ class Manager {
 
     // use default template
     if($templateName == Template::DEFAULT_TEMPLATE) {
-      $templateName = $this->configurator->getConfig()->getTemplate();
+      $templateName = $this->configurator->getConfig()->getTemplateName();
     }
+
+    // merge config parameters with console parameters
+    $parameters = Arrays::merge($this->configurator->getConfig()->getParameters(), $parameters);
 
     // load template
     $template = $templateName ? $this->templateLoader->getTemplate($templateName, $parameters) : null;
@@ -108,10 +115,11 @@ class Manager {
     }
 
     // replacement parameters
-    if($template) {
-      $replacementParameters = $template->getParameters();
-      $replacementParameters['project-name'] = $projectName;
-    }
+    $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig()->applyConsoleParameters($parameters);
+
+    // add common replacement parameters
+    $replacementParameters['project-name'] = $projectName;
+    $replacementParameters['project-dir'] = $projectDir;
 
     // run before_create
     if($template) {
@@ -124,6 +132,26 @@ class Manager {
     // create project (actually)
     $result[self::CREATE] = Console::execute("mkdir $projectDir");
 
+    // load origin source
+    $originSource = $template && isset($template->getParameters()['origin-source']) ? $template->getParameter('origin-source') : $this->configurator->getConfig()->getParameter('origin-source');
+
+    // load project from origin source (actually)
+    $originSourceType = $originSource['type'];
+    if($originSourceType) {
+
+      if (!isset($originSource['types'][$originSourceType])) {
+        throw new \Exception("Origin source '$originSourceType' does not exist.");
+      }
+
+      // add specific replacement parameters
+      $replacementParameters['url'] = $originSource['url'];
+      $replacementParameters['name'] = $originSource['name'];
+
+      $result[self::CREATE_ORIGIN_SOURCE] = $this->runScript($originSource['types'][$originSourceType], $replacementParameters);
+    } else {
+      $result[self::CREATE_ORIGIN_SOURCE] = [];
+    }
+
     // run after create
     if($template) {
       $result[self::AFTER_CREATE] = $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters);
@@ -135,12 +163,14 @@ class Manager {
   }
 
   /**
-   * @param array $script
+   * @param array|string $script
    * @param array $replaceParameters
    *
    * @return array
    */
-  public function runScript(array $script, $replaceParameters = array()) {
+  public function runScript($script, $replaceParameters = array()) {
+    $script = is_string($script) ? array($script) : $script;
+
     $result = [];
     foreach($script as $index => $scriptLine) {
       $scriptLine = Parser::parse($scriptLine, $replaceParameters);
