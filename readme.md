@@ -29,13 +29,11 @@ Create `config.local.neon` and set up your `projects-dir`, eventually folder wit
 ###Create project
 
 ```sh
-$ alchemist create <project-name>
-$ alchemist create-project <project-name>
+$ alchemist create-project <name>
 ```
 
 ###Remove project
 
 ```sh
-$ alchemist remove <project-name>
-$ alchemist remove-project <project-name>
+$ alchemist remove-project <name>
 ```
