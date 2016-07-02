@@ -46,12 +46,12 @@ class CreateProjectCommand extends Command {
       ))
       ->setDescription('Create project')
       ->setDefinition(array(
-        new InputArgument('name', InputArgument::REQUIRED, 'project name'),
-        new InputOption('template', null, InputOption::VALUE_REQUIRED, 'template'),
-        new InputOption('projects-dir', null, InputOption::VALUE_REQUIRED, 'projects-dir'),
-        new InputOption('original-source.name', null, InputOption::VALUE_REQUIRED, 'original-source.name'),
-        new InputOption('original-source.type', null, InputOption::VALUE_REQUIRED, 'original-source.type'),
-        new InputOption('original-source.url', null, InputOption::VALUE_REQUIRED, 'original-source.url')
+        new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
+        new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template'),
+        new InputOption('projects-dir', 'd', InputOption::VALUE_REQUIRED, 'Projects dir'),
+        new InputOption('origin-source.name', 'name', InputOption::VALUE_REQUIRED, 'Origin source name used in default type composer as package name'),
+        new InputOption('origin-source.type', 'type', InputOption::VALUE_REQUIRED, 'Origin source type'),
+        new InputOption('origin-source.url', 'url', InputOption::VALUE_REQUIRED, 'Origin source url used in default type git')
       ));
   }
 
@@ -63,10 +63,10 @@ class CreateProjectCommand extends Command {
 
     $options = array(
         'projects-dir' => $input->getOption('projects-dir'),
-        'original-source' => array(
-            'name' => $input->getOption('original-source.name'),
-            'type' => $input->getOption('original-source.type'),
-            'url' => $input->getOption('original-source.url'),
+        'origin-source' => array(
+            'name' => $input->getOption('origin-source.name'),
+            'type' => $input->getOption('origin-source.type'),
+            'url' => $input->getOption('origin-source.url'),
         )
     );
 

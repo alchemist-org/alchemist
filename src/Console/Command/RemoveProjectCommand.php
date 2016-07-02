@@ -45,7 +45,7 @@ class RemoveProjectCommand extends Command {
         ))
       ->setDescription('Remove project')
       ->setDefinition(array(
-        new InputArgument('name', InputArgument::REQUIRED, 'project name')
+        new InputArgument('name', InputArgument::REQUIRED, 'Project name')
       ));
   }
 
