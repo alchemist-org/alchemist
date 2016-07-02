@@ -25,7 +25,16 @@ class Config extends Object {
   /** @var array */
   private $default = array(
     'parameters' => array(
-      'projects-dir' => null  #required ['projects location']
+      'projects-dir' => null,  #required ['projects location']
+      'origin-source' => array(
+        'types' => array(      #the most usage as defaults
+          'composer' => 'composer create-project <name> <project-dir>',
+          'git' => 'git clone <url> <project-dir>'
+        ),
+        'type' => null,    #optional ['means default origin-source type, required when is origin-source used']
+        'url' => null,      #optional ['required when is used to parse inside type <url>']
+        'name' => null      #optional ['required when is used to parse inside type <name>']
+      )
     ),
     'core' => array(
       'template' => null,   #optional ['by default is template not set']
@@ -43,7 +52,7 @@ class Config extends Object {
     $this->config = Arrays::merge($this->default, $config);
   }
 
-  public function getTemplate() {
+  public function getTemplateName() {
     return $this->config['core']['template'];
   }
 
@@ -57,6 +66,14 @@ class Config extends Object {
 
   public function getParameters() {
     return $this->config['parameters'];
+  }
+
+  public function applyConsoleParameters(array $parameters = array()) {
+    return $this->config['parameters'] = Arrays::merge($this->config['parameters'], $parameters);
+  }
+
+  public function getParameter($name) {
+    return $this->config['parameters'][$name];
   }
 
 }

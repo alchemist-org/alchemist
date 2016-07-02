@@ -49,7 +49,6 @@ class TemplateLoader {
 
     // merge with console && merge with config
     $template->setParameters(Arrays::merge($template->getParameters(), $parameters));
-    $template->setParameters(Arrays::merge($template->getParameters(), $this->configurator->getConfig()->getParameters()));
 
     return $template;
   }

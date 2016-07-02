@@ -45,7 +45,10 @@ class CreateProjectCommand extends Command {
       ->setDefinition(array(
         new InputArgument('name', InputArgument::REQUIRED, 'project name'),
         new InputOption('template', null, InputOption::VALUE_REQUIRED, 'template'),
-        new InputOption('projects-dir', null, InputOption::VALUE_REQUIRED, 'projects-dir')
+        new InputOption('projects-dir', null, InputOption::VALUE_REQUIRED, 'projects-dir'),
+        new InputOption('original-source.name', null, InputOption::VALUE_REQUIRED, 'original-source.name'),
+        new InputOption('original-source.type', null, InputOption::VALUE_REQUIRED, 'original-source.type'),
+        new InputOption('original-source.url', null, InputOption::VALUE_REQUIRED, 'original-source.url')
       ));
   }
 
@@ -56,7 +59,12 @@ class CreateProjectCommand extends Command {
     $template = $input->getOption('template');
 
     $options = array(
-      'projects-dir' => $input->getOption('projects-dir')
+        'projects-dir' => $input->getOption('projects-dir'),
+        'original-source' => array(
+            'name' => $input->getOption('original-source.name'),
+            'type' => $input->getOption('original-source.type'),
+            'url' => $input->getOption('original-source.url'),
+        )
     );
 
     $manager->createProject($name, $template, $options);
