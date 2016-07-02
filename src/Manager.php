@@ -144,10 +144,11 @@ class Manager {
       }
 
       // add specific replacement parameters
-      $replacementParameters['url'] = $originSource['url'];
-      $replacementParameters['name'] = $originSource['name'];
+      $originSourceParameters = $originSource;
+      unset($originSourceParameters['types']);
+      $replacementParametersOriginSource = Arrays::merge($replacementParameters, $originSourceParameters);
 
-      $result[self::CREATE_ORIGIN_SOURCE] = $this->runScript($originSource['types'][$originSourceType], $replacementParameters);
+      $result[self::CREATE_ORIGIN_SOURCE] = $this->runScript($originSource['types'][$originSourceType], $replacementParametersOriginSource);
     } else {
       $result[self::CREATE_ORIGIN_SOURCE] = [];
     }
