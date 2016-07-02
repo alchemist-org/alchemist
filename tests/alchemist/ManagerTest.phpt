@@ -249,13 +249,10 @@ class ManagerTest extends TestCase
 
     private function assertManagerCreateProjectResult($expectedResult, $result)
     {
-        file_put_contents('expectedResult.txt', var_dump($expectedResult));
-        file_put_contents('result.txt', var_dump($result));
         Assert::equal($expectedResult[Manager::BEFORE_CREATE], $result[Manager::BEFORE_CREATE]);
         Assert::equal($expectedResult[Manager::CREATE], $result[Manager::CREATE]);
         Assert::equal($expectedResult[Manager::CREATE_ORIGIN_SOURCE], $result[Manager::CREATE_ORIGIN_SOURCE]);
         Assert::equal($expectedResult[Manager::AFTER_CREATE], $result[Manager::AFTER_CREATE]);
-
     }
 
 }
