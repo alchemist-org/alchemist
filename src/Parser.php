@@ -16,17 +16,19 @@ use UrlMatcher\Matcher;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class Parser {
+class Parser
+{
 
-  /**
-   * @param string $line
-   * @param array $args
-   *
-   * @return string
-   */
-  static function parse($line, array $args = array()) {
-    $parser = new Matcher($line, $args);
-    return $parser->parse();
-  }
+    /**
+     * @param string $line
+     * @param array $args
+     *
+     * @return string
+     */
+    static function parse($line, array $args = array())
+    {
+        $parser = new Matcher($line, $args);
+        return $parser->parse();
+    }
 
 }

@@ -21,53 +21,57 @@ use Alchemist\Manager;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class CreateProjectCommand extends Command {
+class CreateProjectCommand extends Command
+{
 
-  /** @var Manager $manager */
-  private $manager;
-  
-  /**
-   * @param null|string $name
-   * @param Manager $manager
-   */
-  public function __construct(
-    $name = null,
-    Manager $manager
-  ) {
-    parent::__construct($name);
-    $this->manager = $manager;
-  }
+    /** @var Manager $manager */
+    private $manager;
 
-  protected function configure() {
-    $this
-      ->setName('create-project')
-      ->setDescription('Create project')
-      ->setDefinition(array(
-        new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
-        new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template'),
-        new InputOption('projects-dir', 'd', InputOption::VALUE_REQUIRED, 'Projects dir'),
-        new InputOption('origin-source.name', 'name', InputOption::VALUE_REQUIRED, 'Origin source name used in default type composer as package name'),
-        new InputOption('origin-source.type', 'type', InputOption::VALUE_REQUIRED, 'Origin source type'),
-        new InputOption('origin-source.url', 'url', InputOption::VALUE_REQUIRED, 'Origin source url used in default type git')
-      ));
-  }
+    /**
+     * @param null|string $name
+     * @param Manager $manager
+     */
+    public function __construct(
+        $name = null,
+        Manager $manager
+    )
+    {
+        parent::__construct($name);
+        $this->manager = $manager;
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $manager = $this->manager;
+    protected function configure()
+    {
+        $this
+            ->setName('create-project')
+            ->setDescription('Create project')
+            ->setDefinition(array(
+                new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
+                new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template'),
+                new InputOption('projects-dir', 'd', InputOption::VALUE_REQUIRED, 'Projects dir'),
+                new InputOption('origin-source.name', 'name', InputOption::VALUE_REQUIRED, 'Origin source name used in default type composer as package name'),
+                new InputOption('origin-source.type', 'type', InputOption::VALUE_REQUIRED, 'Origin source type'),
+                new InputOption('origin-source.url', 'url', InputOption::VALUE_REQUIRED, 'Origin source url used in default type git')
+            ));
+    }
 
-    $name = $input->getArgument('name');
-    $template = $input->getOption('template');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $manager = $this->manager;
 
-    $options = array(
-        'projects-dir' => $input->getOption('projects-dir'),
-        'origin-source' => array(
-            'name' => $input->getOption('origin-source.name'),
-            'type' => $input->getOption('origin-source.type'),
-            'url' => $input->getOption('origin-source.url'),
-        )
-    );
+        $name = $input->getArgument('name');
+        $template = $input->getOption('template');
 
-    $manager->createProject($name, $template, $options);
-  }
+        $options = array(
+            'projects-dir' => $input->getOption('projects-dir'),
+            'origin-source' => array(
+                'name' => $input->getOption('origin-source.name'),
+                'type' => $input->getOption('origin-source.type'),
+                'url' => $input->getOption('origin-source.url'),
+            )
+        );
+
+        $manager->createProject($name, $template, $options);
+    }
 
 }

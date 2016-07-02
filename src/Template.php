@@ -16,76 +16,83 @@ use Alchemist\Utils\Arrays;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class Template {
+class Template
+{
 
-  /** @var string */
-  private $name;
+    /** @var string */
+    private $name;
 
-  /** @var array */
-  private $data;
+    /** @var array */
+    private $data;
 
-  /** @var array */
-  private $default = array(
-    'parameters' => array(),
-    'before_remove' => array(),
-    'after_remove' => array(),
-    'before_create' => array(),
-    'after_create' => array()
-  );
+    /** @var array */
+    private $default = array(
+        'parameters' => array(),
+        'before_remove' => array(),
+        'after_remove' => array(),
+        'before_create' => array(),
+        'after_create' => array()
+    );
 
-  /** @var string */
-  const DEFAULT_TEMPLATE = 'default';
+    /** @var string */
+    const DEFAULT_TEMPLATE = 'default';
 
-  /**
-   * Template constructor.
-   *
-   * @param string $name
-   * @param null|array $data
-   */
-  public function __construct($name, $data = null) {
-    $this->name = $name;
-    $this->data = $data ? Arrays::merge($this->default, $data) : $this->default;
-  }
+    /**
+     * Template constructor.
+     *
+     * @param string $name
+     * @param null|array $data
+     */
+    public function __construct($name, $data = null)
+    {
+        $this->name = $name;
+        $this->data = $data ? Arrays::merge($this->default, $data) : $this->default;
+    }
 
-  /**
-   * @return string
-   */
-  public function getName() {
-    return $this->name;
-  }
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-  /**
-   * @param string $name
-   *
-   * @return mixed
-   */
-  public function getParameter($name) {
-    return $this->data['parameters'][$name];
-  }
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getParameter($name)
+    {
+        return $this->data['parameters'][$name];
+    }
 
-  /**
-   * @param string $name
-   *
-   * @return mixed
-   */
-  public function getScript($name) {
-    return $this->data[$name] ? $this->data[$name] : array();
-  }
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getScript($name)
+    {
+        return $this->data[$name] ? $this->data[$name] : array();
+    }
 
-  /**
-   * @return mixed
-   */
-  public function getParameters() {
-    return $this->data['parameters'];
-  }
+    /**
+     * @return mixed
+     */
+    public function getParameters()
+    {
+        return $this->data['parameters'];
+    }
 
-  /**
-   * @param array $parameters
-   *
-   * @return void
-   */
-  public function setParameters(array $parameters) {
-    $this->data['parameters'] = $parameters;
-  }
+    /**
+     * @param array $parameters
+     *
+     * @return void
+     */
+    public function setParameters(array $parameters)
+    {
+        $this->data['parameters'] = $parameters;
+    }
 
 }

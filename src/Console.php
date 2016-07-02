@@ -14,17 +14,19 @@ namespace Alchemist;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class Console {
+class Console
+{
 
-  /**
-   * @param string $cmd
-   *
-   * @return string
-   */
-  public static function execute($cmd) {
-    $result = [];
-    exec($cmd, $result);
-    return $result;
-  }
+    /**
+     * @param string $cmd
+     *
+     * @return string
+     */
+    public static function execute($cmd)
+    {
+        $result = [];
+        exec($cmd, $result);
+        return $result;
+    }
 
 }

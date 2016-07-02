@@ -1,18 +1,18 @@
 services:
 
-  - Alchemist\Manager
-  - Alchemist\Configurator('./config.local.neon')
-  - Alchemist\TemplateLoader
+    - Alchemist\Manager
+    - Alchemist\Configurator('./config.local.neon')
+    - Alchemist\TemplateLoader
 
-  application:
-     class: Symfony\Component\Console\Application
-     setup:
-        - addCommands([
-            @createProjectCommand,
-            @removeProjectCommand
-        ])
+    application:
+        class: Symfony\Component\Console\Application
+        setup:
+            - addCommands([
+                @createProjectCommand,
+                @removeProjectCommand
+            ])
 
-  createProjectCommand:
-      class: Alchemist\Console\Command\CreateProjectCommand
-  removeProjectCommand:
-      class: Alchemist\Console\Command\RemoveProjectCommand
+    createProjectCommand:
+        class: Alchemist\Console\Command\CreateProjectCommand
+    removeProjectCommand:
+        class: Alchemist\Console\Command\RemoveProjectCommand

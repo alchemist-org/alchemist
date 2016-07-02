@@ -20,38 +20,42 @@ use Alchemist\Manager;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class RemoveProjectCommand extends Command {
+class RemoveProjectCommand extends Command
+{
 
-  /** @var Manager $manager */
-  private $manager;
+    /** @var Manager $manager */
+    private $manager;
 
-  /**
-   * @param null|string $name
-   * @param Manager $manager
-   */
-  public function __construct(
-    $name = null,
-    Manager $manager
-  ) {
-    parent::__construct($name);
-    $this->manager = $manager;
-  }
+    /**
+     * @param null|string $name
+     * @param Manager $manager
+     */
+    public function __construct(
+        $name = null,
+        Manager $manager
+    )
+    {
+        parent::__construct($name);
+        $this->manager = $manager;
+    }
 
-  protected function configure() {
-    $this
-      ->setName('remove-project')
-      ->setDescription('Remove project')
-      ->setDefinition(array(
-        new InputArgument('name', InputArgument::REQUIRED, 'Project name')
-      ));
-  }
+    protected function configure()
+    {
+        $this
+            ->setName('remove-project')
+            ->setDescription('Remove project')
+            ->setDefinition(array(
+                new InputArgument('name', InputArgument::REQUIRED, 'Project name')
+            ));
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output) {
-    $manager = $this->manager;
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $manager = $this->manager;
 
-    $name = $input->getArgument('name');
+        $name = $input->getArgument('name');
 
-    $manager->removeProject($name);
-  }
+        $manager->removeProject($name);
+    }
 
 }

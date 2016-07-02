@@ -17,72 +17,77 @@ use Nette\Neon\Neon;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class TemplateLoader {
+class TemplateLoader
+{
 
-  /** @var Configurator */
-  private $configurator;
+    /** @var Configurator */
+    private $configurator;
 
-  /**
-   * TemplateLoader constructor.
-   *
-   * @param Configurator $configurator
-   */
-  public function __construct(Configurator $configurator) {
-    $this->configurator = $configurator;
-  }
-
-  /**
-   * @param string $templateName
-   * @param array $parameters
-   *
-   * @return Template
-   *
-   * @throws \Exception
-   */
-  public function getTemplate($templateName, array $parameters = array()) {
-    // load config
-    $config = $this->configurator->getConfig();
-
-    // load template
-    $templatesDir = $config->getTemplates();
-    $template = $this->loadTemplate($templateName, $templatesDir);
-
-    // merge with console && merge with config
-    $template->setParameters(Arrays::merge($template->getParameters(), $parameters));
-
-    return $template;
-  }
-
-  /**
-   * @param string $templateName
-   * @param string $templatesDir
-   *
-   * @return mixed
-   *
-   * @throws \Exception
-   */
-  public function loadTemplate($templateName, $templatesDir) {
-    $path = $this->getTemplatePath($templateName, $templatesDir);
-
-    if(!file_exists($path)) {
-      throw new \Exception("Template '$path' does not exist");
+    /**
+     * TemplateLoader constructor.
+     *
+     * @param Configurator $configurator
+     */
+    public function __construct(Configurator $configurator)
+    {
+        $this->configurator = $configurator;
     }
 
-    $contents = file_get_contents($path);
-    $data = Neon::decode($contents);
-    $template = new Template($templateName, $data);
+    /**
+     * @param string $templateName
+     * @param array $parameters
+     *
+     * @return Template
+     *
+     * @throws \Exception
+     */
+    public function getTemplate($templateName, array $parameters = array())
+    {
+        // load config
+        $config = $this->configurator->getConfig();
 
-    return $template;
-  }
+        // load template
+        $templatesDir = $config->getTemplates();
+        $template = $this->loadTemplate($templateName, $templatesDir);
 
-  /**
-   * @param string $templateName
-   * @param string $templatesDir
-   * 
-   * @return string
-   */
-  private function getTemplatePath($templateName, $templatesDir) {
-    return $templatesDir.DIRECTORY_SEPARATOR.$templateName.'.neon';
-  }
+        // merge with console && merge with config
+        $template->setParameters(Arrays::merge($template->getParameters(), $parameters));
+
+        return $template;
+    }
+
+    /**
+     * @param string $templateName
+     * @param string $templatesDir
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function loadTemplate($templateName, $templatesDir)
+    {
+        $path = $this->getTemplatePath($templateName, $templatesDir);
+
+        if (!file_exists($path)) {
+            throw new \Exception("Template '$path' does not exist");
+        }
+
+        $contents = file_get_contents($path);
+        $data = Neon::decode($contents);
+        $template = new Template($templateName, $data);
+
+        return $template;
+    }
+
+    /**
+     * @param string $templateName
+     * @param string $templatesDir
+     *
+     * @return string
+     */
+    private function getTemplatePath($templateName, $templatesDir)
+    {
+        return $templatesDir . DIRECTORY_SEPARATOR . $templateName . '.neon';
+    }
 
 }
