@@ -110,8 +110,7 @@ class Manager {
 
     // duplicates are not allowed
     if(file_exists($projectDir)) {
-      throw new \Exception("Duplicates are not allowed, project with name: $projectName and dir: 
-      $projectDir already exists");
+      throw new \Exception("Duplicates are not allowed, project with name: $projectName ['$projectDir']' already exists.");
     }
 
     // replacement parameters
