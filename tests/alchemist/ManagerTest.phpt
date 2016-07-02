@@ -110,17 +110,17 @@ class ManagerTest extends TestCase
             $result = $this->manager->createProject('foo', Template::DEFAULT_TEMPLATE);
 
             $this->assertManagerCreateProjectResult(
-                    $this->createManagerCreateProjectResult(
-                        [],
-                        [],
-                        [],
-                        [
-                            0 => [],
-                            1 => [
-                                0 => "Project '$projectName' was successfully created."
-                            ]
+                $this->createManagerCreateProjectResult(
+                    [],
+                    [],
+                    [],
+                    [
+                        0 => [],
+                        1 => [
+                            0 => "Project '$projectName' was successfully created."
                         ]
-                    ),
+                    ]
+                ),
                 $result
             );
             Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'www'));
@@ -156,8 +156,7 @@ class ManagerTest extends TestCase
         Assert::error(function () use ($projectName) {
             $this->manager->removeProject($projectName);
         },
-            '\Exception',
-            "Project '$projectName' does not exist and can not be removed.");
+            '\Exception');
     }
 
     public function testDuplicatesExpectsException()
@@ -224,8 +223,7 @@ class ManagerTest extends TestCase
                 )
             );
         },
-            '\Exception',
-            'Origin source \'noExistType\' does not exist.'
+            '\Exception'
         );
     }
 
