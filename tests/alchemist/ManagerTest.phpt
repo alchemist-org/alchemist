@@ -41,6 +41,9 @@ class ManagerTest extends TestCase
     const PROJECTS_DIR = TEMP__DIR__ . '/projects-dir';
 
     /** @var string */
+    const CONFIG_LOCAL = __DIR__ . '/data/config/config.local.neon';
+
+    /** @var string */
     const TEST_SOURCE_TYPE = 'fooType';
 
     /** @var array */
@@ -84,7 +87,10 @@ class ManagerTest extends TestCase
         \Tester\Helpers::purge(self::PROJECTS_DIR);
 
         $this->configurator = $this->container->getByType(Configurator::class);
+
+        // set array (because const used above in tests) but self::CONFIG_LOCAL reflect any change
         $this->configurator->setConfig(new Config($this->config));
+        $this->configurator->setConfigFile(self::CONFIG_LOCAL);
 
         $this->manager = $this->container->getByType(Manager::class);
     }
