@@ -20,7 +20,7 @@ use Alchemist\Manager;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class RemoveProjectCommand extends Command
+class TouchProjectCommand extends Command
 {
 
     /** @var Manager $manager */
@@ -40,8 +40,8 @@ class RemoveProjectCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('remove-project')
-            ->setDescription('Remove project')
+            ->setName('touch')
+            ->setDescription('Touch project')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'Project name')
             ));
@@ -53,7 +53,8 @@ class RemoveProjectCommand extends Command
 
         $name = $input->getArgument('name');
 
-        $manager->removeProject($name);
+        $result = $manager->touchProject($name);
+        $output->writeln($result);
     }
 
 }

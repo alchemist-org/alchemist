@@ -26,14 +26,52 @@ $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 
 Create `config.local.neon` and set up your `projects-dir`, eventually folder with `templates` and default `template` to use.
 
+###Self update
+
+```sh
+$ alchemist self-update
+```
+
 ###Create project
 
 ```sh
-$ alchemist create-project <name>
+$ alchemist create-project <name> [--template <name>] [--projects-dir <dir>] [--type <type='git'>] [--value <value>] [--force] [--save]
 ```
+
+Name | Explanation
+------------ | -------------
+<name> | Project name
+--template <name> | Template name
+--projects-dir <dir> | Projects dir
+--type <type> | Type, e.g. git, composer..
+--value <value> | Value, e.g. url, package-name..
+--force | Re-create alredy existing project
+--save | Save to distant sources
 
 ###Remove project
 
 ```sh
 $ alchemist remove-project <name>
+```
+
+Name | Comment
+------------ | -------------
+<name> | Project name
+
+
+###Install projects
+
+Alchemist
+
+```
+    distant-sources:
+        github:
+            alchemist:
+                origin-source:
+                    type: git
+                    url: https://github.com/alchemist-org/alchemist.git
+```
+
+```sh
+$ alchemist install
 ```

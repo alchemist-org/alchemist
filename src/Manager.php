@@ -10,173 +10,308 @@
  */
 
 namespace Alchemist;
+
 use Alchemist\Utils\Arrays;
 
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class Manager {
+class Manager
+{
 
-  /** @var Configurator */
-  private $configurator;
+    /** @var Configurator */
+    private $configurator;
 
-  /** @var TemplateLoader */
-  private $templateLoader;
+    /** @var TemplateLoader */
+    private $templateLoader;
 
-  /** @var string */
-  const BEFORE_CREATE = 'before_create';
+    /** @var string */
+    const BEFORE_CREATE = 'before_create';
 
-  /** @var string */
-  const AFTER_CREATE = 'after_create';
+    /** @var string */
+    const AFTER_CREATE = 'after_create';
 
-  /** @var string */
-  const CREATE = 'create';
+    /** @var string */
+    const BEFORE_REMOVE = 'before_remove';
 
-  /** @var string */
-  const CREATE_ORIGIN_SOURCE = 'create_origin_source';
+    /** @var string */
+    const AFTER_REMOVE = 'after_remove';
 
-  /**
-   * Manager constructor.
-   *
-   * @param Configurator $configurator
-   * @param TemplateLoader $templateLoader
-   */
-  public function __construct(Configurator $configurator, TemplateLoader $templateLoader) {
-    $this->configurator = $configurator;
-    $this->templateLoader = $templateLoader;
-  }
+    /** @var string */
+    const REMOVE = 'remove';
 
-  /**
-   * @param string $projectName
-   *
-   * @return array
-   */
-  public function removeProject($projectName) {
-    $result = [];
+    /** @var string */
+    const CREATE = 'create';
 
-    // get project dir
-    $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
+    /** @var string */
+    const CREATE_ORIGIN_SOURCE = 'create_origin_source';
 
-    // check if project exists
-    if(!file_exists($projectDir)) {
-      throw new \Exception("Project '$projectName' does not exist and can not be removed.");
+    /**
+     * Manager constructor.
+     *
+     * @param Configurator $configurator
+     * @param TemplateLoader $templateLoader
+     */
+    public function __construct(Configurator $configurator, TemplateLoader $templateLoader)
+    {
+        $this->configurator = $configurator;
+        $this->templateLoader = $templateLoader;
     }
 
-    // remove project (actually)
-    $result[] = Console::execute("rm -rf $projectDir");
+    /**
+     * @param string $projectName
+     *
+     * @return array
+     */
+    public function removeProject($projectName)
+    {
+        $result = [];
 
-    return $result;
-  }
+        $projectsDir = $this->configurator->getConfig()->getProjectsDir();
+        $projectDir = $this->getProjectDir($projectName, $projectsDir);
 
-  /**
-   * @param string $projectName
-   * @param string $projectsDir
-   *
-   * @return string
-   */
-  private function getProjectDir($projectName, $projectsDir) {
-    return $projectsDir.DIRECTORY_SEPARATOR.$projectName;
-  }
+        // check if project exists
+        if (!is_readable($projectDir)) {
+            throw new \Exception("Project $projectName can not be removed.");
+        }
 
-  /**
-   * @param string $projectName
-   * @param string|Template::DEFAULT_TEMPLATE|null $templateName
-   * @param array $parameters
-   *
-   * @return array
-   *
-   * @throws \Exception
-   */
-  public function createProject(
-    $projectName,
-    $templateName = Template::DEFAULT_TEMPLATE,
-    array $parameters = array()
-  ) {
-    $result = [];
+        // TODO: load used template from cache, load before_remove, after_remove
+        $templateName = null;
 
-    // use default template
-    if($templateName == Template::DEFAULT_TEMPLATE) {
-      $templateName = $this->configurator->getConfig()->getTemplateName();
+        // load template
+        $template = $templateName ? $this->templateLoader->getTemplate($templateName) : null;
+
+        // replacement parameters
+        $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig()->getParameters();
+
+        // add common replacement parameters
+        $replacementParameters['project-name'] = $projectName;
+        $replacementParameters['project-dir'] = $projectDir;
+
+        // run before remove
+        $result[self::BEFORE_REMOVE] = $template ? $this->runScript($template->getScript(self::BEFORE_REMOVE), $replacementParameters) : [];
+
+        // remove project (actually)
+        $result[self::REMOVE] = Console::execute("rm -rf $projectDir");
+
+        // run after remove
+        $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : [];
+
+        return $result;
     }
 
-    // merge config parameters with console parameters
-    $parameters = Arrays::merge($this->configurator->getConfig()->getParameters(), $parameters);
-
-    // load template
-    $template = $templateName ? $this->templateLoader->getTemplate($templateName, $parameters) : null;
-
-    // load projectDir
-    $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
-
-    // duplicates are not allowed
-    if(file_exists($projectDir)) {
-      throw new \Exception("Duplicates are not allowed, project with name: $projectName ['$projectDir']' already exists.");
+    /**
+     * @param string $projectName
+     * @param string $projectsDir
+     *
+     * @return string
+     */
+    private function getProjectDir($projectName, $projectsDir)
+    {
+        return $projectsDir . DIRECTORY_SEPARATOR . $projectName;
     }
 
-    // replacement parameters
-    $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig()->applyConsoleParameters($parameters);
+    /**
+     * @param string $projectName
+     * @param string|Template::DEFAULT_TEMPLATE|null $templateName
+     * @param array $parameters
+     * @param bool $save
+     * @param bool $force
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function createProject(
+        $projectName,
+        $templateName = Template::DEFAULT_TEMPLATE,
+        array $parameters = array(),
+        $save = true,
+        $force = false
+    )
+    {
+        $result = [];
 
-    // add common replacement parameters
-    $replacementParameters['project-name'] = $projectName;
-    $replacementParameters['project-dir'] = $projectDir;
+        // use default template
+        if ($templateName == Template::DEFAULT_TEMPLATE) {
+            $templateName = $this->configurator->getConfig()->getTemplateName();
+        }
 
-    // run before_create
-    if($template) {
-      $result[self::BEFORE_CREATE] = $this->runScript($template->getScript(self::BEFORE_CREATE),
-        $replacementParameters);
-    } else {
-      $result[self::BEFORE_CREATE] = [];
+        // merge config parameters with console parameters
+        $parameters = Arrays::merge($this->configurator->getConfig()->getParameters(), $parameters);
+
+        // load template
+        $template = $templateName ? $this->templateLoader->getTemplate($templateName, $parameters) : null;
+
+        // load projectDir
+        $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
+
+        // duplicates are not allowed, if is force enable, remove project
+        if (file_exists($projectDir)) {
+            if ($force) {
+                $this->removeProject($projectName);
+            } else {
+                throw new \Exception("Project '$projectName' ['$projectDir'] already exists.");
+            }
+        }
+
+        // replacement parameters
+        $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig()->applyConsoleParameters($parameters);
+
+        // add common replacement parameters
+        $replacementParameters['project-name'] = $projectName;
+        $replacementParameters['project-dir'] = $projectDir;
+
+        // run before_create
+        $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : [];
+
+        // create project (actually)
+        $result[self::CREATE] = Console::execute("mkdir $projectDir");
+
+        // load origin source
+        $originSource = $template && isset($template->getParameters()['origin-source']) ? $template->getParameter('origin-source') : $this->configurator->getConfig()->getParameter('origin-source');
+        $sourceTypes = $this->configurator->getConfig()->getSourceTypes();
+
+        // load project from origin source (actually)
+        $originSourceType = $originSource['type'];
+        if ($originSourceType) {
+            if (!isset($sourceTypes[$originSourceType])) {
+                throw new \Exception("Source type '$originSourceType' does not exist.");
+            }
+
+            // add specific replacement parameters
+            $originSourceParameters = $originSource;
+            unset($originSourceParameters['types']);
+            $replacementParametersOriginSource = Arrays::merge($replacementParameters, $originSourceParameters);
+
+            $result[self::CREATE_ORIGIN_SOURCE] = $this->runScript($sourceTypes[$originSourceType], $replacementParametersOriginSource);
+        } else {
+            $result[self::CREATE_ORIGIN_SOURCE] = [];
+        }
+
+        // run after create
+        $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : [];
+
+        // save to default distant-source
+        if ($save) {
+            $config = $this->configurator->getConfig();
+            $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, array(
+                    $projectName => array(
+                        'origin-source' => array(
+                            'type' => $originSourceType,
+                            'value' => $originSource['value'],
+                        )
+                    )
+                )
+            );
+
+            $this->configurator->setConfig($config);
+        }
+
+        return $result;
     }
 
-    // create project (actually)
-    $result[self::CREATE] = Console::execute("mkdir $projectDir");
+    /**
+     * @param array|string|null $script
+     * @param array $replaceParameters
+     *
+     * @return array
+     */
+    public function runScript($script, $replaceParameters = array())
+    {
+        // string -> array
+        $script = is_string($script) ? array($script) : $script;
 
-    // load origin source
-    $originSource = $template && isset($template->getParameters()['origin-source']) ? $template->getParameter('origin-source') : $this->configurator->getConfig()->getParameter('origin-source');
-
-    // load project from origin source (actually)
-    $originSourceType = $originSource['type'];
-    if($originSourceType) {
-
-      if (!isset($originSource['types'][$originSourceType])) {
-        throw new \Exception("Origin source '$originSourceType' does not exist.");
-      }
-
-      // add specific replacement parameters
-      $originSourceParameters = $originSource;
-      unset($originSourceParameters['types']);
-      $replacementParametersOriginSource = Arrays::merge($replacementParameters, $originSourceParameters);
-
-      $result[self::CREATE_ORIGIN_SOURCE] = $this->runScript($originSource['types'][$originSourceType], $replacementParametersOriginSource);
-    } else {
-      $result[self::CREATE_ORIGIN_SOURCE] = [];
+        $result = [];
+        foreach ($script as $scriptLine) {
+            // filter out what is not a string
+            $replaceParametersFiltered = array_filter($replaceParameters, function ($value) {
+                return is_string($value) ? $value : null;
+            });
+            $scriptLine = Parser::parse($scriptLine, $replaceParametersFiltered);
+            $result[] = Console::execute($scriptLine);
+        }
+        return $result;
     }
 
-    // run after create
-    if($template) {
-      $result[self::AFTER_CREATE] = $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters);
-    } else {
-      $result[self::AFTER_CREATE] = [];
+    /**
+     * @param string $name
+     * @param array $data
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function setDistantSource($name, $data)
+    {
+        return $this->configurator->getConfig()->setDistantSource($name, $data);
     }
 
-    return $result;
-  }
+    /**
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function install()
+    {
+        $result = [];
 
-  /**
-   * @param array|string $script
-   * @param array $replaceParameters
-   *
-   * @return array
-   */
-  public function runScript($script, $replaceParameters = array()) {
-    $script = is_string($script) ? array($script) : $script;
+        // load all distant sources
+        foreach ($this->configurator->getConfig()->getDistantSources() as $distantSourceName => $distantSource) {
 
-    $result = [];
-    foreach($script as $index => $scriptLine) {
-      $scriptLine = Parser::parse($scriptLine, $replaceParameters);
-      $result[] = Console::execute($scriptLine);
+            // [ CLEAR INSTALL ]
+            foreach ($distantSource as $projectName => $projectData) {
+
+                // load templateName
+                $templateName = isset($projectData['core']['template']) ? $projectData['core']['template'] : null;
+
+                // load originSource
+                $originSource = isset($projectData['origin-source']) ? $projectData['origin-source'] : array();
+
+                // create project
+                $result = $this->createProject($projectName, $templateName, array(
+                    'origin-source' => $originSource
+                ),
+                    false,
+                    true
+                );
+
+                // add result
+                $result[$distantSourceName] = $result;
+            }
+        }
+
+        return $result;
     }
-    return $result;
-  }
+
+    public function update()
+    {
+        // TODO: update
+    }
+
+    public function upgrade()
+    {
+        // TODO: upgrade
+    }
+
+    /**
+     * @param string $projectName
+     *
+     * @return string
+     */
+    public function touchProject($projectName)
+    {
+        $projectsDir = $this->configurator->getConfig()->getProjectsDir();
+        $projectDir = $this->getProjectDir($projectName, $projectsDir);
+        return !is_readable($projectDir) ? "" : $projectDir;
+    }
+
+    /**
+     * @return void
+     */
+    public function selfUpdate()
+    {
+        $this->runScript("git pull origin master");
+    }
 
 }

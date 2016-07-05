@@ -24,13 +24,16 @@ class Configurator {
   /** @var null|string */
   private $configFile = null;
 
+  /** @var string */
+  const DEFAULT_LOCAL_CONFIG_FILE = __DIR__ .'/Config/config.local.neon';
+
   /**
    * Configurator constructor.
    *
    * @param string $configFile
    */
   public function __construct($configFile = null) {
-    $this->configFile = $configFile;
+    $this->configFile = $configFile ? $configFile : self::DEFAULT_LOCAL_CONFIG_FILE;
   }
 
   /**
@@ -44,9 +47,14 @@ class Configurator {
 
   /**
    * @param Config $config
+   * @param bool $save
    */
-  public function setConfig(Config $config) {
+  public function setConfig(Config $config, $save = true) {
     $this->config = $config;
+
+    if($save) {
+      $this->saveConfigData();
+    }
   }
 
   /**
@@ -79,6 +87,24 @@ class Configurator {
     $config = Neon::decode($contents);
 
     return $config;
+  }
+
+  private function saveConfigData() {
+    if(file_exists($this->configFile)) {
+      $configData = $this->config->getConfig();
+
+      // TODO: filter null values
+      foreach($configData as $key => $value) {
+        if(is_null($value)) {
+          unset($configData[$key]);
+        }
+      }
+
+      // TODO: filter default values which was not overwrited
+
+      $content = Neon::encode($configData, array(Neon::BLOCK));
+      file_put_contents($this->configFile, $content);
+    }
   }
 
 }

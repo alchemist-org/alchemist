@@ -11,7 +11,6 @@
 
 namespace Alchemist\Console\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
@@ -20,7 +19,7 @@ use Alchemist\Manager;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class RemoveProjectCommand extends Command
+class UpgradeCommand extends Command
 {
 
     /** @var Manager $manager */
@@ -40,20 +39,15 @@ class RemoveProjectCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('remove-project')
-            ->setDescription('Remove project')
-            ->setDefinition(array(
-                new InputArgument('name', InputArgument::REQUIRED, 'Project name')
-            ));
+            ->setName('upgrade')
+            ->setDescription('Upgrade projects');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $manager = $this->manager;
 
-        $name = $input->getArgument('name');
-
-        $manager->removeProject($name);
+        $manager->upgrade();
     }
 
 }

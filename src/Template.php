@@ -40,9 +40,9 @@ class Template {
    * Template constructor.
    *
    * @param string $name
-   * @param null|array $data
+   * @param array $data
    */
-  public function __construct($name, $data = null) {
+  public function __construct($name, array $data = array()) {
     $this->name = $name;
     $this->data = $data ? Arrays::merge($this->default, $data) : $this->default;
   }
@@ -69,7 +69,7 @@ class Template {
    * @return mixed
    */
   public function getScript($name) {
-    return $this->data[$name] ? $this->data[$name] : array();
+    return isset($this->data[$name]) ? $this->data[$name] : array();
   }
 
   /**

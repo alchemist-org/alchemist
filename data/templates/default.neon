@@ -1,5 +1,2 @@
-before_create:
-
 after_create:
-  - mkdir <projects-dir>/<project-name>/after_create
   - echo "Project '<project-name>' was successfully created."
