@@ -86,7 +86,7 @@ class Configurator {
     $contents = file_get_contents($this->configFile);
     $config = Neon::decode($contents);
 
-    return $config;
+    return $config ? $config : array();
   }
 
   private function saveConfigData() {
@@ -94,11 +94,6 @@ class Configurator {
       $configData = $this->config->getConfig();
 
       // TODO: filter null values
-      foreach($configData as $key => $value) {
-        if(is_null($value)) {
-          unset($configData[$key]);
-        }
-      }
 
       // TODO: filter default values which was not overwrited
 

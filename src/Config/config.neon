@@ -9,8 +9,6 @@ services:
         setup:
             - addCommands([
                 @installCommand,
-                @updateCommand,
-                @upgradeCommand,
                 @touchProjectCommand,
                 @createProjectCommand,
                 @removeProjectCommand,
@@ -19,10 +17,6 @@ services:
 
     installCommand:
         class: Alchemist\Console\Command\InstallCommand
-    updateCommand:
-        class: Alchemist\Console\Command\UpdateCommand
-    upgradeCommand:
-        class: Alchemist\Console\Command\UpgradeCommand
     touchProjectCommand:
         class: Alchemist\Console\Command\TouchProjectCommand
     createProjectCommand:

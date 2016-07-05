@@ -40,7 +40,9 @@ class Config extends Object
                 'git' => 'git clone <value> <project-dir>'
             ),
         ),
-        'distant-sources' => array()    #optional ['list of dissources used during install, update, upgrade']
+        'distant-sources' => array(
+            'default' => array()
+        )
     );
 
     /**

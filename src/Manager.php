@@ -298,16 +298,6 @@ class Manager
         return $result;
     }
 
-    public function update()
-    {
-        // TODO: update
-    }
-
-    public function upgrade()
-    {
-        // TODO: upgrade
-    }
-
     /**
      * @param string $projectName
      *
@@ -326,6 +316,8 @@ class Manager
     public function selfUpdate()
     {
         $this->runScript("git pull origin master");
+
+        //TODO: purge cached generated container
     }
 
 }
