@@ -114,4 +114,9 @@ class Config extends Object
         return $this->config;
     }
 
+    public function removeDistantSource($name)
+    {
+        unset($this->config['distant-sources'][$name]);
+    }
+
 }

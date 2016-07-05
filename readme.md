@@ -46,7 +46,7 @@ Name | Explanation
 --type <type> | Type, e.g. git, composer..
 --value <value> | Value, e.g. url, package-name..
 --force | Re-create alredy existing project
---save | Save to distant sources
+--save | Save change to distant sources
 
 ###Remove project
 
@@ -57,7 +57,7 @@ $ alchemist remove-project <name>
 Name | Comment
 ------------ | -------------
 <name> | Project name
-
+--save | Save change to distant sources
 
 ###Install projects
 

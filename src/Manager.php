@@ -60,10 +60,11 @@ class Manager
 
     /**
      * @param string $projectName
+     * @param bool $save
      *
      * @return array
      */
-    public function removeProject($projectName)
+    public function removeProject($projectName, $save = true)
     {
         $result = [];
 
@@ -96,6 +97,19 @@ class Manager
 
         // run after remove
         $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : [];
+
+        // remove from distant source
+        if($save) {
+            $config = $this->configurator->getConfig();
+
+            $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+            $config->removeDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+            unset($distantSourceData[$projectName]);
+            $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, array(
+                    $distantSourceData
+                )
+            );
+        }
 
         return $result;
     }

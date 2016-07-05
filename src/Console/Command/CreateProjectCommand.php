@@ -50,7 +50,7 @@ class CreateProjectCommand extends Command
                 new InputOption('type', null, InputOption::VALUE_REQUIRED, 'Type, e.g. git, composer..'),
                 new InputOption('value', null, InputOption::VALUE_REQUIRED, 'Value, e.g. url, package-name..'),
                 new InputOption('force', 'f', InputOption::VALUE_NONE, 'Re-create alredy existing project'),
-                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save to distant sources')
+                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save change to distant sources')
             ));
     }
 

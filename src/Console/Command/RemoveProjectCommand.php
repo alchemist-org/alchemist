@@ -13,6 +13,7 @@ namespace Alchemist\Console\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Alchemist\Manager;
@@ -43,7 +44,8 @@ class RemoveProjectCommand extends Command
             ->setName('remove-project')
             ->setDescription('Remove project')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::REQUIRED, 'Project name')
+                new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
+                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save change to distant sources')
             ));
     }
 
@@ -52,8 +54,9 @@ class RemoveProjectCommand extends Command
         $manager = $this->manager;
 
         $name = $input->getArgument('name');
+        $save = $input->getArgument('save');
 
-        $manager->removeProject($name);
+        $manager->removeProject($name, $save);
     }
 
 }
