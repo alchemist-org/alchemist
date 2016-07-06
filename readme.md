@@ -24,16 +24,76 @@ $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 
 ###Set up
 
-Create `config.local.neon` and set up your `projects-dir`, eventually folder with `templates` and default `template` to use.
+Create and set up `config.local.neon`. For example:
+
+```
+parameters:  # default parameters, could be overwritten in templates
+    projects-dir: /usr/share/nginx/alchemist/tests/temp/test29794/projects-dir
+    origin-source:
+        type: git
+        value: https://github.com/nette/web-project
+
+core:
+    template: common
+    templates: /usr/share/nginx/alchemist/data/templates
+    source-types:
+
+        # default types
+        #composer: composer create-project <value> <project-dir>
+        #git: git clone <value> <project-dir>
+
+        # your own type
+        specialSourceType:
+            - mkdir <project-dir>/www
+            - echo Succesfully processed specialSourceType
+
+distant-sources:
+    # default group, new projects with save add here
+    default:
+
+    alchemist-org:
+        alchemist:
+            origin-source:
+            type: git
+            url: https://github.com/alchemist-org/alchemist.git
+```
+
+
+###Self update
+
+```sh
+$ alchemist self-update
+```
 
 ###Create project
 
 ```sh
-$ alchemist create-project <name>
+$ alchemist create-project <name> [--template <name>] [--projects-dir <dir>] [--type <type>] [--value <value>] [--force] [--save]
 ```
+
+Name | Explanation
+------------ | -------------
+<name> | Project name
+--template <name> | Template name
+--projects-dir <dir> | Projects dir
+--type <type> | Type, e.g. git, composer..
+--value <value> | Value, e.g. url, package-name..
+--force | Re-create already existing project
+--save | Save change to distant sources
 
 ###Remove project
 
 ```sh
 $ alchemist remove-project <name>
+```
+
+Name | Comment
+------------ | -------------
+<name> | Project name
+--save | Save change to distant sources
+
+###Install projects
+
+```sh
+$ alchemist install
 ```

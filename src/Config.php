@@ -26,20 +26,22 @@ class Config extends Object
     /** @var array */
     private $default = array(
         'parameters' => array(
-            'projects-dir' => null,  #required ['projects location']
+            'projects-dir' => null,
             'origin-source' => array(
-                'types' => array(      #the most usage as defaults
-                    'composer' => 'composer create-project <name> <project-dir>',
-                    'git' => 'git clone <url> <project-dir>'
-                ),
-                'type' => null,    #optional ['means default origin-source type, required when is origin-source used']
-                'url' => null,      #optional ['required when is used to parse inside type <url>']
-                'name' => null      #optional ['required when is used to parse inside type <name>']
+                'type' => null,
+                'value' => null
             )
         ),
         'core' => array(
-            'template' => null,   #optional ['by default is template not set']
-            'templates' => null   #optional ['templates folder is required when is needed']
+            'template' => 'default',
+            'templates' => __DIR__ . '/../data/templates',
+            'source-types' => array(
+                'composer' => 'composer create-project <value> <project-dir>',
+                'git' => 'git clone <value> <project-dir>'
+            ),
+        ),
+        'distant-sources' => array(
+            'default' => array()
         )
     );
 
@@ -64,6 +66,16 @@ class Config extends Object
         return $this->config['core']['templates'];
     }
 
+    public function getSourceTypes()
+    {
+        return $this->config['core']['source-types'];
+    }
+
+    public function getSourceType($name)
+    {
+        return $this->config['core']['source-types'][$name];
+    }
+
     public function getProjectsDir()
     {
         return $this->config['parameters']['projects-dir'];
@@ -82,6 +94,26 @@ class Config extends Object
     public function getParameter($name)
     {
         return $this->config['parameters'][$name];
+    }
+
+    public function getDistantSources()
+    {
+        return $this->config['distant-sources'];
+    }
+
+    public function getDistantSource($name)
+    {
+        return isset($this->config['distant-sources'][$name]) ? $this->config['distant-sources'][$name] : null;
+    }
+
+    public function setDistantSource($name, $data)
+    {
+        $this->config['distant-sources'][$name] = $data;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
     }
 
 }

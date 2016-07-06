@@ -1,5 +1,7 @@
 <?php
 
+namespace Alchemist;
+
 /*
  * This file is part of Alchemist.
  *
@@ -9,23 +11,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Alchemist;
-
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class Console
-{
+class DistantSource {
 
-  /**
-   * @param string $cmd
-   *
-   * @return string
-   */
-  public static function execute($cmd) {
-    $result = array();
-    exec($cmd, $result);
-    return $result;
-  }
+  /** @var string */
+  const DEFAULT_DISTANT_SOURCE = 'default';
 
 }

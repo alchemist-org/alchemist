@@ -1,0 +1,4 @@
+before_create:
+
+after_create:
+  - echo "Project '<project-name>' was successfully created."

@@ -28,15 +28,13 @@ class CreateProjectCommand extends Command
     private $manager;
 
     /**
-     * @param null|string $name
      * @param Manager $manager
      */
     public function __construct(
-        $name = null,
         Manager $manager
     )
     {
-        parent::__construct($name);
+        parent::__construct();
         $this->manager = $manager;
     }
 
@@ -47,11 +45,12 @@ class CreateProjectCommand extends Command
             ->setDescription('Create project')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
-                new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template'),
+                new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template name'),
                 new InputOption('projects-dir', 'd', InputOption::VALUE_REQUIRED, 'Projects dir'),
-                new InputOption('origin-source.name', 'name', InputOption::VALUE_REQUIRED, 'Origin source name used in default type composer as package name'),
-                new InputOption('origin-source.type', 'type', InputOption::VALUE_REQUIRED, 'Origin source type'),
-                new InputOption('origin-source.url', 'url', InputOption::VALUE_REQUIRED, 'Origin source url used in default type git')
+                new InputOption('type', null, InputOption::VALUE_REQUIRED, 'Type, e.g. git, composer..'),
+                new InputOption('value', null, InputOption::VALUE_REQUIRED, 'Value, e.g. url, package-name..'),
+                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Re-create alredy existing project'),
+                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save change to distant sources')
             ));
     }
 
@@ -60,18 +59,20 @@ class CreateProjectCommand extends Command
         $manager = $this->manager;
 
         $name = $input->getArgument('name');
-        $template = $input->getOption('template');
+
+        $templateName = $input->getOption('template');
+        $force = $input->getOption('force');
+        $save = $input->getOption('save');
 
         $options = array(
             'projects-dir' => $input->getOption('projects-dir'),
             'origin-source' => array(
-                'name' => $input->getOption('origin-source.name'),
-                'type' => $input->getOption('origin-source.type'),
-                'url' => $input->getOption('origin-source.url'),
+                'type' => $input->getOption('type'),
+                'value' => $input->getOption('value')
             )
         );
 
-        $manager->createProject($name, $template, $options);
+        $manager->createProject($name, $templateName, $options, $save, $force);
     }
 
 }

@@ -11,9 +11,7 @@
 
 namespace Alchemist\Console\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Alchemist\Manager;
@@ -21,7 +19,7 @@ use Alchemist\Manager;
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class RemoveProjectCommand extends Command
+class SelfUpdateCommand extends Command
 {
 
     /** @var Manager $manager */
@@ -41,23 +39,15 @@ class RemoveProjectCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('remove-project')
-            ->setDescription('Remove project')
-            ->setDefinition(array(
-                new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
-                new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
-                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save change to distant sources')
-            ));
+            ->setName('self-update')
+            ->setDescription('Self update projects');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $manager = $this->manager;
 
-        $name = $input->getArgument('name');
-        $save = $input->getArgument('save');
-
-        $manager->removeProject($name, $save);
+        $manager->selfUpdate();
     }
 
 }

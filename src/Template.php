@@ -74,7 +74,7 @@ class Template
      */
     public function getScript($name)
     {
-        return $this->data[$name] ? $this->data[$name] : array();
+        return isset($this->data[$name]) ? $this->data[$name] : array();
     }
 
     /**

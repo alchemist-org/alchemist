@@ -73,7 +73,7 @@ class TemplateLoader
         }
 
         $contents = file_get_contents($path);
-        $data = Neon::decode($contents);
+        $data = Neon::decode($contents) ? Neon::decode($contents) : array();
         $template = new Template($templateName, $data);
 
         return $template;
