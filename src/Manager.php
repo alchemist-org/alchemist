@@ -76,8 +76,15 @@ class Manager
             throw new \Exception("Project $projectName can not be removed.");
         }
 
-        // TODO: load used template from cache, load before_remove, after_remove
+        // load template
         $templateName = null;
+        foreach ($this->configurator->getConfig()->getDistantSources() as $distantSource) {
+            foreach ($distantSource as $distantSourceProjectName => $projectData) {
+                if ($distantSourceProjectName == $projectName) {
+                    $templateName = isset($projectData['template']) ? $projectData['template'] : null;
+                }
+            }
+        }
 
         // load template
         $template = $templateName ? $this->templateLoader->getTemplate($templateName) : null;
@@ -99,16 +106,20 @@ class Manager
         $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : [];
 
         // remove from distant source
-        if($save) {
+        if ($save) {
             $config = $this->configurator->getConfig();
 
-            $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
-            $config->removeDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
-            unset($distantSourceData[$projectName]);
-            $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, array(
-                    $distantSourceData
-                )
-            );
+            foreach ($this->configurator->getConfig()->getDistantSources() as $distantSourceName => $distantSourceData) {
+                foreach ($distantSourceData as $distantSourceProjectName => $projectData) {
+                    if ($projectName == $distantSourceProjectName) {
+                        unset($distantSourceData[$projectName]);
+                        $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, array(
+                                $distantSourceData
+                            )
+                        );
+                    }
+                }
+            }
         }
 
         return $result;
@@ -140,7 +151,7 @@ class Manager
         $projectName,
         $templateName = Template::DEFAULT_TEMPLATE,
         array $parameters = array(),
-        $save = true,
+        $save = false,
         $force = false
     )
     {
@@ -206,18 +217,18 @@ class Manager
         // run after create
         $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : [];
 
-        // save to default distant-source
+        // save project to default distant-source
         if ($save) {
             $config = $this->configurator->getConfig();
-            $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, array(
-                    $projectName => array(
-                        'origin-source' => array(
-                            'type' => $originSourceType,
-                            'value' => $originSource['value'],
-                        )
-                    )
+
+            $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+            $distantSourceData[$projectName] = array(
+                'origin-source' => array(
+                    'type' => $originSourceType,
+                    'value' => $originSource['value'],
                 )
             );
+            $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
 
             $this->configurator->setConfig($config);
         }

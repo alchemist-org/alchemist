@@ -44,7 +44,10 @@ class ManagerTest extends TestCase
     const CONFIG_LOCAL = __DIR__ . '/data/config/config.local.neon';
 
     /** @var string */
-    const TEST_SOURCE_TYPE = 'fooType';
+    const TEST_PROJECT = 'test';
+
+    /** @var string */
+    const TEST_PROJECT_SOURCE_TYPE = 'fooType';
 
     /** @var array */
     private $config = array(
@@ -56,7 +59,7 @@ class ManagerTest extends TestCase
             'template' => 'common',
             'templates' => __DIR__ . '/data/templates',
             'source-types' => array(
-                self::TEST_SOURCE_TYPE => array(
+                self::TEST_PROJECT_SOURCE_TYPE => array(
                     'mkdir <project-dir>/<project-name>',
                     'echo <project-name>'
                 )
@@ -65,9 +68,10 @@ class ManagerTest extends TestCase
         'distant-sources' => array(
             'default' => array(),
             'github' => array(
-                'test' => array(
+                self::TEST_PROJECT => array(
+                    'template' => 'common',
                     'origin-source' => array(
-                        'type' => self::TEST_SOURCE_TYPE
+                        'type' => self::TEST_PROJECT_SOURCE_TYPE
                     )
                 )
             )
@@ -122,7 +126,7 @@ class ManagerTest extends TestCase
     {
         $projectName = 'foo';
         Assert::noError(function () use ($projectName) {
-            $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array());
+            $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(), true);
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
         });
@@ -167,10 +171,10 @@ class ManagerTest extends TestCase
 
     public function testRemoveProject()
     {
-        $projectName = 'foo';
+        $projectName = self::TEST_PROJECT;
 
         Assert::noError(function () use ($projectName) {
-            $this->manager->createProject($projectName);
+            $this->manager->createProject($projectName, null, array(), true);
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
             Assert::truthy($this->manager->touchProject($projectName));
             $this->manager->removeProject($projectName);
@@ -215,7 +219,7 @@ class ManagerTest extends TestCase
                 null,
                 array(
                     'origin-source' => array(
-                        'type' => self::TEST_SOURCE_TYPE,
+                        'type' => self::TEST_PROJECT_SOURCE_TYPE,
                         'name' => $originSourceName,
                     )
                 )

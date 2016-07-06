@@ -45,7 +45,7 @@ Name | Explanation
 --projects-dir <dir> | Projects dir
 --type <type> | Type, e.g. git, composer..
 --value <value> | Value, e.g. url, package-name..
---force | Re-create alredy existing project
+--force | Re-create already existing project
 --save | Save change to distant sources
 
 ###Remove project

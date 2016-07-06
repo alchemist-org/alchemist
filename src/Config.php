@@ -103,7 +103,7 @@ class Config extends Object
 
     public function getDistantSource($name)
     {
-        return $this->config['distant-sources'][$name];
+        return isset($this->config['distant-sources'][$name]) ? $this->config['distant-sources'][$name] : null;
     }
 
     public function setDistantSource($name, $data)
@@ -114,11 +114,6 @@ class Config extends Object
     public function getConfig()
     {
         return $this->config;
-    }
-
-    public function removeDistantSource($name)
-    {
-        unset($this->config['distant-sources'][$name]);
     }
 
 }
