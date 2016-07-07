@@ -109,6 +109,7 @@ class ManagerTest extends TestCase
    /* public function testCreateProject()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName);
             Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
@@ -119,6 +120,7 @@ class ManagerTest extends TestCase
     public function testCreateProjectAndForceRecreateNew()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(), null, false);
             Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
@@ -132,6 +134,7 @@ class ManagerTest extends TestCase
     public function testCreateProjectAndCheckSave()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(
                 'projects-dir' => self::PROJECTS_DIR
@@ -145,6 +148,7 @@ class ManagerTest extends TestCase
     public function testCreateProjectAndCheckSaveNotSave()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(), false);
             Assert::falsey($this->configurator->getConfig()->getDistantSource($projectName));
@@ -176,6 +180,7 @@ class ManagerTest extends TestCase
     public function testTouchProject()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName);
             $result = $this->manager->touchProject($projectName);
@@ -186,8 +191,9 @@ class ManagerTest extends TestCase
     public function testCreateProjectSetDefaultTemplateConst()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
-            $this->manager->createProject('foo', Template::DEFAULT_TEMPLATE);
+            $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE);
             Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
         });
     }
@@ -195,8 +201,9 @@ class ManagerTest extends TestCase
     public function testCreateProjectSetNoTemplate()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
-            $this->manager->createProject('foo', null);
+            $this->manager->createProject($projectName, null);
             Assert::false(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
         });
     }
@@ -209,15 +216,29 @@ class ManagerTest extends TestCase
             $this->manager->createProject($projectName, null, array(), true);
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
             Assert::truthy($this->manager->touchProject($projectName));
-            $this->manager->removeProject($projectName);
+            $this->manager->removeProject($projectName, true);
             Assert::falsey($this->manager->touchProject($projectName));
             Assert::falsey($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
+        });
+    }
+
+    public function testRemoveProjectNoSave()
+    {
+        $projectName = self::TEST_PROJECT;
+
+        Assert::noError(function () use ($projectName) {
+            $this->manager->createProject($projectName, null, array(), true);
+            Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
+            Assert::truthy($this->manager->touchProject($projectName));
+            $this->manager->removeProject($projectName);
+            Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
         });
     }
 
     public function testRemoveProjectWhichDoesNotExist()
     {
         $projectName = 'foo';
+
         Assert::error(function () use ($projectName) {
             $this->manager->removeProject($projectName);
         },
@@ -226,18 +247,13 @@ class ManagerTest extends TestCase
 
     public function testDuplicatesExpectsException()
     {
-        $this->manager->createProject('foo');
-        Assert::exception(function () {
-            $this->manager->createProject('foo');
+        $projectName = 'foo';
+
+        $this->manager->createProject($projectName);
+        Assert::exception(function () use ($projectName) {
+            $this->manager->createProject($projectName);
         },
             '\Exception');
-    }
-
-    public function testCreateProjectChangeProjectsDir()
-    {
-        Assert::noError(function () {
-            $this->manager->createProject('empty', 'empty');
-        });
     }
 
     public function testCreateProjectFromDistantSource()
