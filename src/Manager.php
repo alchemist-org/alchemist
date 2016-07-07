@@ -64,7 +64,7 @@ class Manager
      *
      * @return array
      */
-    public function removeProject($projectName, $save = true)
+    public function removeProject($projectName, $save = false)
     {
         $result = [];
 
@@ -235,13 +235,13 @@ class Manager
             $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
 
             // projects-dir
-         //   if(!isset(array_values($config->getProjectsDirs())[$projectDir])) {
+            if (!isset(array_values($config->getProjectsDirs())[$projectDir])) {
                 $projectsDirs = $config->getProjectsDirs();
 
                 $projectsDirPath = $this->configurator->getConfig()->getProjectsDir();
                 $projectsDirs[basename($projectsDirPath)] = $projectsDirPath;
                 $config->setProjectsDirs($projectsDirs);
-           // }
+            }
 
             $this->configurator->setConfig($config);
         }

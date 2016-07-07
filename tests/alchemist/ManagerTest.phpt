@@ -106,7 +106,7 @@ class ManagerTest extends TestCase
         $this->manager = $this->container->getByType(Manager::class);
     }
 
-   /* public function testCreateProject()
+    public function testCreateProject()
     {
         $projectName = 'foo';
 
@@ -115,7 +115,7 @@ class ManagerTest extends TestCase
             Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
             Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
         });
-    }*/
+    }
 
     public function testCreateProjectAndForceRecreateNew()
     {
