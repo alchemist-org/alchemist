@@ -68,14 +68,6 @@ class Manager
     {
         $result = [];
 
-        $projectsDir = $this->configurator->getConfig()->getProjectsDir();
-        $projectDir = $this->getProjectDir($projectName, $projectsDir);
-
-        // check if project exists
-        if (!is_readable($projectDir)) {
-            throw new \Exception("Project $projectName can not be removed.");
-        }
-
         // load template
         $templateName = null;
         foreach ($this->configurator->getConfig()->getDistantSources() as $distantSource) {
@@ -88,6 +80,14 @@ class Manager
 
         // load template
         $template = $templateName ? $this->templateLoader->getTemplate($templateName) : null;
+
+        $projectsDir = $this->configurator->getConfig()->getProjectsDir();
+        $projectDir = $this->getProjectDir($projectName, $projectsDir);
+
+        // check if project exists
+        if (!is_readable($projectDir)) {
+            throw new \Exception("Project $projectName can not be removed.");
+        }
 
         // replacement parameters
         $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig()->getParameters();
@@ -183,6 +183,9 @@ class Manager
         // replacement parameters
         $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig()->applyConsoleParameters($parameters);
 
+        // overwrite projects-dir, name to path
+        $replacementParameters['projects-dir'] = $this->configurator->getConfig()->getProjectsDir();
+
         // add common replacement parameters
         $replacementParameters['project-name'] = $projectName;
         $replacementParameters['project-dir'] = $projectDir;
@@ -217,18 +220,28 @@ class Manager
         // run after create
         $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : [];
 
-        // save project to default distant-source
+        // save
         if ($save) {
             $config = $this->configurator->getConfig();
 
+            // origin source
             $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
             $distantSourceData[$projectName] = array(
                 'origin-source' => array(
                     'type' => $originSourceType,
-                    'value' => $originSource['value'],
+                    'value' => $originSource['value']
                 )
             );
             $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
+
+            // projects-dir
+         //   if(!isset(array_values($config->getProjectsDirs())[$projectDir])) {
+                $projectsDirs = $config->getProjectsDirs();
+
+                $projectsDirPath = $this->configurator->getConfig()->getProjectsDir();
+                $projectsDirs[basename($projectsDirPath)] = $projectsDirPath;
+                $config->setProjectsDirs($projectsDirs);
+           // }
 
             $this->configurator->setConfig($config);
         }

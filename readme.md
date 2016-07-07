@@ -28,7 +28,7 @@ Create and set up `config.local.neon`. For example:
 
 ```
 parameters:  # default parameters, could be overwritten in templates
-    projects-dir: /usr/share/nginx/alchemist/tests/temp/test29794/projects-dir
+    projects-dir: nginx
     origin-source:
         type: git
         value: https://github.com/nette/web-project
@@ -36,6 +36,9 @@ parameters:  # default parameters, could be overwritten in templates
 core:
     template: common
     templates: /usr/share/nginx/alchemist/data/templates
+    project-dirs:
+        nginx: /usr/share/nginx
+        apache2: /var/www/
     source-types:
 
         # default types
@@ -47,15 +50,17 @@ core:
             - mkdir <project-dir>/www
             - echo Succesfully processed specialSourceType
 
+
 distant-sources:
-    # default group, new projects with save add here
+    # default group, new projects with save adds here
     default:
 
     alchemist-org:
         alchemist:
+            projects-dir: nginx
             origin-source:
-            type: git
-            url: https://github.com/alchemist-org/alchemist.git
+                type: git
+                url: https://github.com/alchemist-org/alchemist.git
 ```
 
 

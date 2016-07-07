@@ -39,6 +39,7 @@ class Config extends Object
                 'composer' => 'composer create-project <value> <project-dir>',
                 'git' => 'git clone <value> <project-dir>'
             ),
+            'projects-dirs' => array()
         ),
         'distant-sources' => array(
             'default' => array()
@@ -76,9 +77,36 @@ class Config extends Object
         return $this->config['core']['source-types'][$name];
     }
 
+    public function getProjectsDirs()
+    {
+        return $this->config['core']['projects-dirs'];
+    }
+
+    public function setProjectsDirs(array $projectsDirs = array())
+    {
+        $this->config['core']['projects-dirs'] = $projectsDirs;
+    }
+
+    public function getProjectsDirPath($name)
+    {
+        if(isset($this->getProjectsDirs()[$name])) {
+            return $this->getProjectsDirs()[$name];
+        }
+        return null;
+    }
+
     public function getProjectsDir()
     {
-        return $this->config['parameters']['projects-dir'];
+        $defaultProjectsDirNameOrPath = $this->config['parameters']['projects-dir'];
+
+        // is dir
+        if(file_exists($defaultProjectsDirNameOrPath)) {
+            return $defaultProjectsDirNameOrPath;
+        }
+
+        // is name, find assciate path
+        $result = $this->getProjectsDirPath($defaultProjectsDirNameOrPath);;
+        return $result;
     }
 
     public function getParameters()
