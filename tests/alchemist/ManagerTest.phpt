@@ -75,7 +75,6 @@ class ManagerTest extends TestCase
             'default' => array(),
             'github' => array(
                 self::TEST_PROJECT => array(
-                    'projects-dir' => 'default',
                     'template' => 'common',
                     'origin-source' => array(
                         'type' => self::TEST_PROJECT_SOURCE_TYPE
