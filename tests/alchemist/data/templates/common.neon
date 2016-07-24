@@ -1,12 +1,12 @@
 before_create:
-   - echo "Project '<project-name>' will be created.'
+   - echo "Project '<project-name>' will be created."
 
 after_create:
   - mkdir <projects-dir>/<project-name>/after_create
   - echo "Project '<project-name>' was successfully created."
 
 before_remove:
-    - echo "Project '<project-name>' will be removed.'
+    - echo "Project '<project-name>' will be removed."
 
 after_remove:
     - echo "Project '<project-name>' was successfully removed."
