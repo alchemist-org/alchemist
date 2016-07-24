@@ -62,6 +62,14 @@ class Configurator
     }
 
     /**
+     * @return null|string
+     */
+    public function getConfigFile()
+    {
+        return $this->configFile;
+    }
+
+    /**
      * @return Config
      *
      * @throws \Exception
@@ -97,12 +105,8 @@ class Configurator
 
     private function saveConfigData()
     {
-        if (file_exists($this->configFile)) {
-            $configData = $this->config->getConfig();
-
-            // TODO: filter null values
-
-            // TODO: filter default values which was not overwrited
+        if ($this->getConfigFile()) {
+            $configData = $this->config->getFilteredConfig();
 
             $content = Neon::encode($configData, array(Neon::BLOCK));
             file_put_contents($this->configFile, $content);

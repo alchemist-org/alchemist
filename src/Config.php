@@ -144,4 +144,78 @@ class Config extends Object
         return $this->config;
     }
 
+    public function getFilteredConfig()
+    {
+        $filteredConfig = $this->config;
+
+        // filter ignored values
+        $this->filterConfigData($filteredConfig, $this->default, function($key, $value, $defaultValue) {
+            return $this->isIgnoredValue($key, $value, $defaultValue);
+        });
+
+        // filter default
+        $this->filterConfigData($filteredConfig, $this->default, function($key, $value, $defaultValue) {
+            return $this->isDefaultValue($key, $value, $defaultValue);
+        });
+
+        return $filteredConfig;
+    }
+
+    /**
+     * @param array|mixed $array
+     * @param callable $filterFunction
+     *
+     * @return bool
+     */
+    public function filterConfigData(&$array, $defaultArray, callable $filterFunction)
+    {
+        if(!is_array($array)) {
+            return false;
+        }
+
+        foreach ($array as $key => &$value) {
+            if(array_key_exists($key, $defaultArray)) {
+                $this->filterConfigData($value, $defaultArray[$key], $filterFunction);
+
+                // if is array empty cus childs have been removed remove too
+                $result = call_user_func($filterFunction, $key, $value, $defaultArray[$key]);
+                if($result) {
+                    unset($array[$key]);
+                }
+            } else {
+                $this->filterConfigData($value, array(), $filterFunction);
+
+                // if is array empty cus childs have been removed remove too
+                $result = call_user_func($filterFunction, $key, $value, array());
+                if($result) {
+                    unset($array[$key]);
+                }
+            }
+        }
+
+        return (empty($array)) ? true : false;
+    }
+
+    /**
+     * @param string $key
+     * @param array|string|null $value
+     *
+     * @return bool
+     */
+    public function isIgnoredValue($key, $value, $defaultValue)
+    {
+        return ($value == '' || $value == null || empty($value)) ? true : false;
+    }
+
+    /**
+     * @param string $key
+     * @param array|string|null $value
+     *
+     * @return bool
+     */
+    public function isDefaultValue($key, $value, $defaultValue)
+    {
+        return ($value == $defaultValue) ? true : false;
+    }
+
 }
