@@ -217,7 +217,7 @@ class ManagerTest extends TestCase
             Assert::truthy($this->manager->touchProject($projectName));
             $this->manager->removeProject($projectName, true);
             Assert::falsey($this->manager->touchProject($projectName));
-            Assert::falsey($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
+            Assert::truthy(!isset($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]));
         });
     }
 
