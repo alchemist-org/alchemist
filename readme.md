@@ -11,12 +11,16 @@ Check [composer.json](https://github.com/alchemist-org/alchemist/blob/master/com
 
 ##Installation
 
-Install and make temporary or permanently (put the alias row to ~.bash_aliases or ~.bashrc) global alias:
+Install:
 
 ```sh
 $ git clone https://github.com/alchemist-org/alchemist.git <alchemist/location>
 $ cd <alchemist/location>
 $ composer install
+```
+
+Make temporary or permanently global alias (on Linux put the row to the ~.bash_aliases or ~.bashrc file):
+```
 $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 ```
 
