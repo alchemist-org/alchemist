@@ -19,7 +19,7 @@ $ cd <alchemist/location>
 $ composer install
 ```
 
-Make temporary or permanently global alias (on Linux put the row to the ~.bash_aliases or directly ~.bashrc file):
+Make temporary or permanent global alias (on Linux put the row to the ~.bash_aliases or directly ~.bashrc file):
 ```
 $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 ```
