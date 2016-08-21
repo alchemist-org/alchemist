@@ -12,6 +12,7 @@
 namespace Alchemist;
 
 use Alchemist\Utils\Arrays;
+use Nette\DI\ContainerLoader;
 
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
@@ -24,6 +25,9 @@ class Manager
 
     /** @var TemplateLoader */
     private $templateLoader;
+
+    /** @var ContainerLoader */
+    private $containerLoader;
 
     /** @var string */
     const BEFORE_CREATE = 'before_create';
@@ -51,11 +55,13 @@ class Manager
      *
      * @param Configurator $configurator
      * @param TemplateLoader $templateLoader
+     * @param ContainerLoader $containerLoader
      */
-    public function __construct(Configurator $configurator, TemplateLoader $templateLoader)
+    public function __construct(Configurator $configurator, TemplateLoader $templateLoader, ContainerLoader $containerLoader)
     {
         $this->configurator = $configurator;
         $this->templateLoader = $templateLoader;
+        $this->containerLoader = $containerLoader;
     }
 
     /**
