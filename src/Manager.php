@@ -339,9 +339,11 @@ class Manager
      */
     public function selfUpdate()
     {
+        // update
         $this->runScript("git pull origin master");
 
-        //TODO: purge cached generated container
+        // purge temp dir
+        \Tester\Helpers::purge(TEMP_DIR);
     }
 
 }

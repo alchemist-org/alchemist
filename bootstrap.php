@@ -13,15 +13,15 @@ use Nette\DI\ContainerLoader;
 
 require __DIR__.'/vendor/autoload.php';
 
-$logDir = __DIR__.'/log';
-$tempDir = __DIR__.'/temp';
-$config = __DIR__.'/src/Config/config.neon';
+define('LOG_DIR', __DIR__.'/log');
+define('TEMP_DIR', __DIR__.'/temp');
+define('CONFIG', __DIR__.'/src/Config/config.neon');
 
 // container
-$containerLoader = new ContainerLoader($tempDir);
-$class = $containerLoader->load(function($compiler) use ($config) {
+$containerLoader = new ContainerLoader(TEMP_DIR);
+$class = $containerLoader->load(function($compiler) {
   /** @var \Nette\DI\Compiler $compiler */
-  $compiler->loadConfig($config);
+  $compiler->loadConfig(CONFIG);
   return $compiler->compile();
 },
   '');
