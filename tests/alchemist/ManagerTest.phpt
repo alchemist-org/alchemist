@@ -99,8 +99,8 @@ class ManagerTest extends TestCase
         $this->configurator = $this->container->getByType(Configurator::class);
 
         // set array (because const used above in tests) but self::CONFIG_LOCAL reflect any change
+		$this->configurator->setConfigFile(self::CONFIG_LOCAL);
         $this->configurator->setConfig(new Config($this->config));
-        $this->configurator->setConfigFile(self::CONFIG_LOCAL);
 
         $this->manager = $this->container->getByType(Manager::class);
     }
