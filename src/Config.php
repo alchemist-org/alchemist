@@ -175,9 +175,12 @@ class Config extends Object
 
         foreach ($array as $key => &$value) {
             if(array_key_exists($key, $defaultArray)) {
-                $this->filterConfigData($value, $defaultArray[$key], $filterFunction);
+                $parentNode = $this->filterConfigData($value, $defaultArray[$key], $filterFunction);
 
-                // if is array empty cus childs have been removed remove too
+                if($parentNode) {
+                    unset($array[$key]);
+                }
+
                 $result = call_user_func($filterFunction, $key, $value, $defaultArray[$key]);
                 if($result) {
                     unset($array[$key]);
@@ -185,8 +188,7 @@ class Config extends Object
             } else {
                 $this->filterConfigData($value, array(), $filterFunction);
 
-                // if is array empty cus childs have been removed remove too
-                $result = call_user_func($filterFunction, $key, $value, array());
+                $result = call_user_func($filterFunction, $key, $value, null);
                 if($result) {
                     unset($array[$key]);
                 }
@@ -215,7 +217,7 @@ class Config extends Object
      */
     public function isDefaultValue($key, $value, $defaultValue)
     {
-        return ($value == $defaultValue) ? true : false;
+        return $defaultValue ? $value == $defaultValue : false;
     }
 
 }

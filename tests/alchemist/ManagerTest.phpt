@@ -69,6 +69,13 @@ class ManagerTest extends TestCase
             ),
             'projects-dirs' => array(
                self::PROJECT_DIR_NAME => self::PROJECTS_DIR
+            ),
+            'test' => array(
+                'test' => array(
+                    'test' => array(
+                        'test' => array()
+                    )
+                )
             )
         ),
         'distant-sources' => array(
