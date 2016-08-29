@@ -62,6 +62,8 @@ class Manager
      * @param string $projectName
      * @param bool $save
      *
+     * @throws \Exception
+     *
      * @return array
      */
     public function removeProject($projectName, $save = false)
@@ -86,7 +88,7 @@ class Manager
 
         // check if project exists
         if (!is_readable($projectDir)) {
-            throw new \Exception("Project $projectName can not be removed.");
+            throw new \Exception("Project '$projectName' can not be removed.");
         }
 
         // replacement parameters
@@ -277,8 +279,6 @@ class Manager
      * @param array $data
      *
      * @return mixed
-     *
-     * @throws \Exception
      */
     public function setDistantSource($name, $data)
     {
@@ -287,8 +287,6 @@ class Manager
 
     /**
      * @return array
-     *
-     * @throws \Exception
      */
     public function install()
     {

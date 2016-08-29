@@ -67,6 +67,11 @@ class Config extends Object
         return $this->config['core']['templates'];
     }
 
+    public function setTemplates()
+    {
+        $this->config['core']['tepmplates'];
+    }
+
     public function getSourceTypes()
     {
         return $this->config['core']['source-types'];
@@ -99,14 +104,11 @@ class Config extends Object
     {
         $defaultProjectsDirNameOrPath = $this->config['parameters']['projects-dir'];
 
-        // is dir
-        if(file_exists($defaultProjectsDirNameOrPath)) {
-            return $defaultProjectsDirNameOrPath;
+        if($this->getProjectsDirPath($defaultProjectsDirNameOrPath)) {
+            return $this->getProjectsDirPath($defaultProjectsDirNameOrPath);
         }
 
-        // is name, find assciate path
-        $result = $this->getProjectsDirPath($defaultProjectsDirNameOrPath);;
-        return $result;
+        return $defaultProjectsDirNameOrPath;
     }
 
     public function getParameters()
@@ -116,7 +118,14 @@ class Config extends Object
 
     public function applyConsoleParameters(array $parameters = array())
     {
-        return $this->config['parameters'] = Arrays::merge($this->config['parameters'], $parameters);
+        $filteredParameters = $parameters;
+
+        // filter ignored values
+        $this->filterConfigData($filteredParameters, $this->config['parameters'], function($key, $value, $defaultValue) {
+            return $this->isIgnoredValue($key, $value, $defaultValue);
+        });
+
+        return $this->config['parameters'] = Arrays::merge($this->config['parameters'], $filteredParameters);
     }
 
     public function getParameter($name)
