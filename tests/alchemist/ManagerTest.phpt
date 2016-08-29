@@ -16,7 +16,6 @@ use Alchemist\Configurator;
 use Alchemist\DistantSource;
 use Alchemist\Manager;
 use Alchemist\Template;
-use Nette\DI\Config\Helpers;
 use Nette\DI\Container;
 use Tester\Assert;
 use Tester\TestCase;
