@@ -318,8 +318,21 @@ class ManagerTest extends TestCase
 
     public function testInstall()
     {
+        $projectName = 'test';
+
         $this->manager->install();
-        Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . 'test'));
+
+        Assert::truthy($this->manager->touchProject($projectName));
+    }
+
+    public function testTouchProjects()
+    {
+        $this->manager->createProject('foo');
+        $this->manager->createProject('bar');
+
+        $result = $this->manager->touchProjects();
+
+        Assert::truthy($result);
     }
 
 }

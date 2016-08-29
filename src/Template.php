@@ -28,6 +28,9 @@ class Template
     /** @var array */
     private $default = array(
         'parameters' => array(),
+        'touch' => array(
+            "echo '<project-name>': '<projects-dir>/<project-name>'"
+        ),
         'before_remove' => array(),
         'after_remove' => array(),
         'before_create' => array(),
@@ -40,10 +43,10 @@ class Template
     /**
      * Template constructor.
      *
-     * @param string $name
+     * @param null|string $name
      * @param null|array $data
      */
-    public function __construct($name, $data = null)
+    public function __construct($name = null, $data = null)
     {
         $this->name = $name;
         $this->data = $data ? Arrays::merge($this->default, $data) : $this->default;
