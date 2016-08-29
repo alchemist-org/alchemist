@@ -8,13 +8,19 @@ services:
         class: Symfony\Component\Console\Application
         setup:
             - addCommands([
+                @defaultCommand
                 @installCommand,
                 @touchProjectCommand,
                 @createProjectCommand,
                 @removeProjectCommand,
                 @selfUpdateCommand
             ])
+            - setDefaultCommand(
+                'default'
+            )
 
+    defaultCommand:
+        class: Alchemist\Console\Command\DefaultCommand
     installCommand:
         class: Alchemist\Console\Command\InstallCommand
     touchProjectCommand:

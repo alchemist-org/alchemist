@@ -100,6 +100,15 @@ class Config extends Object
         return null;
     }
 
+    public function getProjectsDirName($path)
+    {
+        $inversedArray = array_flip($this->getProjectsDirs());
+        if(isset($inversedArray[$path])) {
+            return $inversedArray[$path];
+        }
+        return null;
+    }
+
     public function getProjectsDir()
     {
         $defaultProjectsDirNameOrPath = $this->config['parameters']['projects-dir'];

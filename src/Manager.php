@@ -44,6 +44,9 @@ class Manager
     const CREATE = 'create';
 
     /** @var string */
+    const TOUCH = 'touch';
+
+    /** @var string */
     const CREATE_ORIGIN_SOURCE = 'create_origin_source';
 
     /**
@@ -71,17 +74,7 @@ class Manager
         $result = [];
 
         // load template
-        $templateName = null;
-        foreach ($this->configurator->getConfig()->getDistantSources() as $distantSource) {
-            foreach ($distantSource as $distantSourceProjectName => $projectData) {
-                if ($distantSourceProjectName == $projectName) {
-                    $templateName = isset($projectData['template']) ? $projectData['template'] : null;
-                }
-            }
-        }
-
-        // load template
-        $template = $templateName ? $this->templateLoader->getTemplate($templateName) : null;
+        $template = $this->loadTemplatePerProject($projectName);
 
         $projectsDir = $this->configurator->getConfig()->getProjectsDir();
         $projectDir = $this->getProjectDir($projectName, $projectsDir);
@@ -125,6 +118,27 @@ class Manager
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $projectName
+     *
+     * @return Template|null
+     */
+    public function loadTemplatePerProject($projectName)
+    {
+        // load template
+        $templateName = null;
+        foreach ($this->configurator->getConfig()->getDistantSources() as $distantSource) {
+            foreach ($distantSource as $distantSourceProjectName => $projectData) {
+                if ($distantSourceProjectName == $projectName) {
+                    $templateName = isset($projectData['template']) ? $projectData['template'] : null;
+                }
+            }
+        }
+
+        // load template
+        return $templateName ? $this->templateLoader->getTemplate($templateName) : null;
     }
 
     /**
@@ -322,20 +336,45 @@ class Manager
 
     /**
      * @param string $projectName
+     * @param string $projectsDir
      *
-     * @return string
+     * @return string|null
      */
-    public function touchProject($projectName)
+    public function touchProject($projectName, $projectsDir = null)
     {
-        $result = array();
+        $result = null;
 
         $projectsDirs = $this->configurator->getConfig()->getProjectsDirs();
         foreach($projectsDirs as $projectsDirName => $projectsDirPath) {
-            $projectDir = $this->getProjectDir($projectName, $projectsDirPath);
-            if(is_readable($projectDir)) {
-                $result[] = "'$projectName' ['$projectDir']";
+
+            // load templateName
+            $template = $this->loadTemplatePerProject($projectName) ? $this->loadTemplatePerProject($projectName) : new Template();
+
+            // replacement parameters
+            $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig();
+
+            // overwrite projects-dir, name to path
+            $replacementParameters['projects-dir'] = $projectsDirPath;
+
+            // add common replacement parameters
+            $replacementParameters['project-name'] = $projectName;
+            $replacementParameters['project-dir'] = $projectsDirPath;
+
+            if($projectsDir) {
+                if($projectsDir == $projectsDirPath) {
+                    $projectDir = $this->getProjectDir($projectName, $projectsDir);
+                    if (is_readable($projectDir)) {
+                        $result = $this->runScript($template->getScript(self::TOUCH), $replacementParameters);
+                    }
+                }
+            } else {
+                $projectDir = $this->getProjectDir($projectName, $projectsDirPath);
+                if (is_readable($projectDir)) {
+                    $result = $this->runScript($template->getScript(self::TOUCH), $replacementParameters);
+                }
             }
         }
+
         return $result;
     }
 
@@ -349,6 +388,38 @@ class Manager
 
         // purge temp dir
         \Tester\Helpers::purge(TEMP_DIR);
+    }
+
+    /**
+     * @return array
+     */
+    public function touchProjects($filterProjectName = null)
+    {
+        $result = array();
+
+        // load all projects
+        foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDir) {
+            $mask = $projectsDir . DIRECTORY_SEPARATOR . '*';
+            $projects = glob($mask, GLOB_ONLYDIR);
+
+            // run
+            $projectsDirName = $this->configurator->getConfig()->getProjectsDirName($projectsDir);
+            $result[$projectsDirName] = $this->runScript("echo $projectsDirName:");
+
+            foreach ($projects as $projectDir) {
+                $projectName = basename($projectDir);
+
+                if($filterProjectName) {
+                    if($projectName == $filterProjectName) {
+                        $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
+                    }
+                } else {
+                    $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
+                }
+            }
+        }
+
+        return $result;
     }
 
 }
