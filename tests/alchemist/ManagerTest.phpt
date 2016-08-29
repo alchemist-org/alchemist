@@ -16,6 +16,7 @@ use Alchemist\Configurator;
 use Alchemist\DistantSource;
 use Alchemist\Manager;
 use Alchemist\Template;
+use Nette\DI\Config\Helpers;
 use Nette\DI\Container;
 use Tester\Assert;
 use Tester\TestCase;
@@ -38,9 +39,6 @@ class ManagerTest extends TestCase
     private $container;
 
     /** @var string */
-    const PROJECTS_DIR = TEMP__DIR__ . '/projects-dir';
-
-    /** @var string */
     const PROJECT_DIR_NAME = 'default';
 
     /** @var string */
@@ -56,7 +54,8 @@ class ManagerTest extends TestCase
     private $config = array(
         'parameters' => array(
             'projects-dir' => self::PROJECT_DIR_NAME,
-            'origin-source' => array()
+            'origin-source' => array(),
+            'test' => 'test'
         ),
         'core' => array(
             'template' => 'common',
@@ -68,7 +67,14 @@ class ManagerTest extends TestCase
                 )
             ),
             'projects-dirs' => array(
-               self::PROJECT_DIR_NAME => self::PROJECTS_DIR
+               self::PROJECT_DIR_NAME => TEST_PROJECTS_DIR
+            ),
+            'test' => array(
+                'test' => array(
+                    'test' => array(
+                        'test' => array()
+                    )
+                )
             )
         ),
         'distant-sources' => array(
@@ -93,13 +99,23 @@ class ManagerTest extends TestCase
     {
         parent::setUp();
 
-        @mkdir(self::PROJECTS_DIR);
-        \Tester\Helpers::purge(self::PROJECTS_DIR);
-
         $this->configurator = $this->container->getByType(Configurator::class);
 
+        // clear test directories
+        if(!file_exists(TEST_PROJECTS_DIR)) {
+            mkdir(TEST_PROJECTS_DIR);
+        } else {
+            \Tester\Helpers::purge(TEST_PROJECTS_DIR);
+        }
+
+        if(!file_exists(TEST_TEMP_DIR)) {
+            mkdir(TEST_TEMP_DIR);
+        } else {
+            \Tester\Helpers::purge(TEST_TEMP_DIR);
+        }
+
         // set array (because const used above in tests) but self::CONFIG_LOCAL reflect any change
-		$this->configurator->setConfigFile(self::CONFIG_LOCAL);
+        $this->configurator->setConfigFile(self::CONFIG_LOCAL);
         $this->configurator->setConfig(new Config($this->config));
 
         $this->manager = $this->container->getByType(Manager::class);
@@ -111,8 +127,8 @@ class ManagerTest extends TestCase
 
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName);
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
         });
     }
 
@@ -122,11 +138,11 @@ class ManagerTest extends TestCase
 
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(), null, false);
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
             $this->manager->createProject($projectName, null, array(), null, true);
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
-            Assert::false(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
+            Assert::false(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
         });
     }
 
@@ -135,9 +151,13 @@ class ManagerTest extends TestCase
         $projectName = 'foo';
 
         Assert::noError(function () use ($projectName) {
+            Assert::equal(TEST_PROJECTS_DIR, $this->configurator->getConfig()->getProjectsDir());
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(
-                'projects-dir' => self::PROJECTS_DIR
+                'projects-dir' => TEST_PROJECTS_DIR
             ), true);
+            Assert::equal(TEST_PROJECTS_DIR, $this->configurator->getConfig()->getProjectsDir());
+            Assert::truthy($this->configurator->getConfig()->getProjectsDir());
+            Assert::truthy($this->configurator->getConfig()->getProjectsDirPath('projects-dir'));
             Assert::truthy($this->configurator->getConfig()->getProjectsDirPath('projects-dir'));
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
@@ -157,22 +177,24 @@ class ManagerTest extends TestCase
     public function testCreateProjectAndChangeProjectDirViaNameInConsole()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(
                 'projects-dir' => 'default'
             ), false);
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
         });
     }
 
     public function testCreateProjectAndChangeProjectDirViaFullPathInConsole()
     {
         $projectName = 'foo';
+
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(
-                'projects-dir' => self::PROJECTS_DIR
+                'projects-dir' => TEST_PROJECTS_DIR
             ), false);
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
         });
     }
 
@@ -193,7 +215,7 @@ class ManagerTest extends TestCase
 
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE);
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
         });
     }
 
@@ -203,7 +225,7 @@ class ManagerTest extends TestCase
 
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, null);
-            Assert::false(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
+            Assert::false(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
         });
     }
 
@@ -271,13 +293,14 @@ class ManagerTest extends TestCase
                     )
                 )
             );
-            Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . $projectName));
+            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . $projectName));
         });
     }
 
     public function testCreateProjectFromDistantSourceWhichDoesNotExist()
     {
         $projectName = 'distant';
+
         Assert::error(function () use ($projectName) {
             $this->manager->createProject(
                 $projectName,
@@ -296,7 +319,7 @@ class ManagerTest extends TestCase
     public function testInstall()
     {
         $this->manager->install();
-        Assert::true(file_exists(self::PROJECTS_DIR . DIRECTORY_SEPARATOR . 'test'));
+        Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . 'test'));
     }
 
 }

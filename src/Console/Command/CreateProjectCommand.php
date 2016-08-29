@@ -11,6 +11,8 @@
 
 namespace Alchemist\Console\Command;
 
+use Alchemist\Console\Utils\ConsoleUtils;
+use Alchemist\Template;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,7 +47,7 @@ class CreateProjectCommand extends Command
             ->setDescription('Create project')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
-                new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template name'),
+                new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template name', Template::DEFAULT_TEMPLATE),
                 new InputOption('projects-dir', 'd', InputOption::VALUE_REQUIRED, 'Projects dir'),
                 new InputOption('type', null, InputOption::VALUE_REQUIRED, 'Type, e.g. git, composer..'),
                 new InputOption('value', null, InputOption::VALUE_REQUIRED, 'Value, e.g. url, package-name..'),
@@ -72,7 +74,9 @@ class CreateProjectCommand extends Command
             )
         );
 
-        $manager->createProject($name, $templateName, $options, $save, $force);
+        $result = $manager->createProject($name, $templateName, $options, $save, $force);
+
+        ConsoleUtils::writeln($result, $output);
     }
 
 }

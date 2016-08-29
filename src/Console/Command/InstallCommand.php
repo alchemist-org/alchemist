@@ -11,6 +11,7 @@
 
 namespace Alchemist\Console\Command;
 
+use Alchemist\Console\Utils\ConsoleUtils;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
@@ -47,7 +48,9 @@ class InstallCommand extends Command
     {
         $manager = $this->manager;
 
-        $manager->install();
+        $result = $manager->install();
+
+        ConsoleUtils::writeln($result, $output);
     }
 
 }

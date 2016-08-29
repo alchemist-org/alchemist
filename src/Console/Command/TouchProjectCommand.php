@@ -11,6 +11,7 @@
 
 namespace Alchemist\Console\Command;
 
+use Alchemist\Console\Utils\ConsoleUtils;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -54,7 +55,8 @@ class TouchProjectCommand extends Command
         $name = $input->getArgument('name');
 
         $result = $manager->touchProject($name);
-        $output->writeln($result);
+
+        ConsoleUtils::writeln($result, $output);
     }
 
 }
