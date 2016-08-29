@@ -41,7 +41,7 @@ class TouchProjectCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('touch')
+            ->setName('touch-project')
             ->setDescription('Touch project')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'Project name')

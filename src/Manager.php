@@ -327,9 +327,16 @@ class Manager
      */
     public function touchProject($projectName)
     {
-        $projectsDir = $this->configurator->getConfig()->getProjectsDir();
-        $projectDir = $this->getProjectDir($projectName, $projectsDir);
-        return !is_readable($projectDir) ? "" : $projectDir;
+        $result = array();
+
+        $projectsDirs = $this->configurator->getConfig()->getProjectsDirs();
+        foreach($projectsDirs as $projectsDirName => $projectsDirPath) {
+            $projectDir = $this->getProjectDir($projectName, $projectsDirPath);
+            if(is_readable($projectDir)) {
+                $result[] = "'$projectName' ['$projectDir']";
+            }
+        }
+        return $result;
     }
 
     /**
