@@ -31,20 +31,19 @@ $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 Create and set up `config.local.neon`. For example:
 
 ```
-parameters:  # default parameters, could be overwritten in templates
+parameters:     # default parameters, could be overwritten in templates
     projects-dir: nginx
     origin-source:
         type: git
         value: https://github.com/nette/web-project
 
 core:
-    template: common
-    templates: /usr/share/nginx/alchemist/data/templates
+    template: common    # default template
+    templates: /usr/share/nginx/alchemist/data/templates    #templates directory
     project-dirs:
         nginx: /usr/share/nginx
         apache2: /var/www/
     source-types:
-
         # default types
         #composer: composer create-project <value> <project-dir>
         #git: git clone <value> <project-dir>
@@ -67,6 +66,16 @@ distant-sources:
                 url: https://github.com/alchemist-org/alchemist.git
 ```
 
+Create template, in default you can set up these blocks:
+```
+    before_create:
+    after_create:
+    before_remove:
+    after_remove:
+    touch:
+        - echo `something`
+        - echo `something`
+```
 
 ###Self update
 
@@ -106,3 +115,12 @@ Name | Comment
 ```sh
 $ alchemist install
 ```
+
+```sh
+$ alchemist
+$ alchemist touch <name>
+```
+
+Name | Comment
+------------ | -------------
+<name> | Project name
