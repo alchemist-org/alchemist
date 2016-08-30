@@ -1,4 +1,8 @@
-before_create:
+parameters:
+	projects-dir: nginx
 
 after_create:
-  - echo "Project '<project-name>' was successfully created."
+	- echo "Project '<project-name>' was successfully created."
+
+after_remove:
+	- echo "Project '<project-name>' was successfully removed."
