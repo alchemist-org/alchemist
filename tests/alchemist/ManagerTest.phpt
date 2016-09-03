@@ -38,7 +38,7 @@ class ManagerTest extends TestCase
     private $container;
 
     /** @var string */
-    const PROJECT_DIR_NAME = 'default';
+    const PROJECTS_DIR_NAME = 'defaultt';
 
     /** @var string */
     const CONFIG_LOCAL = __DIR__ . '/data/config/config.local.neon';
@@ -52,7 +52,7 @@ class ManagerTest extends TestCase
     /** @var array */
     private $config = array(
         'parameters' => array(
-            'projects-dir' => self::PROJECT_DIR_NAME,
+            'projects-dir' => self::PROJECTS_DIR_NAME,
             'origin-source' => array(),
             'test' => 'test'
         ),
@@ -66,7 +66,7 @@ class ManagerTest extends TestCase
                 )
             ),
             'projects-dirs' => array(
-               self::PROJECT_DIR_NAME => TEST_PROJECTS_DIR
+               self::PROJECTS_DIR_NAME => TEST_PROJECTS_DIR
             ),
             'test' => array(
                 'test' => array(
@@ -179,7 +179,7 @@ class ManagerTest extends TestCase
 
         Assert::noError(function () use ($projectName) {
             $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(
-                'projects-dir' => 'default'
+                'projects-dir' => TEST_PROJECTS_DIR
             ), false);
             Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
         });

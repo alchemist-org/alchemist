@@ -42,7 +42,10 @@ class RemoveProjectCommandTest extends CommandTestCase
 
         $this->runCommand(
             $this->container->getByType(CreateProjectCommand::class),
-            array('name' => $projectName)
+            array(
+                'name' => $projectName,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            )
         );
         $this->runCommand(
             $this->container->getByType(RemoveProjectCommand::class),
@@ -61,7 +64,8 @@ class RemoveProjectCommandTest extends CommandTestCase
             $this->container->getByType(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
-                '--save' => true
+                '--save' => true,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
             )
         );
 

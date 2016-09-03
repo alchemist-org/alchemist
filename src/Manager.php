@@ -76,6 +76,11 @@ class Manager
         // load template
         $template = $this->loadTemplatePerProject($projectName);
 
+        // template & console parameters merge to parameters loaded by config
+        if($template) {
+            $this->configurator->getConfig()->applyParameters($template->getParameters());
+        }
+
         $projectsDir = $this->configurator->getConfig()->getProjectsDir();
         $projectDir = $this->getProjectDir($projectName, $projectsDir);
 
@@ -85,9 +90,7 @@ class Manager
         }
 
         // replacement parameters
-        $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig()->getParameters();
-
-        // add common replacement parameters
+        $replacementParameters = $this->configurator->getConfig()->getParameters();
         $replacementParameters['project-name'] = $projectName;
         $replacementParameters['project-dir'] = $projectDir;
 
@@ -123,6 +126,8 @@ class Manager
     }
 
     /**
+     * Returns associated template or new Template()
+     *
      * @param string $projectName
      *
      * @return Template|null
@@ -140,7 +145,7 @@ class Manager
         }
 
         // load template
-        return $templateName ? $this->templateLoader->getTemplate($templateName) : null;
+        return $templateName ? $this->templateLoader->getTemplate($templateName) : new Template;
     }
 
     /**
@@ -180,11 +185,16 @@ class Manager
             $templateName = $this->configurator->getConfig()->getTemplateName();
         }
 
-        // merge config parameters with console parameters
-        $parameters = Arrays::merge($this->configurator->getConfig()->getParameters(), $parameters);
-
         // load template
-        $template = $templateName ? $this->templateLoader->getTemplate($templateName, $parameters) : null;
+        $template = $templateName ? $this->templateLoader->getTemplate($templateName) : null;
+
+        // template & console parameters merge to parameters loaded by config
+        if($template) {
+            $this->configurator->getConfig()->applyParameters($template->getParameters());
+        }
+        if($parameters) {
+            $this->configurator->getConfig()->applyParameters($parameters);
+        }
 
         // load projectDir
         $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
@@ -199,12 +209,7 @@ class Manager
         }
 
         // replacement parameters
-        $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig()->applyConsoleParameters($parameters);
-
-        // overwrite projects-dir, name to path
-        $replacementParameters['projects-dir'] = $this->configurator->getConfig()->getProjectsDir();
-
-        // add common replacement parameters
+        $replacementParameters = $this->configurator->getConfig()->getParameters();
         $replacementParameters['project-name'] = $projectName;
         $replacementParameters['project-dir'] = $projectDir;
 
@@ -350,15 +355,13 @@ class Manager
         foreach($projectsDirs as $projectsDirName => $projectsDirPath) {
 
             // load templateName
-            $template = $this->loadTemplatePerProject($projectName) ? $this->loadTemplatePerProject($projectName) : new Template();
+            $template = $this->loadTemplatePerProject($projectName);
+
+            // template parameters merge to parameters loaded by config
+            $this->configurator->getConfig()->applyParameters($template->getParameters());
 
             // replacement parameters
-            $replacementParameters = $template ? $template->getParameters() : $this->configurator->getConfig();
-
-            // overwrite projects-dir, name to path
-            $replacementParameters['projects-dir'] = $projectsDirPath;
-
-            // add common replacement parameters
+            $replacementParameters = $this->configurator->getConfig()->getParameters();
             $replacementParameters['project-name'] = $projectName;
             $replacementParameters['project-dir'] = $projectsDirPath;
 

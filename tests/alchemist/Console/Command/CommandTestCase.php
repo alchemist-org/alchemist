@@ -35,7 +35,7 @@ abstract class CommandTestCase extends TestCase
     protected $manager;
 
     /** @var string */
-    const PROJECTS_DIR_NAME = 'default';
+    const PROJECTS_DIR_NAME = 'defaultt';
 
     /** @var string */
     const TEMPLATES = __DIR__ . '/../data/templates';
@@ -48,9 +48,7 @@ abstract class CommandTestCase extends TestCase
 
     /** @var array */
     private $config = array(
-        'parameters' => array(
-            'projects-dir' => self::PROJECTS_DIR_NAME
-        ),
+        'parameters' => array(),
         'core' => array(
             'template' => 'default',
             'templates' => self::TEMPLATES,

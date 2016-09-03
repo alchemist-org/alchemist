@@ -35,7 +35,10 @@ class TouchProjectCommandTest extends CommandTestCase  {
 
         $this->runCommand(
             $this->container->getByType(CreateProjectCommand::class),
-            array('name' => $projectName)
+            array(
+                'name' => $projectName,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            )
         );
 
         $result = $this->runCommand(

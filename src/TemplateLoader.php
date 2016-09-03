@@ -35,23 +35,18 @@ class TemplateLoader
 
     /**
      * @param string $templateName
-     * @param array $parameters
      *
      * @return Template
      *
      * @throws \Exception
      */
-    public function getTemplate($templateName, array $parameters = array())
+    public function getTemplate($templateName)
     {
         // load config
         $config = $this->configurator->getConfig();
 
         // load template
-        $templatesDir = $config->getTemplates();
-        $template = $this->loadTemplate($templateName, $templatesDir);
-
-        // merge with console && merge with config
-        $template->setParameters(Arrays::merge($template->getParameters(), $parameters));
+        $template = $this->loadTemplate($templateName, $config->getTemplatesDir());
 
         return $template;
     }

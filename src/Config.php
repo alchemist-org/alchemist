@@ -51,9 +51,6 @@ class Config extends Object
      */
     public function __construct(array $config)
     {
-        if (!isset($config['parameters']) || !isset($config['parameters']['projects-dir'])) {
-            throw new \Exception("Config parameter 'projects-dir' is required.");
-        }
         $this->config = Arrays::merge($this->default, $config);
     }
 
@@ -62,7 +59,7 @@ class Config extends Object
         return $this->config['core']['template'];
     }
 
-    public function getTemplates()
+    public function getTemplatesDir()
     {
         return $this->config['core']['templates'];
     }
@@ -94,7 +91,7 @@ class Config extends Object
 
     public function getProjectsDirPath($name)
     {
-        if(isset($this->getProjectsDirs()[$name])) {
+        if (isset($this->getProjectsDirs()[$name])) {
             return $this->getProjectsDirs()[$name];
         }
         return null;
@@ -103,18 +100,33 @@ class Config extends Object
     public function getProjectsDirName($path)
     {
         $inversedArray = array_flip($this->getProjectsDirs());
-        if(isset($inversedArray[$path])) {
+        if (isset($inversedArray[$path])) {
             return $inversedArray[$path];
         }
         return null;
+    }
+
+    public function isProjectsDirSetUp()
+    {
+        $defaultProjectsDirNameOrPath = $this->config['parameters']['projects-dir'];
+
+        if ($this->getProjectsDirPath($defaultProjectsDirNameOrPath)) {
+            return $this->getProjectsDirPath($defaultProjectsDirNameOrPath);
+        }
+
+        return $defaultProjectsDirNameOrPath ? true : false;
     }
 
     public function getProjectsDir()
     {
         $defaultProjectsDirNameOrPath = $this->config['parameters']['projects-dir'];
 
-        if($this->getProjectsDirPath($defaultProjectsDirNameOrPath)) {
+        if ($this->getProjectsDirPath($defaultProjectsDirNameOrPath)) {
             return $this->getProjectsDirPath($defaultProjectsDirNameOrPath);
+        }
+
+        if (!$defaultProjectsDirNameOrPath) {
+            throw new \Exception("Config parameter 'projects-dir' is required.");
         }
 
         return $defaultProjectsDirNameOrPath;
@@ -122,15 +134,20 @@ class Config extends Object
 
     public function getParameters()
     {
-        return $this->config['parameters'];
+        $parameters = $this->config['parameters'];
+
+        // overwrite projects-dir, name by path
+        $parameters['projects-dir'] = $this->isProjectsDirSetUp() ? $this->getProjectsDir() : null;
+
+        return $parameters;
     }
 
-    public function applyConsoleParameters(array $parameters = array())
+    public function applyParameters(array $parameters = array())
     {
         $filteredParameters = $parameters;
 
         // filter ignored values
-        $this->filterConfigData($filteredParameters, $this->config['parameters'], function($key, $value, $defaultValue) {
+        $this->filterConfigData($filteredParameters, $this->config['parameters'], function ($key, $value, $defaultValue) {
             return $this->isIgnoredValue($key, $value, $defaultValue);
         });
 
@@ -172,12 +189,12 @@ class Config extends Object
         $filteredConfig = $this->config;
 
         // filter ignored values
-        $this->filterConfigData($filteredConfig, $this->default, function($key, $value, $defaultValue) {
+        $this->filterConfigData($filteredConfig, $this->default, function ($key, $value, $defaultValue) {
             return $this->isIgnoredValue($key, $value, $defaultValue);
         });
 
         // filter default
-        $this->filterConfigData($filteredConfig, $this->default, function($key, $value, $defaultValue) {
+        $this->filterConfigData($filteredConfig, $this->default, function ($key, $value, $defaultValue) {
             return $this->isDefaultValue($key, $value, $defaultValue);
         });
 
@@ -192,27 +209,27 @@ class Config extends Object
      */
     public function filterConfigData(&$array, $defaultArray, callable $filterFunction)
     {
-        if(!is_array($array)) {
+        if (!is_array($array)) {
             return false;
         }
 
         foreach ($array as $key => &$value) {
-            if(array_key_exists($key, $defaultArray)) {
+            if (array_key_exists($key, $defaultArray)) {
                 $parentNode = $this->filterConfigData($value, $defaultArray[$key], $filterFunction);
 
-                if($parentNode) {
+                if ($parentNode) {
                     unset($array[$key]);
                 }
 
                 $result = call_user_func($filterFunction, $key, $value, $defaultArray[$key]);
-                if($result) {
+                if ($result) {
                     unset($array[$key]);
                 }
             } else {
                 $this->filterConfigData($value, array(), $filterFunction);
 
                 $result = call_user_func($filterFunction, $key, $value, null);
-                if($result) {
+                if ($result) {
                     unset($array[$key]);
                 }
             }

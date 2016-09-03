@@ -29,7 +29,10 @@ class CreateProjectCommandTest extends CommandTestCase
 
         $this->runCommand(
             $this->container->getByType(CreateProjectCommand::class),
-            array('name' => $projectName)
+            array(
+                'name' => $projectName,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            )
         );
     }
 
@@ -59,13 +62,34 @@ class CreateProjectCommandTest extends CommandTestCase
 
         $this->runCommand(
             $this->container->getByType(CreateProjectCommand::class),
-            array('name' => $projectName)
+            array(
+                'name' => $projectName,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            )
         );
 
         Assert::error(function () use ($projectName) {
             $this->runCommand(
                 $this->container->getByType(CreateProjectCommand::class),
-                array('name' => $projectName)
+                array(
+                    'name' => $projectName,
+                    '--projects-dir' => self::PROJECTS_DIR_NAME
+                )
+            );
+        }, '\Exception');
+    }
+
+    public function testCreateProjectNoProjectsDirCatchException()
+    {
+        $projectName = 'fooo';
+
+        Assert::error(function () use ($projectName) {
+            $this->runCommand(
+                $this->container->getByType(CreateProjectCommand::class),
+                array(
+                    'name' => $projectName,
+                    'template' => null
+                )
             );
         }, '\Exception');
     }
@@ -76,7 +100,9 @@ class CreateProjectCommandTest extends CommandTestCase
 
         $this->runCommand(
             $this->container->getByType(CreateProjectCommand::class),
-            array('name' => $projectName)
+            array(
+                'name' => $projectName,
+                '--projects-dir' => self::PROJECTS_DIR_NAME)
         );
 
         $this->runCommand(
