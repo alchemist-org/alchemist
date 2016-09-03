@@ -21,7 +21,7 @@ $container = require_once __DIR__ . '/../../../bootstrap.php';
  */
 class InstallProjectCommandTest extends CommandTestCase  {
 
-    public function testInstallProjectsCommand()
+    public function testInstallProjects()
     {
         $this->runCommand(
             $this->container->getByType(InstallCommand::class)

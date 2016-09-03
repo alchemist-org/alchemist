@@ -20,9 +20,10 @@ $container = require_once __DIR__ . '/../../../bootstrap.php';
  * @author Lukáš Drahník (http://ldrahnik.com)
  * @testCase
  */
-class CreateProjectCommandTest extends CommandTestCase  {
+class CreateProjectCommandTest extends CommandTestCase
+{
 
-    public function testCreateProjectCommand()
+    public function testCreateProject()
     {
         $projectName = 'fooo';
 
@@ -32,15 +33,27 @@ class CreateProjectCommandTest extends CommandTestCase  {
         );
     }
 
-    public function testCreateProjectWithSaveCommand() {
+    public function testCreateProjectWithSave()
+    {
+        $projectName = 'baaar';
+
+        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::truthy(empty($defaultDistanceSourceBefore));
+
         $this->runCommand(
             $this->container->getByType(CreateProjectCommand::class),
-            array('name' => 'baaar'),
-            array('save' => true)
+            array(
+                'name' => $projectName,
+                '--save' => true,
+                '--template' => 'default'
+            )
         );
+
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::falsey(empty($defaultDistanceSource));
     }
 
-    public function testCreateProjectDuplicateAndCatchExceptionCommand()
+    public function testCreateProjectDuplicateAndCatchException()
     {
         $projectName = 'fooo';
 
@@ -55,6 +68,24 @@ class CreateProjectCommandTest extends CommandTestCase  {
                 array('name' => $projectName)
             );
         }, '\Exception');
+    }
+
+    public function testCreateProjectWithForce()
+    {
+        $projectName = 'fooo';
+
+        $this->runCommand(
+            $this->container->getByType(CreateProjectCommand::class),
+            array('name' => $projectName)
+        );
+
+        $this->runCommand(
+            $this->container->getByType(CreateProjectCommand::class),
+            array(
+                'name' => $projectName,
+                '--force' => true
+            )
+        );
     }
 
 }

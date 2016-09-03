@@ -104,17 +104,19 @@ class Manager
         if ($save) {
             $config = $this->configurator->getConfig();
 
-            foreach ($this->configurator->getConfig()->getDistantSources() as $distantSourceName => $distantSourceData) {
+            $distantSources= array();
+            foreach ($config->getDistantSources() as $distantSourceName => $distantSourceData) {
                 foreach ($distantSourceData as $distantSourceProjectName => $projectData) {
-                    if ($projectName == $distantSourceProjectName) {
-                        unset($distantSourceData[$projectName]);
-                        $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, array(
-                                $distantSourceData
-                            )
-                        );
+                    if ($projectName != $distantSourceProjectName) {
+                        $distantSources[$distantSourceProjectName] = $projectData;
                     }
                 }
             }
+            $config->setDistantSources(
+                $distantSources
+            );
+
+            $this->configurator->setConfig($config);
         }
 
         return $result;

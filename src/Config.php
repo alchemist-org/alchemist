@@ -147,6 +147,11 @@ class Config extends Object
         return $this->config['distant-sources'];
     }
 
+    public function setDistantSources(array $distantSources)
+    {
+        $this->config['distant-sources'] = $distantSources;
+    }
+
     public function getDistantSource($name)
     {
         return isset($this->config['distant-sources'][$name]) ? $this->config['distant-sources'][$name] : null;
@@ -235,7 +240,7 @@ class Config extends Object
      */
     public function isDefaultValue($key, $value, $defaultValue)
     {
-        return $defaultValue ? $value == $defaultValue : false;
+        return $defaultValue ? $value === $defaultValue : false;
     }
 
 }

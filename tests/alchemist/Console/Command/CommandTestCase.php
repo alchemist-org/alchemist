@@ -13,6 +13,7 @@ namespace Test\Console\Command;
 
 use Alchemist\Config;
 use Alchemist\Configurator;
+use Alchemist\Manager;
 use Nette\DI\Container;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -29,6 +30,9 @@ abstract class CommandTestCase extends TestCase
 
     /** @var Configurator */
     protected $configurator;
+
+    /** @var Manager */
+    protected $manager;
 
     /** @var string */
     const PROJECTS_DIR_NAME = 'default';

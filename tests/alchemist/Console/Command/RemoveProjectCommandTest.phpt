@@ -24,7 +24,7 @@ $container = require_once __DIR__ . '/../../../bootstrap.php';
 class RemoveProjectCommandTest extends CommandTestCase
 {
 
-    public function testRemoveNoExistProjectCommand()
+    public function testRemoveNoExistProject()
     {
         $projectName = 'foott';
 
@@ -48,6 +48,36 @@ class RemoveProjectCommandTest extends CommandTestCase
             $this->container->getByType(RemoveProjectCommand::class),
             array('name' => $projectName)
         );
+    }
+
+    public function testRemoveSavedProject()
+    {
+        $projectName = 'baaaaar';
+
+        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::truthy(empty($defaultDistanceSourceBefore));
+
+        $this->runCommand(
+            $this->container->getByType(CreateProjectCommand::class),
+            array(
+                'name' => $projectName,
+                '--save' => true
+            )
+        );
+
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::falsey(empty($defaultDistanceSource));
+
+        $this->runCommand(
+            $this->container->getByType(RemoveProjectCommand::class),
+            array(
+                'name' => $projectName,
+                '--save' => true
+            )
+        );
+
+        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::truthy(empty($defaultDistanceSourceBefore));
     }
 
 }

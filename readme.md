@@ -91,7 +91,7 @@ $ alchemist create-project <name> [--template <name>] [--projects-dir <dir>] [--
 
 Name | Explanation
 ------------ | -------------
-<name> | Project name
+name | Project name
 --template <name> | Template name
 --projects-dir <dir> | Projects dir
 --type <type> | Type, e.g. git, composer..
@@ -107,7 +107,7 @@ $ alchemist remove-project <name>
 
 Name | Comment
 ------------ | -------------
-<name> | Project name
+name | Project name
 --save | Save change to distant sources
 
 ###Install projects
@@ -123,4 +123,4 @@ $ alchemist touch <name>
 
 Name | Comment
 ------------ | -------------
-<name> | Project name
+name | Project name
