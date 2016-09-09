@@ -15,6 +15,7 @@ use Alchemist\Config;
 use Alchemist\Configurator;
 use Alchemist\Manager;
 use Nette\DI\Container;
+use Nette\Utils\Finder;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -38,7 +39,10 @@ abstract class CommandTestCase extends TestCase
     const PROJECTS_DIR_NAME = 'defaultt';
 
     /** @var string */
-    const TEMPLATES = __DIR__ . '/../data/templates';
+    const APP_DATA_DIR = __DIR__ . '/../../../../data';
+
+    /** @var string */
+    const TEMPLATES = self::APP_DATA_DIR . '/templates';
 
     /** @var string */
     const TEMPLATE_NAME = 'default';
@@ -46,9 +50,40 @@ abstract class CommandTestCase extends TestCase
     /** @var string */
     const CONFIG_LOCAL = __DIR__ . '/../data/config/config.local.neon';
 
+    /** @var string */
+    const HOSTS_FILE = __DIR__ . '/../data/hosts';
+
+    /** @var string */
+    const NGINX_SITES_ENABLED = __DIR__ . '/../data/nginx/sites-enabled';
+
+    /** @var string */
+    const APACHE_SITES_ENABLED = __DIR__ . '/../data/apache/sites-enabled';
+
+    /** @var string */
+    const TLD = 'dev';
+
+    /** @var integer */
+    const PORT = 80;
+
+    /** @var string */
+    const ROOT = 'www';
+
+    /** @var string */
+    const LOCALHOST = '127.0.0.1';
+
     /** @var array */
     private $config = array(
-        'parameters' => array(),
+        'parameters' => array(
+            'hosts' => self::HOSTS_FILE,
+            'tld' => self::TLD,
+            'localhost' => self::LOCALHOST,
+            'nginx-sites-enabled' => self::NGINX_SITES_ENABLED,
+            'nginx-virtual-host-default' => self::APP_DATA_DIR . '/virtual-hosts/nginx.default',
+            'apache-sites-enabled' => self::APACHE_SITES_ENABLED,
+            'apache-virtual-host-default' => self::APP_DATA_DIR . '/virtual-hosts/apache.default',
+            'port' => self::PORT,
+            'root' => self::ROOT
+        ),
         'core' => array(
             'template' => 'default',
             'templates' => self::TEMPLATES,
@@ -90,6 +125,17 @@ abstract class CommandTestCase extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute($input, $options);
         return $commandTester->getDisplay();
+    }
+
+    /**
+     * @param string $file
+     * @param string $string
+     *
+     * @return string
+     */
+    protected function isStringInFile($file, $string)
+    {
+        return exec('grep ' . escapeshellarg($string) . " $file") ? true : false;
     }
 
 }

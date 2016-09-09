@@ -71,7 +71,7 @@ class Manager
      */
     public function removeProject($projectName, $save = false)
     {
-        $result = [];
+        $result = array();
 
         // load template
         $template = $this->loadTemplatePerProject($projectName);
@@ -95,13 +95,13 @@ class Manager
         $replacementParameters['project-dir'] = $projectDir;
 
         // run before remove
-        $result[self::BEFORE_REMOVE] = $template ? $this->runScript($template->getScript(self::BEFORE_REMOVE), $replacementParameters) : [];
+        $result[self::BEFORE_REMOVE] = $template ? $this->runScript($template->getScript(self::BEFORE_REMOVE), $replacementParameters) : array();
 
         // remove project (actually)
         $result[self::REMOVE] = Console::execute("rm -rf $projectDir");
 
         // run after remove
-        $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : [];
+        $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : array();
 
         // remove from distant source
         if ($save) {
@@ -178,7 +178,7 @@ class Manager
         $force = false
     )
     {
-        $result = [];
+        $result = array();
 
         // use default template
         if ($templateName == Template::DEFAULT_TEMPLATE) {
@@ -214,7 +214,7 @@ class Manager
         $replacementParameters['project-dir'] = $projectDir;
 
         // run before_create
-        $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : [];
+        $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : array();
 
         // create project (actually)
         $result[self::CREATE] = Console::execute("mkdir $projectDir");
@@ -237,11 +237,11 @@ class Manager
 
             $result[self::CREATE_ORIGIN_SOURCE] = $this->runScript($sourceTypes[$originSourceType], $replacementParametersOriginSource);
         } else {
-            $result[self::CREATE_ORIGIN_SOURCE] = [];
+            $result[self::CREATE_ORIGIN_SOURCE] = array();
         }
 
         // run after create
-        $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : [];
+        $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : array();
 
         // save
         if ($save) {
@@ -253,7 +253,8 @@ class Manager
                 'origin-source' => array(
                     'type' => $originSourceType,
                     'value' => $originSource['value']
-                )
+                ),
+                'template' => $templateName
             );
             $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
 
@@ -287,7 +288,7 @@ class Manager
         foreach ($script as $scriptLine) {
             // filter out what is not a string
             $replaceParametersFiltered = array_filter($replaceParameters, function ($value) {
-                return is_string($value) ? $value : null;
+                return is_string($value) || is_integer($value) ? $value : null;
             });
             $scriptLine = Parser::parse($scriptLine, $replaceParametersFiltered);
             $result[] = Console::execute($scriptLine);
@@ -363,7 +364,8 @@ class Manager
             // replacement parameters
             $replacementParameters = $this->configurator->getConfig()->getParameters();
             $replacementParameters['project-name'] = $projectName;
-            $replacementParameters['project-dir'] = $projectsDirPath;
+            $replacementParameters['projects-dir'] = $projectsDirPath;
+            $replacementParameters['project-dir'] = $projectsDirPath . DIRECTORY_SEPARATOR . $projectName;
 
             if($projectsDir) {
                 if($projectsDir == $projectsDirPath) {

@@ -23,9 +23,7 @@ class Console
    * @return string
    */
   public static function execute($cmd) {
-    $result = array();
-    exec($cmd, $result);
-    return $result;
+    return shell_exec($cmd);
   }
 
 }

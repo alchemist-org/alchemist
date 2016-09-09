@@ -28,6 +28,7 @@ if(!file_exists(TEST_TEMP_DIR)) {
     \Tester\Helpers::purge(TEST_TEMP_DIR);
 }
 
+
 $loader->setCacheStorage(new Nette\Caching\Storages\FileStorage(TEST_TEMP_DIR));
 $loader->register(true);
 

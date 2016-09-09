@@ -29,7 +29,7 @@ class Template
     private $default = array(
         'parameters' => array(),
         'touch' => array(
-            "echo '<project-name>': '<projects-dir>/<project-name>'"
+            "echo '<project-name>': '<project-dir>'"
         ),
         'before_remove' => array(),
         'after_remove' => array(),
