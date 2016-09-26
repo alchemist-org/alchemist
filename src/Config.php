@@ -56,7 +56,7 @@ class Config extends Object
 
     public function getTemplateName()
     {
-        return $this->config['core']['template'];
+        return isset($this->config['core']['template']) ? $this->config['core']['template'] : null;
     }
 
     public function getTemplatesDir()

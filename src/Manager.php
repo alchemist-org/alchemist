@@ -144,8 +144,10 @@ class Manager
             }
         }
 
-        // load template
-        return $templateName ? $this->templateLoader->getTemplate($templateName) : new Template;
+        // load default template
+        $templateName = $templateName ? $templateName : $this->configurator->getConfig()->getTemplateName();
+
+        return $this->templateLoader->getTemplate($templateName);
     }
 
     /**
