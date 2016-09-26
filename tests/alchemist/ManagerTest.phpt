@@ -343,18 +343,13 @@ class ManagerTest extends TestCase
     {
         $projectName = 'testSaveCommand';
 
+        Assert::falsey($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
+
         $this->manager->createProject($projectName);
 
         $this->manager->save();
 
-        $this->manager->removeProject($projectName);
-
-        Assert::falsey($this->manager->touchProject($projectName));
-
-        $this->manager->install();
-
-        $result = $this->manager->touchProject($projectName);
-        Assert::truthy($result);
+        Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
     }
 
 }
