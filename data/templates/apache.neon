@@ -4,7 +4,7 @@ parameters:
 before_create:
 	- sudo service apache2 stop
 	- echo "<localhost> <project-name>.<tld>" >> <hosts>
-	- sudo cp <apache-virtual-host-default> <apache-sites-enabled>/<project-name>
+	- sudo cp <apache-virtual-host-default> <apache-sites-enabled>/<project-name>.conf
 	- sudo sed -i 's/port/<port>/g' <apache-sites-enabled>/<project-name>
 	- sudo sed -i 's/host-name/<project-name>.<tld>/g' <apache-sites-enabled>/<project-name>
 	- sudo sed -i 's|'project-root'|'<project-dir>/<root>'|g' <apache-sites-enabled>/<project-name>
