@@ -118,6 +118,8 @@ name | Project name
 $ alchemist install
 ```
 
+###Touch projects
+
 ```sh
 $ alchemist
 $ alchemist touch <name>
@@ -126,3 +128,10 @@ $ alchemist touch <name>
 Name | Comment
 ------------ | -------------
 name | Project name
+
+###Save projects
+
+```sh
+$ alchemist
+$ alchemist save
+```
