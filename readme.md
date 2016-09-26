@@ -66,6 +66,8 @@ distant-sources:
                 url: https://github.com/alchemist-org/alchemist.git
 ```
 
+You can set up your distant sources block from already existing projects with command `alchemist save`.
+
 Create template, in default you can set up these blocks:
 ```
     before_create:

@@ -326,11 +326,34 @@ class ManagerTest extends TestCase
 
     public function testTouchProjects()
     {
-        $this->manager->createProject('foo');
-        $this->manager->createProject('bar');
+        $projectName = 'fooooooooo';
 
-        $result = $this->manager->touchProjects();
+        Assert::falsey($this->manager->touchProjects($projectName));
 
+        $this->manager->createProject($projectName);
+
+        Assert::truthy($this->manager->touchProjects($projectName));
+
+        $this->manager->removeProject($projectName);
+
+        Assert::falsey($this->manager->touchProjects($projectName));
+    }
+
+    public function testSaveAndInstall()
+    {
+        $projectName = 'testSaveCommand';
+
+        $this->manager->createProject($projectName);
+
+        $this->manager->save();
+
+        $this->manager->removeProject($projectName);
+
+        Assert::falsey($this->manager->touchProject($projectName));
+
+        $this->manager->install();
+
+        $result = $this->manager->touchProject($projectName);
         Assert::truthy($result);
     }
 
