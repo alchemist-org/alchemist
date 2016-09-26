@@ -1,10 +1,10 @@
 parameters:
-	projects-dir: defaultt
+	projects-dir: nginx
 
 before_create:
 	- sudo service nginx stop
 	- echo "<localhost> <project-name>.<tld>" >> <hosts>
-	- cp <nginx-virtual-host-default> <nginx-sites-enabled>/<project-name>
+	- sudo cp <nginx-virtual-host-default> <nginx-sites-enabled>/<project-name>
 	- sudo sed -i 's/port/<port>/g' <nginx-sites-enabled>/<project-name>
 	- sudo sed -i 's/host-name/<project-name>.<tld>/g' <nginx-sites-enabled>/<project-name>
 	- sudo sed -i 's|'project-root'|'<project-dir>/<root>'|g' <nginx-sites-enabled>/<project-name>
@@ -19,6 +19,6 @@ before_remove:
 
 after_remove:
 	- sudo sed -i "/<localhost> <project-name>.<tld>/d" <hosts>
-	- rm <nginx-sites-enabled>/<project-name>
+	- sudo rm <nginx-sites-enabled>/<project-name>
 	- sudo service nginx start
 	- echo "Project '<project-name>' was successfully removed."

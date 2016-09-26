@@ -1,10 +1,10 @@
 parameters:
-	projects-dir: defaultt
+	projects-dir: apache
 
 before_create:
 	- sudo service apache2 stop
 	- echo "<localhost> <project-name>.<tld>" >> <hosts>
-	- cp <apache-virtual-host-default> <apache-sites-enabled>/<project-name>
+	- sudo cp <apache-virtual-host-default> <apache-sites-enabled>/<project-name>
 	- sudo sed -i 's/port/<port>/g' <apache-sites-enabled>/<project-name>
 	- sudo sed -i 's/host-name/<project-name>.<tld>/g' <apache-sites-enabled>/<project-name>
 	- sudo sed -i 's|'project-root'|'<project-dir>/<root>'|g' <apache-sites-enabled>/<project-name>
@@ -19,6 +19,6 @@ before_remove:
 
 after_remove:
 	- sudo sed -i "/<localhost> <project-name>.<tld>/d" <hosts>
-	- rm <apache-sites-enabled>/<project-name>
+	- sudo rm <apache-sites-enabled>/<project-name>
 	- sudo service apache2 start
 	- echo "Project '<project-name>' was successfully removed."
