@@ -15,7 +15,6 @@ use Alchemist\Config;
 use Alchemist\Configurator;
 use Alchemist\Manager;
 use Nette\DI\Container;
-use Nette\Utils\Finder;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
