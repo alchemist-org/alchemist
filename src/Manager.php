@@ -77,7 +77,7 @@ class Manager
         $template = $this->loadTemplatePerProject($projectName);
 
         // template & console parameters merge to parameters loaded by config
-        if($template) {
+        if ($template) {
             $this->configurator->getConfig()->applyParameters($template->getParameters());
         }
 
@@ -107,7 +107,7 @@ class Manager
         if ($save) {
             $config = $this->configurator->getConfig();
 
-            $distantSources= array();
+            $distantSources = array();
             foreach ($config->getDistantSources() as $distantSourceName => $distantSourceData) {
                 foreach ($distantSourceData as $distantSourceProjectName => $projectData) {
                     if ($projectName != $distantSourceProjectName) {
@@ -189,10 +189,10 @@ class Manager
         $template = $templateName ? $this->templateLoader->getTemplate($templateName) : null;
 
         // template & console parameters merge to parameters loaded by config
-        if($template) {
+        if ($template) {
             $this->configurator->getConfig()->applyParameters($template->getParameters());
         }
-        if($parameters) {
+        if ($parameters) {
             $this->configurator->getConfig()->applyParameters($parameters);
         }
 
@@ -353,7 +353,7 @@ class Manager
         $result = null;
 
         $projectsDirs = $this->configurator->getConfig()->getProjectsDirs();
-        foreach($projectsDirs as $projectsDirName => $projectsDirPath) {
+        foreach ($projectsDirs as $projectsDirName => $projectsDirPath) {
 
             // load templateName
             $template = $this->loadTemplatePerProject($projectName);
@@ -367,8 +367,8 @@ class Manager
             $replacementParameters['projects-dir'] = $projectsDirPath;
             $replacementParameters['project-dir'] = $projectsDirPath . DIRECTORY_SEPARATOR . $projectName;
 
-            if($projectsDir) {
-                if($projectsDir == $projectsDirPath) {
+            if ($projectsDir) {
+                if ($projectsDir == $projectsDirPath) {
                     $projectDir = $this->getProjectDir($projectName, $projectsDir);
                     if (is_readable($projectDir)) {
                         $result = $this->runScript($template->getScript(self::TOUCH), $replacementParameters);
@@ -409,19 +409,22 @@ class Manager
             $mask = $projectsDir . DIRECTORY_SEPARATOR . '*';
             $projects = glob($mask, GLOB_ONLYDIR);
 
-            // run
-            $projectsDirName = $this->configurator->getConfig()->getProjectsDirName($projectsDir);
-            $result[$projectsDirName] = $this->runScript("echo $projectsDirName:");
+            if(!empty($projects)) {
 
-            foreach ($projects as $projectDir) {
-                $projectName = basename($projectDir);
+                // run
+                $projectsDirName = $this->configurator->getConfig()->getProjectsDirName($projectsDir);
+                $result[$projectsDirName] = $this->runScript("echo $projectsDirName:");
 
-                if($filterProjectName) {
-                    if($projectName == $filterProjectName) {
+                foreach ($projects as $projectDir) {
+                    $projectName = basename($projectDir);
+
+                    if ($filterProjectName) {
+                        if ($projectName == $filterProjectName) {
+                            $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
+                        }
+                    } else {
                         $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
                     }
-                } else {
-                    $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
                 }
             }
         }
@@ -429,4 +432,43 @@ class Manager
         return $result;
     }
 
+    /**
+     * @return array
+     */
+    public function save()
+    {
+        $result = array();
+
+        // load all projects
+        foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDir) {
+            $mask = $projectsDir . DIRECTORY_SEPARATOR . '*';
+            $projects = glob($mask, GLOB_ONLYDIR);
+
+            foreach ($projects as $projectDir) {
+                $projectName = basename($projectDir);
+
+                $remoteOriginUrl = exec("cd $projectDir && git config --get remote.origin.url");
+
+                // add
+                if($remoteOriginUrl) {
+                    $config = $this->configurator->getConfig();
+
+                    // origin source
+                    $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+                    $distantSourceData[$projectName] = array(
+                        'projects-dir' => $this->configurator->getConfig()->getProjectsDirName($projectsDir),
+                        'origin-source' => array(
+                            'type' => 'git',
+                            'value' => $remoteOriginUrl
+                        )
+                    );
+                    $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
+
+                    $this->configurator->setConfig($config);
+                }
+            }
+        }
+
+        return $result;
+    }
 }
