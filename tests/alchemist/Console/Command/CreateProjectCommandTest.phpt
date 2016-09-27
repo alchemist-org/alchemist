@@ -50,7 +50,7 @@ class CreateProjectCommandTest extends CommandTestCase
             )
         );
 
-        $hostName = $projectName.'.'.self::TLD;
+        $hostName = $projectName . '.' . self::TLD;
         $rootDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . self::ROOT;
         $defaultDistanceSources = $this->configurator->getConfig()->getDistantSource('default');
         Assert::falsey(empty($defaultDistanceSources));
@@ -86,16 +86,16 @@ class CreateProjectCommandTest extends CommandTestCase
             )
         );
 
-        $hostName = $projectName.'.'.self::TLD;
+        $hostName = $projectName . '.' . self::TLD;
         $rootDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . self::ROOT;
         $defaultDistanceSources = $this->configurator->getConfig()->getDistantSource('default');
         Assert::falsey(empty($defaultDistanceSources));
         Assert::truthy(file_exists(self::HOSTS_FILE));
         Assert::truthy($this->isStringInFile(self::HOSTS_FILE, $hostName));
-        Assert::truthy(file_exists(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName));
-        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName, self::PORT));
-        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName, $hostName));
-        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName, $rootDir));
+        Assert::truthy(file_exists(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf'));
+        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf', self::PORT));
+        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf', $hostName));
+        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf', $rootDir));
 
         $this->runCommand(
             $this->container->getByType(RemoveProjectCommand::class),
