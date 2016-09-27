@@ -11,7 +11,9 @@
 
 namespace Alchemist\Console\Command;
 
+use Alchemist\Console\Utils\ConsoleUtils;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Alchemist\Manager;
@@ -40,14 +42,21 @@ class InstallCommand extends Command
     {
         $this
             ->setName('install')
-            ->setDescription('Install projects');
+            ->setDescription('Install projects')
+            ->setDefinition(array(
+                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Re-create alredy existing projects')
+            ));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $manager = $this->manager;
 
-        $manager->install();
+        $force = $input->getOption('force');
+
+        $result = $manager->install($force);
+
+        ConsoleUtils::writeln($result, $output);
     }
 
 }

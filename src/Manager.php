@@ -310,9 +310,11 @@ class Manager
     }
 
     /**
+     * @param bool $force
+     *
      * @return array
      */
-    public function install()
+    public function install($force = false)
     {
         $result = [];
 
@@ -329,12 +331,17 @@ class Manager
                 $originSource = isset($projectData['origin-source']) ? $projectData['origin-source'] : array();
 
                 // create project
-                $result = $this->createProject($projectName, $templateName, array(
-                    'origin-source' => $originSource
-                ),
-                    false,
-                    true
-                );
+                $projectExist = $this->touchProject($projectName);
+
+                if(!$projectExist || $force) {
+                    $result = $this->createProject(
+                        $projectName,
+                        $templateName,
+                        array('origin-source' => $originSource),
+                        false,
+                        true
+                    );
+                }
 
                 // add result
                 $result[$distantSourceName] = $result;
@@ -411,7 +418,7 @@ class Manager
             $mask = $projectsDir . DIRECTORY_SEPARATOR . '*';
             $projects = glob($mask, GLOB_ONLYDIR);
 
-            if(!empty($projects)) {
+            if (!empty($projects)) {
 
                 // run
                 $projectsDirName = $this->configurator->getConfig()->getProjectsDirName($projectsDir);
@@ -452,7 +459,7 @@ class Manager
                 $remoteOriginUrl = exec("cd $projectDir && git config --get remote.origin.url");
 
                 // add
-                if($remoteOriginUrl) {
+                if ($remoteOriginUrl) {
                     $config = $this->configurator->getConfig();
 
                     // origin source

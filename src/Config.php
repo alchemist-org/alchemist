@@ -37,7 +37,10 @@ class Config extends Object
             'templates' => __DIR__ . '/../data/templates',
             'source-types' => array(
                 'composer' => 'composer create-project <value> <project-dir>',
-                'git' => 'git clone <value> <project-dir>'
+                'git' => array(
+                    'git clone <value> <project-dir>',
+                    'printf \n'
+                )
             ),
             'projects-dirs' => array()
         ),
