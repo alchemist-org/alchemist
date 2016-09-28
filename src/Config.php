@@ -33,7 +33,7 @@ class Config extends Object
             )
         ),
         'core' => array(
-            'template' => 'default',
+            'template' =>  Template::DEFAULT_TEMPLATE,
             'templates' => __DIR__ . '/../data/templates',
             'source-types' => array(
                 'composer' => 'composer create-project <value> <project-dir>',
