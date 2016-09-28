@@ -31,39 +31,32 @@ $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 Create and set up `config.local.neon`. For example:
 
 ```
-parameters:     # default parameters, could be overwritten in templates
-    projects-dir: nginx
-    origin-source:
-        type: git
-        value: https://github.com/nette/web-project
+parameters:
+	projects-dir: default
+	hosts: /etc/hosts
+	tld: dev
+	localhost: 127.0.0.1
+	nginx-sites-enabled: /etc/nginx/sites-enabled
+	nginx-virtual-host-default: <alchemist-location>/data/virtual-hosts/nginx.default
+	apache-sites-enabled: /etc/apache2/sites-enabled
+	apache-virtual-host-default: <alchemist-location>/data/virtual-hosts/apache.default
+	port: 80
+	root: www
 
 core:
-    template: common    # default template
-    templates: /usr/share/nginx/alchemist/data/templates    #templates directory
-    project-dirs:
-        nginx: /usr/share/nginx
-        apache2: /var/www/
-    source-types:
-        # default types
-        #composer: composer create-project <value> <project-dir>
-        #git: git clone <value> <project-dir>
+	projects-dirs:
 
-        # your own type
-        specialSourceType:
-            - mkdir <project-dir>/www
-            - echo Succesfully processed specialSourceType
+		nginx:
+			path: /usr/share/nginx/
+			template: nginx
 
+		apache:
+			path: /var/www/
+			template: apache
 
-distant-sources:
-    # default group, new projects with save adds here
-    default:
-
-    alchemist-org:
-        alchemist:
-            projects-dir: nginx
-            origin-source:
-                type: git
-                url: https://github.com/alchemist-org/alchemist.git
+		default:
+			path: /home/ldrahnik/projects
+			template: default
 ```
 
 You can set up your distant sources block from already existing projects with command `alchemist save`.
@@ -75,8 +68,6 @@ Create template, in default you can set up these blocks:
     before_remove:
     after_remove:
     touch:
-        - echo `something`
-        - echo `something`
 ```
 
 ###Self update

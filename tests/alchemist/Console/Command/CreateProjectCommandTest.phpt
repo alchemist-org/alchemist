@@ -121,7 +121,8 @@ class CreateProjectCommandTest extends CommandTestCase
             array(
                 'name' => $projectName,
                 '--save' => true,
-                '--template' => 'default'
+                '--template' => 'default',
+                '--projects-dir' => self::PROJECTS_DIR_NAME
             )
         );
 

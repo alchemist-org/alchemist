@@ -87,6 +87,15 @@ class Config extends Object
         return $this->config['core']['projects-dirs'];
     }
 
+    public function getProjectsDirsPaths()
+    {
+        $result = array();
+        foreach($this->getProjectsDirs() as $name => $data) {
+            $result[$name] = $this->getProjectsDirPath($name);
+        }
+        return $result;
+    }
+
     public function setProjectsDirs(array $projectsDirs = array())
     {
         $this->config['core']['projects-dirs'] = $projectsDirs;
@@ -95,14 +104,18 @@ class Config extends Object
     public function getProjectsDirPath($name)
     {
         if (isset($this->getProjectsDirs()[$name])) {
-            return $this->getProjectsDirs()[$name];
+            if(is_string($this->getProjectsDirs()[$name])) {
+                return $this->getProjectsDirs()[$name];
+            } else {
+                return $this->getProjectsDirs()[$name]['path'];
+            }
         }
         return null;
     }
 
     public function getProjectsDirName($path)
     {
-        $inversedArray = array_flip($this->getProjectsDirs());
+        $inversedArray = array_flip($this->getProjectsDirsPaths());
         if (isset($inversedArray[$path])) {
             return $inversedArray[$path];
         }

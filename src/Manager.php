@@ -361,8 +361,7 @@ class Manager
     {
         $result = null;
 
-        $projectsDirs = $this->configurator->getConfig()->getProjectsDirs();
-        foreach ($projectsDirs as $projectsDirName => $projectsDirPath) {
+        foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
 
             // load templateName
             $template = $this->loadTemplatePerProject($projectName);
@@ -414,7 +413,7 @@ class Manager
         $result = array();
 
         // load all projects
-        foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDirName => $projectsDirPath) {
+        foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
             $mask = $projectsDirPath . DIRECTORY_SEPARATOR . '*';
             $projects = glob($mask, GLOB_ONLYDIR);
 
@@ -448,8 +447,16 @@ class Manager
         $result = array();
 
         // load all projects
-        foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDir) {
-            $mask = $projectsDir . DIRECTORY_SEPARATOR . '*';
+        foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDirName => $projectsDirData) {
+            $projectsDirTemplate = null;
+            if(is_array($projectsDirData)) {
+                $projectsDirPath = $projectsDirData['path'];
+                $projectsDirTemplate = isset($projectsDirData['template']) ? $projectsDirData['template'] : null;
+            } else {
+                $projectsDirPath = $projectsDirData;
+            }
+
+            $mask = $projectsDirPath . DIRECTORY_SEPARATOR . '*';
             $projects = glob($mask, GLOB_ONLYDIR);
 
             foreach ($projects as $projectDir) {
@@ -464,7 +471,10 @@ class Manager
                     // origin source
                     $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
                     $distantSourceData[$projectName] = array(
-                        'projects-dir' => $this->configurator->getConfig()->getProjectsDirName($projectsDir),
+                        'projects-dir' => $projectsDirName,
+                        'core' => array(
+                            'template' => $projectsDirTemplate
+                        ),
                         'origin-source' => array(
                             'type' => 'git',
                             'value' => $remoteOriginUrl

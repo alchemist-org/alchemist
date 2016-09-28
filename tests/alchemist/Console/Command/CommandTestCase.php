@@ -88,8 +88,14 @@ abstract class CommandTestCase extends TestCase
             'templates' => self::TEMPLATES,
             'projects-dirs' => array(
                 self::PROJECTS_DIR_NAME => TEST_PROJECTS_DIR,
-                'nginx' => TEST_PROJECTS_DIR,
-                'apache' => TEST_PROJECTS_DIR
+                'nginx' => array(
+                    'path' => TEST_PROJECTS_DIR,
+                    'template' => 'nginx'
+                ),
+                'apache' => array(
+                    'path' => TEST_PROJECTS_DIR,
+                    'template' => 'apache'
+                ),
             )
         )
     );

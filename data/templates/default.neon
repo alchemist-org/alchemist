@@ -1,6 +1,3 @@
-parameters:
-	projects-dir: defaultt
-
 before_create:
 	- echo "Project '<project-name>' will be created."
 
