@@ -374,7 +374,7 @@ class Manager
             $replacementParameters = $this->configurator->getConfig()->getParameters();
             $replacementParameters['project-name'] = $projectName;
             $replacementParameters['projects-dir'] = $projectsDirPath;
-            $replacementParameters['project-dir'] = $projectsDirPath . DIRECTORY_SEPARATOR . $projectName;
+            $replacementParameters['project-dir'] = $this->getProjectDir($projectName, $projectsDirPath);
 
             if ($projectsDir) {
                 if ($projectsDir == $projectsDirPath) {
@@ -414,14 +414,13 @@ class Manager
         $result = array();
 
         // load all projects
-        foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDir) {
-            $mask = $projectsDir . DIRECTORY_SEPARATOR . '*';
+        foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDirName => $projectsDirPath) {
+            $mask = $projectsDirPath . DIRECTORY_SEPARATOR . '*';
             $projects = glob($mask, GLOB_ONLYDIR);
 
             if (!empty($projects)) {
 
                 // run
-                $projectsDirName = $this->configurator->getConfig()->getProjectsDirName($projectsDir);
                 $result[$projectsDirName] = $this->runScript("echo $projectsDirName:");
 
                 foreach ($projects as $projectDir) {
@@ -432,7 +431,7 @@ class Manager
                             $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
                         }
                     } else {
-                        $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
+                        $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath);
                     }
                 }
             }
