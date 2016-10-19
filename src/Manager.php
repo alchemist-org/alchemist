@@ -188,10 +188,44 @@ class Manager
      */
     public function createProject(
         $projectName,
-        $templateName = Template::DEFAULT_TEMPLATE,
+        $templates = Template::DEFAULT_TEMPLATE,
         array $parameters = array(),
         $save = false,
         $force = false
+    ) {
+        if(is_array($templates)) {
+            $isFirst = true;
+            foreach($templates as $key => $templateName) {
+                if($isFirst) {
+                    $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force);
+                    $isFirst = false;
+                } else {
+                    $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force, true);
+                }
+            }
+        } else {
+            $this->createProjectInternal($projectName, $templates, $parameters, $save, $force);
+        }
+    }
+
+    /**
+     * @param string $projectName
+     * @param string|Template::DEFAULT_TEMPLATE|null $templateName
+     * @param array $parameters
+     * @param bool $save
+     * @param bool $force
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    private function createProjectInternal(
+        $projectName,
+        $templateName = Template::DEFAULT_TEMPLATE,
+        array $parameters = array(),
+        $save = false,
+        $force = false,
+        $ignoreCreatingProjectDir = false
     )
     {
         $result = array();
@@ -215,12 +249,15 @@ class Manager
         // load projectDir
         $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
 
-        // duplicates are not allowed, if is force enable, remove project
-        if (file_exists($projectDir)) {
-            if ($force) {
-                $this->removeProject($projectName);
-            } else {
-                throw new \Exception("Project '$projectName' ['$projectDir'] already exists.");
+        // used when is called more templates in row, only first create projectDir
+        if(!$ignoreCreatingProjectDir) {
+            // duplicates are not allowed, if is force enable, remove project
+            if (file_exists($projectDir)) {
+                if ($force) {
+                    $this->removeProject($projectName);
+                } else {
+                    throw new \Exception("Project '$projectName' ['$projectDir'] already exists.");
+                }
             }
         }
 

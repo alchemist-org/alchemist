@@ -146,6 +146,26 @@ class ManagerTest extends TestCase
         });
     }
 
+    public function testCreateProjectMoreTemplates()
+    {
+        $projectName = 'foo';
+
+        Assert::noError(function () use ($projectName) {
+            $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+
+            $this->manager->createProject($projectName, array(
+                'default',
+                'git.user',
+                'git.email',
+                'git.user'
+            ));
+            Assert::true(file_exists($projectDir));
+            Assert::true(file_exists($projectDir . DIRECTORY_SEPARATOR . 'after_create'));
+            Assert::equal(self::DEFAULT_GIT_EMAIL, exec("cd " . $projectDir . " && git config user.email"));
+            Assert::equal(self::DEFAULT_GIT_NAME, exec("cd " . $projectDir . " && git config user.name"));
+        });
+    }
+
     public function testCreateProjectAndForceRecreateNew()
     {
         $projectName = 'foo';
@@ -171,7 +191,6 @@ class ManagerTest extends TestCase
             ), true);
             Assert::equal(TEST_PROJECTS_DIR, $this->configurator->getConfig()->getProjectsDir());
             Assert::truthy($this->configurator->getConfig()->getProjectsDir());
-            Assert::truthy($this->configurator->getConfig()->getProjectsDirPath('projects-dir'));
             Assert::truthy($this->configurator->getConfig()->getProjectsDirPath('projects-dir'));
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);

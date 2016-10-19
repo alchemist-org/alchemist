@@ -1,0 +1,2 @@
+after_create:
+	- cd <project-dir> && git init
