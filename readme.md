@@ -43,6 +43,11 @@ parameters:
 	port: 80
 	root: www
 
+after_create:
+	- cd <project-dir> && git init
+	- cd <project-dir> && git config user.name 'super user'
+	- cd <project-dir> && git config user.email 'super@user.com'
+
 core:
 	projects-dirs:
 
