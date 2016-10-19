@@ -29,13 +29,25 @@ class Manager
     const BEFORE_CREATE = 'before_create';
 
     /** @var string */
+    const BEFORE_CREATE_ROOT = 'before_create_root';
+
+    /** @var string */
     const AFTER_CREATE = 'after_create';
+
+    /** @var string */
+    const AFTER_CREATE_ROOT = 'after_create_root';
 
     /** @var string */
     const BEFORE_REMOVE = 'before_remove';
 
     /** @var string */
+    const BEFORE_REMOVE_ROOT = 'before_remove_root';
+
+    /** @var string */
     const AFTER_REMOVE = 'after_remove';
+
+    /** @var string */
+    const AFTER_REMOVE_ROOT = 'before_remove_root';
 
     /** @var string */
     const REMOVE = 'remove';
@@ -95,12 +107,14 @@ class Manager
         $replacementParameters['project-dir'] = $projectDir;
 
         // run before remove
+        $result[self::BEFORE_REMOVE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_REMOVE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_REMOVE], $replacementParameters) : array();
         $result[self::BEFORE_REMOVE] = $template ? $this->runScript($template->getScript(self::BEFORE_REMOVE), $replacementParameters) : array();
 
         // remove project (actually)
         $result[self::REMOVE] = Console::execute("rm -rf $projectDir");
 
         // run after remove
+        $result[self::AFTER_REMOVE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_REMOVE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_REMOVE], $replacementParameters) : array();
         $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : array();
 
         // remove from distant source
@@ -216,6 +230,7 @@ class Manager
         $replacementParameters['project-dir'] = $projectDir;
 
         // run before_create
+        $result[self::BEFORE_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE], $replacementParameters) : array();
         $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : array();
 
         // create project (actually)
@@ -243,6 +258,7 @@ class Manager
         }
 
         // run after create
+        $result[self::AFTER_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE], $replacementParameters) : array();
         $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : array();
 
         // save

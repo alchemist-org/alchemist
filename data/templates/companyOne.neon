@@ -1,0 +1,3 @@
+after_create:
+	- git config --global user.name "Lukáš Drahník"
+	- git config --global user.email "test@company.one"

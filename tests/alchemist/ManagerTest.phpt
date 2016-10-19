@@ -49,12 +49,23 @@ class ManagerTest extends TestCase
     /** @var string */
     const TEST_PROJECT_SOURCE_TYPE = 'fooType';
 
+    /** @var string */
+    const DEFAULT_GIT_EMAIL = 'super@user.com';
+
+    /** @var string */
+    const DEFAULT_GIT_NAME = 'super user';
+
     /** @var array */
     private $config = array(
         'parameters' => array(
             'projects-dir' => self::PROJECTS_DIR_NAME,
             'origin-source' => array(),
             'test' => 'test'
+        ),
+        'after_create' => array(
+            "cd <project-dir> && git init",
+            "cd <project-dir> && git config user.name '" . self::DEFAULT_GIT_NAME . "'",
+            "cd <project-dir> && git config user.email '" . self::DEFAULT_GIT_EMAIL . "'",
         ),
         'core' => array(
             'template' => 'common',
@@ -125,9 +136,13 @@ class ManagerTest extends TestCase
         $projectName = 'foo';
 
         Assert::noError(function () use ($projectName) {
+            $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+
             $this->manager->createProject($projectName);
-            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName));
-            Assert::true(file_exists(TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . 'after_create'));
+            Assert::true(file_exists($projectDir));
+            Assert::true(file_exists($projectDir . DIRECTORY_SEPARATOR . 'after_create'));
+            Assert::equal(self::DEFAULT_GIT_EMAIL, exec("cd " . $projectDir . " && git config user.email"));
+            Assert::equal(self::DEFAULT_GIT_NAME, exec("cd " . $projectDir . " && git config user.name"));
         });
     }
 
@@ -345,7 +360,7 @@ class ManagerTest extends TestCase
 
         Assert::falsey($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
 
-        $this->manager->createProject($projectName);
+        $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(), true);
 
         $this->manager->save();
 
