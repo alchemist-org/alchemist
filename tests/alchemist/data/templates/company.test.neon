@@ -1,0 +1,4 @@
+after_create:
+	- cd <project-dir> && git init
+	- cd <project-dir> && git config user.email "test@company.a"
+	- cd <project-dir> && git config user.name 'super user - company A'

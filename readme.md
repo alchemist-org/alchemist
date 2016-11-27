@@ -43,6 +43,11 @@ parameters:
 	port: 80
 	root: www
 
+after_create:
+	- cd <project-dir> && git init
+	- cd <project-dir> && git config user.name 'super user'
+	- cd <project-dir> && git config user.email 'super@user.com'
+
 core:
 	projects-dirs:
 
@@ -85,7 +90,7 @@ $ alchemist create-project <name> [--template <name>] [--projects-dir <dir>] [--
 Name | Explanation
 ------------ | -------------
 name | Project name
---template <name> | Template name
+--template <name> | Template name or names
 --projects-dir <dir> | Projects dir
 --type <type> | Type, e.g. git, composer..
 --value <value> | Value, e.g. url, package-name..

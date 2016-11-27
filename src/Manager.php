@@ -29,13 +29,25 @@ class Manager
     const BEFORE_CREATE = 'before_create';
 
     /** @var string */
+    const BEFORE_CREATE_ROOT = 'before_create_root';
+
+    /** @var string */
     const AFTER_CREATE = 'after_create';
+
+    /** @var string */
+    const AFTER_CREATE_ROOT = 'after_create_root';
 
     /** @var string */
     const BEFORE_REMOVE = 'before_remove';
 
     /** @var string */
+    const BEFORE_REMOVE_ROOT = 'before_remove_root';
+
+    /** @var string */
     const AFTER_REMOVE = 'after_remove';
+
+    /** @var string */
+    const AFTER_REMOVE_ROOT = 'before_remove_root';
 
     /** @var string */
     const REMOVE = 'remove';
@@ -95,12 +107,14 @@ class Manager
         $replacementParameters['project-dir'] = $projectDir;
 
         // run before remove
+        $result[self::BEFORE_REMOVE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_REMOVE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_REMOVE], $replacementParameters) : array();
         $result[self::BEFORE_REMOVE] = $template ? $this->runScript($template->getScript(self::BEFORE_REMOVE), $replacementParameters) : array();
 
         // remove project (actually)
         $result[self::REMOVE] = Console::execute("rm -rf $projectDir");
 
         // run after remove
+        $result[self::AFTER_REMOVE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_REMOVE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_REMOVE], $replacementParameters) : array();
         $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : array();
 
         // remove from distant source
@@ -174,10 +188,47 @@ class Manager
      */
     public function createProject(
         $projectName,
-        $templateName = Template::DEFAULT_TEMPLATE,
+        $templates = Template::DEFAULT_TEMPLATE,
         array $parameters = array(),
         $save = false,
         $force = false
+    ) {
+        if(is_array($templates)) {
+            $isFirst = true;
+            $results = [];
+            foreach($templates as $key => $templateName) {
+                if($isFirst) {
+                    $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force);
+                    $isFirst = false;
+                } else {
+                    $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force, true);
+                }
+            }
+            return $results;
+        } else {
+            return $this->createProjectInternal($projectName, $templates, $parameters, $save, $force);
+        }
+    }
+
+    /**
+     * @param string $projectName
+     * @param string|Template::DEFAULT_TEMPLATE|null $templateName
+     * @param array $parameters
+     * @param bool $save
+     * @param bool $force
+     * @param bool $isNotFirstCreating
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    private function createProjectInternal(
+        $projectName,
+        $templateName = Template::DEFAULT_TEMPLATE,
+        array $parameters = array(),
+        $save = false,
+        $force = false,
+        $isNotFirstCreating = false
     )
     {
         $result = array();
@@ -201,12 +252,15 @@ class Manager
         // load projectDir
         $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
 
-        // duplicates are not allowed, if is force enable, remove project
-        if (file_exists($projectDir)) {
-            if ($force) {
-                $this->removeProject($projectName);
-            } else {
-                throw new \Exception("Project '$projectName' ['$projectDir'] already exists.");
+        // used when is called more templates in row, only first create projectDir
+        if(!$isNotFirstCreating) {
+            // duplicates are not allowed, if is force enable, remove project
+            if (file_exists($projectDir)) {
+                if ($force) {
+                    $this->removeProject($projectName);
+                } else {
+                    throw new \Exception("Project '$projectName' ['$projectDir'] already exists.");
+                }
             }
         }
 
@@ -216,6 +270,10 @@ class Manager
         $replacementParameters['project-dir'] = $projectDir;
 
         // run before_create
+        // used when is called more templates in row, only first create projectDir
+        if(!$isNotFirstCreating) {
+            $result[self::BEFORE_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE], $replacementParameters) : array();
+        }
         $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : array();
 
         // create project (actually)
@@ -243,6 +301,10 @@ class Manager
         }
 
         // run after create
+        // used when is called more templates in row, only first create projectDir
+        if(!$isNotFirstCreating) {
+            $result[self::AFTER_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE], $replacementParameters) : array();
+        }
         $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : array();
 
         // save
@@ -427,7 +489,7 @@ class Manager
 
                     if ($filterProjectName) {
                         if ($projectName == $filterProjectName) {
-                            $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
+                            $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath);
                         }
                     } else {
                         $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath);
