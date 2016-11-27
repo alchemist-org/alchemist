@@ -51,9 +51,11 @@ class ManagerTest extends TestCase
 
     /** @var string */
     const DEFAULT_GIT_EMAIL = 'super@user.com';
+    const DEFAULT_GIT_NAME = 'super user';
 
     /** @var string */
-    const DEFAULT_GIT_NAME = 'super user';
+    const COMPANY_A_GIT_NAME = 'super user - company A';
+    const COMPANY_A_GIT_EMAIL = 'test@company.a';
 
     /** @var array */
     private $config = array(
@@ -146,7 +148,7 @@ class ManagerTest extends TestCase
         });
     }
 
-    public function testCreateProjectMoreTemplates()
+    public function testCreateProjectMoreTemplatesAndAnotherGitSetUp()
     {
         $projectName = 'foo';
 
@@ -154,15 +156,12 @@ class ManagerTest extends TestCase
             $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
 
             $this->manager->createProject($projectName, array(
-                'default',
-                'git.user',
-                'git.email',
-                'git.user'
+                'company.test'
             ));
             Assert::true(file_exists($projectDir));
-            Assert::true(file_exists($projectDir . DIRECTORY_SEPARATOR . 'after_create'));
-            Assert::equal(self::DEFAULT_GIT_EMAIL, exec("cd " . $projectDir . " && git config user.email"));
-            Assert::equal(self::DEFAULT_GIT_NAME, exec("cd " . $projectDir . " && git config user.name"));
+            Assert::equal('true', exec("cd " . $projectDir . " && git rev-parse --is-inside-work-tree"));
+            Assert::equal(self::COMPANY_A_GIT_NAME, exec("cd " . $projectDir . " && git config user.name"));
+            Assert::equal(self::COMPANY_A_GIT_EMAIL, exec("cd " . $projectDir . " && git config user.email"));
         });
     }
 

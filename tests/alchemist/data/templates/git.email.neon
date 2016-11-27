@@ -1,2 +1,0 @@
-after_create:
-	- git config --global user.email "test@company.two"

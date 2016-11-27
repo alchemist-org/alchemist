@@ -195,16 +195,18 @@ class Manager
     ) {
         if(is_array($templates)) {
             $isFirst = true;
+            $results = [];
             foreach($templates as $key => $templateName) {
                 if($isFirst) {
-                    $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force);
+                    $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force);
                     $isFirst = false;
                 } else {
-                    $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force, true);
+                    $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force, true);
                 }
             }
+            return $results;
         } else {
-            $this->createProjectInternal($projectName, $templates, $parameters, $save, $force);
+            return $this->createProjectInternal($projectName, $templates, $parameters, $save, $force);
         }
     }
 
@@ -214,6 +216,7 @@ class Manager
      * @param array $parameters
      * @param bool $save
      * @param bool $force
+     * @param bool $isNotFirstCreating
      *
      * @return array
      *
@@ -225,7 +228,7 @@ class Manager
         array $parameters = array(),
         $save = false,
         $force = false,
-        $ignoreCreatingProjectDir = false
+        $isNotFirstCreating = false
     )
     {
         $result = array();
@@ -250,7 +253,7 @@ class Manager
         $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
 
         // used when is called more templates in row, only first create projectDir
-        if(!$ignoreCreatingProjectDir) {
+        if(!$isNotFirstCreating) {
             // duplicates are not allowed, if is force enable, remove project
             if (file_exists($projectDir)) {
                 if ($force) {
@@ -267,7 +270,10 @@ class Manager
         $replacementParameters['project-dir'] = $projectDir;
 
         // run before_create
-        $result[self::BEFORE_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE], $replacementParameters) : array();
+        // used when is called more templates in row, only first create projectDir
+        if(!$isNotFirstCreating) {
+            $result[self::BEFORE_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE], $replacementParameters) : array();
+        }
         $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : array();
 
         // create project (actually)
@@ -295,7 +301,10 @@ class Manager
         }
 
         // run after create
-        $result[self::AFTER_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE], $replacementParameters) : array();
+        // used when is called more templates in row, only first create projectDir
+        if(!$isNotFirstCreating) {
+            $result[self::AFTER_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE], $replacementParameters) : array();
+        }
         $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : array();
 
         // save
@@ -480,7 +489,7 @@ class Manager
 
                     if ($filterProjectName) {
                         if ($projectName == $filterProjectName) {
-                            $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDir);
+                            $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath);
                         }
                     } else {
                         $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath);
