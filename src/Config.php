@@ -39,6 +39,8 @@ class Config extends Object
                 'composer' => 'composer create-project <value> <project-dir>',
                 'git' => array(
                     'git clone <value> <project-dir>',
+                    'cd <project-dir> && git config user.name <name>',
+                    'cd <project-dir> && git config user.email <email>',
                     'printf \n'
                 )
             ),
