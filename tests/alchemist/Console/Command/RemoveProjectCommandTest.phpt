@@ -31,7 +31,10 @@ class RemoveProjectCommandTest extends CommandTestCase
         Assert::error(function () use ($projectName) {
             $this->runCommand(
                 $this->container->getByType(RemoveProjectCommand::class),
-                array('name' => $projectName)
+                array(
+                    'name' => $projectName,
+                    '--projects-dir' => self::PROJECTS_DIR_NAME
+                )
             );
         }, '\Exception');
     }
@@ -76,7 +79,8 @@ class RemoveProjectCommandTest extends CommandTestCase
             $this->container->getByType(RemoveProjectCommand::class),
             array(
                 'name' => $projectName,
-                '--save' => true
+                '--save' => true,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
             )
         );
 

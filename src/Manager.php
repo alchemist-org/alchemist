@@ -19,47 +19,34 @@ use Alchemist\Utils\Arrays;
 class Manager
 {
 
-    /** @var Configurator */
-    private $configurator;
-
-    /** @var TemplateLoader */
-    private $templateLoader;
-
     /** @var string */
     const BEFORE_CREATE = 'before_create';
-
     /** @var string */
     const BEFORE_CREATE_ROOT = 'before_create_root';
-
     /** @var string */
     const AFTER_CREATE = 'after_create';
-
     /** @var string */
     const AFTER_CREATE_ROOT = 'after_create_root';
-
     /** @var string */
     const BEFORE_REMOVE = 'before_remove';
-
     /** @var string */
     const BEFORE_REMOVE_ROOT = 'before_remove_root';
-
     /** @var string */
     const AFTER_REMOVE = 'after_remove';
-
     /** @var string */
     const AFTER_REMOVE_ROOT = 'before_remove_root';
-
     /** @var string */
     const REMOVE = 'remove';
-
     /** @var string */
     const CREATE = 'create';
-
     /** @var string */
     const TOUCH = 'touch';
-
     /** @var string */
     const CREATE_ORIGIN_SOURCE = 'create_origin_source';
+    /** @var Configurator */
+    private $configurator;
+    /** @var TemplateLoader */
+    private $templateLoader;
 
     /**
      * Manager constructor.
@@ -71,293 +58,6 @@ class Manager
     {
         $this->configurator = $configurator;
         $this->templateLoader = $templateLoader;
-    }
-
-    /**
-     * @param string $projectName
-     * @param bool $save
-     *
-     * @throws \Exception
-     *
-     * @return array
-     */
-    public function removeProject($projectName, $save = false)
-    {
-        $result = array();
-
-        // load template
-        $template = $this->loadTemplatePerProject($projectName);
-
-        // template & console parameters merge to parameters loaded by config
-        if ($template) {
-            $this->configurator->getConfig()->applyParameters($template->getParameters());
-        }
-
-        $projectsDir = $this->configurator->getConfig()->getProjectsDir();
-        $projectDir = $this->getProjectDir($projectName, $projectsDir);
-
-        // check if project exists
-        if (!is_readable($projectDir)) {
-            throw new \Exception("Project '$projectName' can not be removed.");
-        }
-
-        // replacement parameters
-        $replacementParameters = $this->configurator->getConfig()->getParameters();
-        $replacementParameters['project-name'] = $projectName;
-        $replacementParameters['project-dir'] = $projectDir;
-
-        // run before remove
-        $result[self::BEFORE_REMOVE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_REMOVE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_REMOVE], $replacementParameters) : array();
-        $result[self::BEFORE_REMOVE] = $template ? $this->runScript($template->getScript(self::BEFORE_REMOVE), $replacementParameters) : array();
-
-        // remove project (actually)
-        $result[self::REMOVE] = Console::execute("rm -rf $projectDir");
-
-        // run after remove
-        $result[self::AFTER_REMOVE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_REMOVE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_REMOVE], $replacementParameters) : array();
-        $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : array();
-
-        // remove from distant source
-        if ($save) {
-            $config = $this->configurator->getConfig();
-
-            $distantSources = array();
-            foreach ($config->getDistantSources() as $distantSourceName => $distantSourceData) {
-                foreach ($distantSourceData as $distantSourceProjectName => $projectData) {
-                    if ($projectName != $distantSourceProjectName) {
-                        $distantSources[$distantSourceProjectName] = $projectData;
-                    }
-                }
-            }
-            $config->setDistantSources(
-                $distantSources
-            );
-
-            $this->configurator->setConfig($config);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns associated template or new Template()
-     *
-     * @param string $projectName
-     *
-     * @return Template|null
-     */
-    public function loadTemplatePerProject($projectName)
-    {
-        // load template
-        $templateName = null;
-        foreach ($this->configurator->getConfig()->getDistantSources() as $distantSource) {
-            foreach ($distantSource as $distantSourceProjectName => $projectData) {
-                if ($distantSourceProjectName == $projectName) {
-                    $templateName = isset($projectData['template']) ? $projectData['template'] : null;
-                }
-            }
-        }
-
-        // load default template
-        $templateName = $templateName ? $templateName : $this->configurator->getConfig()->getTemplateName();
-
-        return $this->templateLoader->getTemplate($templateName);
-    }
-
-    /**
-     * @param string $projectName
-     * @param string $projectsDir
-     *
-     * @return string
-     */
-    private function getProjectDir($projectName, $projectsDir)
-    {
-        return $projectsDir . DIRECTORY_SEPARATOR . $projectName;
-    }
-
-    /**
-     * @param string $projectName
-     * @param string|Template::DEFAULT_TEMPLATE|null $templateName
-     * @param array $parameters
-     * @param bool $save
-     * @param bool $force
-     *
-     * @return array
-     *
-     * @throws \Exception
-     */
-    public function createProject(
-        $projectName,
-        $templates = Template::DEFAULT_TEMPLATE,
-        array $parameters = array(),
-        $save = false,
-        $force = false
-    ) {
-        if(is_array($templates)) {
-            $isFirst = true;
-            $results = [];
-            foreach($templates as $key => $templateName) {
-                if($isFirst) {
-                    $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force);
-                    $isFirst = false;
-                } else {
-                    $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force, true);
-                }
-            }
-            return $results;
-        } else {
-            return $this->createProjectInternal($projectName, $templates, $parameters, $save, $force);
-        }
-    }
-
-    /**
-     * @param string $projectName
-     * @param string|Template::DEFAULT_TEMPLATE|null $templateName
-     * @param array $parameters
-     * @param bool $save
-     * @param bool $force
-     * @param bool $isNotFirstCreating
-     *
-     * @return array
-     *
-     * @throws \Exception
-     */
-    private function createProjectInternal(
-        $projectName,
-        $templateName = Template::DEFAULT_TEMPLATE,
-        array $parameters = array(),
-        $save = false,
-        $force = false,
-        $isNotFirstCreating = false
-    )
-    {
-        $result = array();
-
-        // use default template
-        if ($templateName == Template::DEFAULT_TEMPLATE) {
-            $templateName = $this->configurator->getConfig()->getTemplateName();
-        }
-
-        // load template
-        $template = $templateName ? $this->templateLoader->getTemplate($templateName) : null;
-
-        // template & console parameters merge to parameters loaded by config
-        if ($template) {
-            $this->configurator->getConfig()->applyParameters($template->getParameters());
-        }
-        if ($parameters) {
-            $this->configurator->getConfig()->applyParameters($parameters);
-        }
-
-        // load projectDir
-        $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
-
-        // used when is called more templates in row, only first create projectDir
-        if(!$isNotFirstCreating) {
-            // duplicates are not allowed, if is force enable, remove project
-            if (file_exists($projectDir)) {
-                if ($force) {
-                    $this->removeProject($projectName);
-                } else {
-                    throw new \Exception("Project '$projectName' ['$projectDir'] already exists.");
-                }
-            }
-        }
-
-        // replacement parameters
-        $replacementParameters = $this->configurator->getConfig()->getParameters();
-        $replacementParameters['project-name'] = $projectName;
-        $replacementParameters['project-dir'] = $projectDir;
-
-        // run before_create
-        // used when is called more templates in row, only first create projectDir
-        if(!$isNotFirstCreating) {
-            $result[self::BEFORE_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE], $replacementParameters) : array();
-        }
-        $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : array();
-
-        // create project (actually)
-        $result[self::CREATE] = Console::execute("mkdir $projectDir");
-
-        // load origin source
-        $originSource = $template && isset($template->getParameters()['origin-source']) ? $template->getParameter('origin-source') : $this->configurator->getConfig()->getParameter('origin-source');
-        $sourceTypes = $this->configurator->getConfig()->getSourceTypes();
-
-        // load project from origin source (actually)
-        $originSourceType = $originSource['type'];
-        if ($originSourceType) {
-            if (!isset($sourceTypes[$originSourceType])) {
-                throw new \Exception("Source type '$originSourceType' does not exist.");
-            }
-
-            // add specific replacement parameters
-            $originSourceParameters = $originSource;
-            unset($originSourceParameters['types']);
-            $replacementParametersOriginSource = Arrays::merge($replacementParameters, $originSourceParameters);
-
-            $result[self::CREATE_ORIGIN_SOURCE] = $this->runScript($sourceTypes[$originSourceType], $replacementParametersOriginSource);
-        } else {
-            $result[self::CREATE_ORIGIN_SOURCE] = array();
-        }
-
-        // run after create
-        // used when is called more templates in row, only first create projectDir
-        if(!$isNotFirstCreating) {
-            $result[self::AFTER_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE], $replacementParameters) : array();
-        }
-        $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : array();
-
-        // save
-        if ($save) {
-            $config = $this->configurator->getConfig();
-
-            // origin source
-            $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
-            $distantSourceData[$projectName] = array(
-                'origin-source' => array(
-                    'type' => $originSourceType,
-                    'value' => $originSource['value']
-                ),
-                'template' => $templateName
-            );
-            $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
-
-            // projects-dir
-            if (!isset(array_values($config->getProjectsDirs())[$projectDir])) {
-                $projectsDirs = $config->getProjectsDirs();
-
-                $projectsDirPath = $this->configurator->getConfig()->getProjectsDir();
-                $projectsDirs[basename($projectsDirPath)] = $projectsDirPath;
-                $config->setProjectsDirs($projectsDirs);
-            }
-
-            $this->configurator->setConfig($config);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array|string|null $script
-     * @param array $replaceParameters
-     *
-     * @return array
-     */
-    public function runScript($script, $replaceParameters = array())
-    {
-        // string -> array
-        $script = is_string($script) ? array($script) : $script;
-
-        $result = [];
-        foreach ($script as $scriptLine) {
-            // filter out what is not a string
-            $replaceParametersFiltered = array_filter($replaceParameters, function ($value) {
-                return is_string($value) || is_integer($value) ? $value : null;
-            });
-            $scriptLine = Parser::parse($scriptLine, $replaceParametersFiltered);
-            $result[] = Console::execute($scriptLine);
-        }
-        return $result;
     }
 
     /**
@@ -395,7 +95,7 @@ class Manager
                 // create project
                 $projectExist = $this->touchProject($projectName);
 
-                if(!$projectExist || $force) {
+                if (!$projectExist || $force) {
                     $result = $this->createProject(
                         $projectName,
                         $templateName,
@@ -413,46 +113,412 @@ class Manager
         return $result;
     }
 
-    /**
-     * @param string $projectName
-     * @param string $projectsDir
-     *
-     * @return string|null
-     */
     public function touchProject($projectName, $projectsDir = null)
     {
-        $result = null;
+        $results = [];
 
         foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
 
             // load templateName
-            $template = $this->loadTemplatePerProject($projectName);
+            $templates = $this->loadTemplatePerProject($projectName);
 
-            // template parameters merge to parameters loaded by config
-            $this->configurator->getConfig()->applyParameters($template->getParameters());
-
-            // replacement parameters
-            $replacementParameters = $this->configurator->getConfig()->getParameters();
-            $replacementParameters['project-name'] = $projectName;
-            $replacementParameters['projects-dir'] = $projectsDirPath;
-            $replacementParameters['project-dir'] = $this->getProjectDir($projectName, $projectsDirPath);
-
-            if ($projectsDir) {
-                if ($projectsDir == $projectsDirPath) {
-                    $projectDir = $this->getProjectDir($projectName, $projectsDir);
-                    if (is_readable($projectDir)) {
-                        $result = $this->runScript($template->getScript(self::TOUCH), $replacementParameters);
-                    }
+            if(is_array($templates) && count($templates)) {
+                foreach ($templates as $key => $template) {
+                    $results[] = $this->touchProjectInternal($projectName, $projectsDir, $template, $projectsDirName, $projectsDirPath);
                 }
             } else {
-                $projectDir = $this->getProjectDir($projectName, $projectsDirPath);
-                if (is_readable($projectDir)) {
-                    $result = $this->runScript($template->getScript(self::TOUCH), $replacementParameters);
+                $results[] = $this->touchProjectInternal($projectName, $projectsDir, null, $projectsDirName, $projectsDirPath);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Returns associated template or new Template()
+     *
+     * @param string $projectName
+     *
+     * @return Template[]
+     */
+    public function loadTemplatePerProject($projectName)
+    {
+        $result = [];
+
+        // load template
+        $templateName = null;
+        foreach ($this->configurator->getConfig()->getDistantSources() as $distantSource) {
+            foreach ($distantSource as $distantSourceProjectName => $projectData) {
+                if ($distantSourceProjectName == $projectName) {
+                    $templateName = isset($projectData['template']) ? $projectData['template'] : array();
+
+                    // load default template
+                    $templates = $templateName ? $templateName : $this->configurator->getConfig()->getTemplateName();
+
+                    if(is_array($templates) && count($templates)) {
+                        foreach($templates as $template) {
+                            $result[] = $this->templateLoader->getTemplate($template);
+                        }
+                    } else {
+                        $result[] = $this->templateLoader->getTemplate($templates);
+                    }
                 }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $projectName
+     * @param string $projectsDir
+     * @param Template|null $template
+     * @param string $projectsDirName
+     * @param string $projectsDirPath
+     *
+     * @return string|null
+     */
+    public function touchProjectInternal($projectName, $projectsDir, $template, $projectsDirName, $projectsDirPath)
+    {
+        $result = null;
+
+        // template parameters merge to parameters loaded by config
+        if($template) {
+            $this->configurator->getConfig()->applyParameters($template->getParameters());
+        }
+
+        // replacement parameters
+        $replacementParameters = $this->configurator->getConfig()->getParameters();
+        $replacementParameters['project-name'] = $projectName;
+        $replacementParameters['projects-dir'] = $projectsDirPath;
+        $replacementParameters['project-dir'] = $this->getProjectDir($projectName, $projectsDirPath);
+
+        if ($projectsDir) {
+            if ($projectsDir == $projectsDirPath) {
+                $projectDir = $this->getProjectDir($projectName, $projectsDir);
+                if (is_readable($projectDir)) {
+                    $result = $template ? $this->runScript($template->getScript(self::TOUCH), $replacementParameters) : null;
+                }
+            }
+        } else {
+            $projectDir = $this->getProjectDir($projectName, $projectsDirPath);
+            if (is_readable($projectDir)) {
+                $result = $template ? $this->runScript($template->getScript(self::TOUCH), $replacementParameters) : null;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $projectName
+     * @param string $projectsDir
+     *
+     * @return string
+     */
+    private function getProjectDir($projectName, $projectsDir)
+    {
+        return $projectsDir . DIRECTORY_SEPARATOR . $projectName;
+    }
+
+    /**
+     * @param array|string|null $script
+     * @param array $replaceParameters
+     *
+     * @return array
+     */
+    public function runScript($script, $replaceParameters = array())
+    {
+        // string -> array
+        $script = is_string($script) ? array($script) : $script;
+
+        $result = [];
+        foreach ($script as $scriptLine) {
+            // filter out what is not a string
+            $replaceParametersFiltered = array_filter($replaceParameters, function ($value) {
+                return is_string($value) || is_integer($value) ? $value : null;
+            });
+            $scriptLine = Parser::parse($scriptLine, $replaceParametersFiltered);
+            $result[] = Console::execute($scriptLine);
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $projectName
+     * @param string|Template::DEFAULT_TEMPLATE|null $templateName
+     * @param array $parameters
+     * @param bool $save
+     * @param bool $force
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function createProject(
+        $projectName,
+        $templates = Template::DEFAULT_TEMPLATE,
+        array $parameters = array(),
+        $save = false,
+        $force = false
+    )
+    {
+        $results = [];
+
+        $isFirst = true;
+        if (is_array($templates) && count($templates)) {
+            foreach ($templates as $key => $templateName) {
+                $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force, $isFirst);
+                if ($isFirst) {
+                    $isFirst = false;
+                }
+            }
+        } else {
+            $results[] = $this->createProjectInternal($projectName, $templates, $parameters, $save, $force, $isFirst);
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param string $projectName
+     * @param string|Template::DEFAULT_TEMPLATE|null $templateName
+     * @param array $parameters
+     * @param bool $save
+     * @param bool $force
+     * @param bool $isFirstCreating
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    private function createProjectInternal(
+        $projectName,
+        $templateName,
+        array $parameters = array(),
+        $save = false,
+        $force = false,
+        $isFirstCreating = true
+    )
+    {
+        $result = array();
+
+        // use default template
+        if ($templateName == Template::DEFAULT_TEMPLATE) {
+            $templateName = $this->configurator->getConfig()->getTemplateName();
+        }
+
+        // load template
+        $template = $templateName ? $this->templateLoader->getTemplate($templateName) : null;
+
+        // template & console parameters merge to parameters loaded by config
+        if ($template) {
+            $this->configurator->getConfig()->applyParameters($template->getParameters());
+        }
+        if ($parameters) {
+            $this->configurator->getConfig()->applyParameters($parameters);
+        }
+
+        // load projectDir
+        $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
+
+        // used when is called more templates in row, only first create projectDir
+        if ($isFirstCreating) {
+            // duplicates are not allowed, if is force enable, remove project
+            if (file_exists($projectDir)) {
+                if ($force) {
+                    $this->removeProject($projectName);
+                } else {
+                    throw new \Exception("Project '$projectName' ['$projectDir'] already exists.");
+                }
+            }
+        }
+
+        // replacement parameters
+        $replacementParameters = $this->configurator->getConfig()->getParameters();
+        $replacementParameters['project-name'] = $projectName;
+        $replacementParameters['project-dir'] = $projectDir;
+
+        // run before_create
+        // used when is called more templates in row, only first create projectDir
+        if ($isFirstCreating) {
+            $result[self::BEFORE_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_CREATE], $replacementParameters) : array();
+        }
+        $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : array();
+
+        // create project (actually)
+        $result[self::CREATE] = Console::execute("mkdir $projectDir");
+
+        // load origin source
+        $originSource = $template && isset($template->getParameters()['origin-source']) ? $template->getParameter('origin-source') : $this->configurator->getConfig()->getParameter('origin-source');
+        $sourceTypes = $this->configurator->getConfig()->getSourceTypes();
+
+        // load project from origin source (actually)
+        $originSourceType = $originSource['type'];
+        if ($originSourceType) {
+            if (!isset($sourceTypes[$originSourceType])) {
+                throw new \Exception("Source type '$originSourceType' does not exist.");
+            }
+
+            // add specific replacement parameters
+            $originSourceParameters = $originSource;
+            unset($originSourceParameters['types']);
+            $replacementParametersOriginSource = Arrays::merge($replacementParameters, $originSourceParameters);
+
+            $result[self::CREATE_ORIGIN_SOURCE] = $this->runScript($sourceTypes[$originSourceType], $replacementParametersOriginSource);
+        } else {
+            $result[self::CREATE_ORIGIN_SOURCE] = array();
+        }
+
+        // run after create
+        // used when is called more templates in row, only first create projectDir
+        if ($isFirstCreating) {
+            $result[self::AFTER_CREATE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_CREATE], $replacementParameters) : array();
+        }
+        $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE), $replacementParameters) : array();
+
+        // save
+        if ($save) {
+            $config = $this->configurator->getConfig();
+
+            // templates
+            $templates = array_merge(isset($distantSourceData[$projectName]['template']) ? $distantSourceData[$projectName]['template'] : array(), $templateName ? array($templateName) : array());
+
+            // origin source
+            $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+            $distantSourceData[$projectName] = array(
+                'origin-source' => array(
+                    'type' => $originSourceType,
+                    'value' => $originSource['value']
+                ),
+                'template' => $templates
+            );
+            $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
+
+            // projects-dir
+            if (!isset(array_values($config->getProjectsDirs())[$projectDir])) {
+                $projectsDirs = $config->getProjectsDirs();
+
+                $projectsDirPath = $this->configurator->getConfig()->getProjectsDir();
+                $projectsDirs[basename($projectsDirPath)] = $projectsDirPath;
+                $config->setProjectsDirs($projectsDirs);
+            }
+
+            $this->configurator->setConfig($config);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $projectName
+     * @param bool $save
+     * @param array $parameters
+     *
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function removeProject($projectName, $save = false, array $parameters = array())
+    {
+        $result = array();
+
+        // load templates
+        $templates = $this->loadTemplatePerProject($projectName);
+
+        $isFirst = true;
+        if(is_array($templates) && count($templates)) {
+            foreach ($templates as $key => $template) {
+                $results[] = $this->removeProjectInternal($projectName, $template, $parameters, $save, $isFirst);
+                if ($isFirst) {
+                    $isFirst = false;
+                }
+            }
+        } else {
+            $results[] = $this->removeProjectInternal($projectName, null, $parameters, $save, $isFirst);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $projectName
+     * @param Template|null $template
+     * @param array $parameters
+     * @param bool $save
+     * @param bool $isFirstCreating
+     *
+     * @throws \Exception
+     *
+     * @return array
+     */
+    private function removeProjectInternal($projectName, $template, array $parameters = array(), $save = false, $isFirstCreating = true)
+    {
+        $results = [];
+
+        // template & console parameters merge to parameters loaded by config
+        if($template) {
+            $this->configurator->getConfig()->applyParameters($template->getParameters());
+        }
+        if ($parameters) {
+            $this->configurator->getConfig()->applyParameters($parameters);
+        }
+
+        $projectsDir = $this->configurator->getConfig()->getProjectsDir();
+        $projectDir = $this->getProjectDir($projectName, $projectsDir);
+
+        // check if project exists
+        // used when is called more templates in row, only first create projectDir
+        if ($isFirstCreating) {
+            if (!is_readable($projectDir)) {
+                throw new \Exception("Project '$projectName' can not be removed.");
+            }
+        }
+
+        // replacement parameters
+        $replacementParameters = $this->configurator->getConfig()->getParameters();
+        $replacementParameters['project-name'] = $projectName;
+        $replacementParameters['project-dir'] = $projectDir;
+
+        // run before remove
+        // used when is called more templates in row, only first create projectDir
+        if ($isFirstCreating) {
+            $result[self::BEFORE_REMOVE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::BEFORE_REMOVE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::BEFORE_REMOVE], $replacementParameters) : array();
+        }
+        $result[self::BEFORE_REMOVE] = $template ? $this->runScript($template->getScript(self::BEFORE_REMOVE), $replacementParameters) : array();
+
+        // remove project (actually)
+        // used when is called more templates in row, only first create projectDir
+        if ($isFirstCreating) {
+            $result[self::REMOVE] = Console::execute("rm -rf $projectDir");
+        }
+
+        // run after remove
+        // used when is called more templates in row, only first create projectDir
+        if ($isFirstCreating) {
+            $result[self::AFTER_REMOVE_ROOT] = isset($this->configurator->getConfig()->getConfig()[self::AFTER_REMOVE]) ? $this->runScript($this->configurator->getConfig()->getConfig()[self::AFTER_REMOVE], $replacementParameters) : array();
+        }
+        $result[self::AFTER_REMOVE] = $template ? $this->runScript($template->getScript(self::AFTER_REMOVE), $replacementParameters) : array();
+
+        // remove from distant source
+        if ($save) {
+            $config = $this->configurator->getConfig();
+
+            $distantSources = array();
+            foreach ($config->getDistantSources() as $distantSourceName => $distantSourceData) {
+                foreach ($distantSourceData as $distantSourceProjectName => $projectData) {
+                    if ($projectName != $distantSourceProjectName) {
+                        $distantSources[$distantSourceProjectName] = $projectData;
+                    }
+                }
+            }
+            $config->setDistantSources(
+                $distantSources
+            );
+
+            $this->configurator->setConfig($config);
+        }
+
+        return $results;
     }
 
     /**
@@ -511,7 +577,7 @@ class Manager
         // load all projects
         foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDirName => $projectsDirData) {
             $projectsDirTemplate = null;
-            if(is_array($projectsDirData)) {
+            if (is_array($projectsDirData)) {
                 $projectsDirPath = $projectsDirData['path'];
                 $projectsDirTemplate = isset($projectsDirData['template']) ? $projectsDirData['template'] : null;
             } else {
@@ -526,9 +592,12 @@ class Manager
 
                 $remoteOriginUrl = exec("cd $projectDir && git config --get remote.origin.url");
 
-                // add
+                // add git project
                 if ($remoteOriginUrl) {
                     $config = $this->configurator->getConfig();
+
+                    $email = exec("cd $projectDir && git config user.email");
+                    $name = exec("cd $projectDir && git config user.name");
 
                     // origin source
                     $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
@@ -539,7 +608,9 @@ class Manager
                         ),
                         'origin-source' => array(
                             'type' => 'git',
-                            'value' => $remoteOriginUrl
+                            'value' => $remoteOriginUrl,
+                            'email' => $email,
+                            'name' => $name
                         )
                     );
                     $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);

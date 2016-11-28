@@ -270,7 +270,7 @@ class ManagerTest extends TestCase
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
             Assert::truthy($this->manager->touchProject($projectName));
             $this->manager->removeProject($projectName, true);
-            Assert::falsey($this->manager->touchProject($projectName));
+            Assert::equal(array(null, null), $this->manager->touchProject($projectName));
             Assert::truthy(!isset($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]));
         });
     }
@@ -280,7 +280,7 @@ class ManagerTest extends TestCase
         $projectName = self::TEST_PROJECT;
 
         Assert::noError(function () use ($projectName) {
-            $this->manager->createProject($projectName, null, array(), true);
+            $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(), true);
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
             Assert::truthy($this->manager->touchProject($projectName));
             $this->manager->removeProject($projectName);
@@ -378,11 +378,12 @@ class ManagerTest extends TestCase
 
         Assert::falsey($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
 
-        $this->manager->createProject($projectName, Template::DEFAULT_TEMPLATE, array(), true);
+        $this->manager->createProject($projectName, array('common', 'empty', 'empty2'), array(), true);
 
         $this->manager->save();
 
-        Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
+        $result = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+        Assert::truthy($result);
     }
 
 }

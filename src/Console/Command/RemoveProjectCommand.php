@@ -46,7 +46,8 @@ class RemoveProjectCommand extends Command
             ->setDescription('Remove project')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
-                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save change to distant sources')
+                new InputOption('save', 's', InputOption::VALUE_NONE, 'Save change to distant sources'),
+                new InputOption('projects-dir', 'd', InputOption::VALUE_REQUIRED, 'Projects dir')
             ));
     }
 
@@ -57,7 +58,11 @@ class RemoveProjectCommand extends Command
         $name = $input->getArgument('name');
         $save = $input->getOption('save');
 
-        $result = $manager->removeProject($name, $save);
+        $options = array(
+            'projects-dir' => $input->getOption('projects-dir')
+        );
+
+        $result = $manager->removeProject($name, $save, $options);
 
         ConsoleUtils::writeln($result, $output);
     }
