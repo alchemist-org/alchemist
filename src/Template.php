@@ -28,9 +28,8 @@ class Template
     /** @var array */
     private $default = array(
         'parameters' => array(),
-        'touch' => array(
-            "echo '<project-name>': '<project-dir>'"
-        ),
+        'touch' => array(),
+        'save' => array(),
         'before_remove' => array(),
         'after_remove' => array(),
         'before_create' => array(),

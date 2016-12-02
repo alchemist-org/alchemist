@@ -9,3 +9,9 @@ before_remove:
 
 after_remove:
 	- echo "Project '<project-name>' was successfully removed."
+
+touch:
+	- echo "'<project-name>' - '<project-dir>'"
+
+save:
+	- echo "Project '<project-name>' was successfully saved."

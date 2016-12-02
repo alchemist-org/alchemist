@@ -47,7 +47,7 @@ class CreateProjectCommand extends Command
             ->setDescription('Create project')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'Project name'),
-                new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template name', Template::DEFAULT_TEMPLATE),
+                new InputOption('template', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Template name', array(Template::DEFAULT_TEMPLATE)),
                 new InputOption('projects-dir', 'd', InputOption::VALUE_REQUIRED, 'Projects dir'),
                 new InputOption('type', null, InputOption::VALUE_REQUIRED, 'Type, e.g. git, composer..'),
                 new InputOption('value', null, InputOption::VALUE_REQUIRED, 'Value, e.g. url, package-name..'),
@@ -62,7 +62,7 @@ class CreateProjectCommand extends Command
 
         $name = $input->getArgument('name');
 
-        $templateName = $input->getOption('template');
+        $templates = $input->getOption('template');
         $force = $input->getOption('force');
         $save = $input->getOption('save');
 
@@ -74,7 +74,7 @@ class CreateProjectCommand extends Command
             )
         );
 
-        $result = $manager->createProject($name, $templateName, $options, $save, $force);
+        $result = $manager->createProject($name, $templates, $options, $save, $force);
 
         ConsoleUtils::writeln($result, $output);
     }
