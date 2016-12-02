@@ -12,3 +12,6 @@ after_remove:
 
 touch:
 	- echo "'<project-name>' - '<project-dir>'"
+
+save:
+	- echo "Project '<project-name>' was successfully saved."

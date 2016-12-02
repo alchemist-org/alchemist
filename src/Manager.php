@@ -40,6 +40,8 @@ class Manager
     /** @var string */
     const CREATE = 'create';
     /** @var string */
+    const SAVE = 'save';
+    /** @var string */
     const TOUCH = 'touch';
     /** @var string */
     const CREATE_ORIGIN_SOURCE = 'create_origin_source';
@@ -614,6 +616,21 @@ class Manager
                         )
                     );
                     $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
+
+                    // load template
+                    $templates = $this->loadTemplatePerProject($projectName);
+
+                    // template parameters merge to parameters loaded by config
+                    if ($templates) {
+                        $this->configurator->getConfig()->applyParameters($templates[0]->getParameters());
+                    }
+
+                    // replacement parameters
+                    $replacementParameters = $this->configurator->getConfig()->getParameters();
+                    $replacementParameters['project-name'] = $projectName;
+                    $replacementParameters['project-dir'] = $projectDir;
+
+                    $result[] = $templates ? $this->runScript($templates[0]->getScript(self::SAVE), $replacementParameters) : null;
 
                     $this->configurator->setConfig($config);
                 }

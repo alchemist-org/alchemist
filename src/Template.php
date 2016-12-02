@@ -29,6 +29,7 @@ class Template
     private $default = array(
         'parameters' => array(),
         'touch' => array(),
+        'save' => array(),
         'before_remove' => array(),
         'after_remove' => array(),
         'before_create' => array(),
