@@ -25,7 +25,7 @@ $container = require_once __DIR__ . '/../../../bootstrap.php';
 class TouchProjectCommandTest extends CommandTestCase
 {
 
-    /*public function testTouchNoExistProject()
+    public function testTouchNoExistProject()
     {
         $this->runCommand(
             $this->container->getByType(TouchProjectCommand::class),
@@ -33,7 +33,7 @@ class TouchProjectCommandTest extends CommandTestCase
                 'name' => 'fooo'
             )
         );
-    }*/
+    }
 
     public function testTouchProject()
     {
