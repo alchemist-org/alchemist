@@ -45,8 +45,8 @@ parameters:
 
 after_create:
 	- cd <project-dir> && git init
-	- cd <project-dir> && git config user.name 'super user'
-	- cd <project-dir> && git config user.email 'super@user.com'
+	- cd <project-dir> && git config --global user.name 'super user'
+	- cd <project-dir> && git config --global user.email 'super@user.com'
 
 core:
 	projects-dirs:
@@ -73,6 +73,7 @@ Create template, in default you can set up these blocks:
     before_remove:
     after_remove:
     touch:
+    save:
 ```
 
 ###Self update
@@ -128,6 +129,9 @@ name | Project name
 ###Save projects
 
 ```sh
-$ alchemist
 $ alchemist save
 ```
+
+Name | Comment
+------------ | -------------
+name | Project name
