@@ -44,7 +44,7 @@ class TouchProjectCommand extends Command
             ->setName('touch-project')
             ->setDescription('Touch project')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::REQUIRED, 'Project name')
+                new InputArgument('name', InputArgument::OPTIONAL, 'Project name')
             ));
     }
 
@@ -54,7 +54,11 @@ class TouchProjectCommand extends Command
 
         $name = $input->getArgument('name');
 
-        $result = $manager->touchProject($name);
+        if($name) {
+            $result = $manager->touchProject($name);
+        } else {
+            $result = $manager->touchProjects();
+        }
 
         ConsoleUtils::writeln($result, $output);
     }
