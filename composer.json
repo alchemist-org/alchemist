@@ -24,6 +24,7 @@
     "ldrahnik/url-matcher": "dev-master"
   },
   "require-dev": {
+    "nette/caching": "@dev",
     "nette/tester": "@dev"
   },
   "bin": [
