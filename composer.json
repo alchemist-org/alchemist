@@ -15,7 +15,7 @@
     "issues": "https://github.com/Alchemist-org/Alchemist/issues"
   },
   "require": {
-    "php": ">=5.6.0",
+    "php": ">=7.0",
     "nette/neon": "dev-master",
     "nette/di": "dev-master",
     "nette/robot-loader": "dev-master",
