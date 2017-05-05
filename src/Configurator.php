@@ -108,7 +108,7 @@ class Configurator
         if ($this->getConfigFile()) {
             $configData = $this->config->getFilteredConfig();
 
-            $content = Neon::encode($configData, array(Neon::BLOCK));
+            $content = Neon::encode($configData, Neon::BLOCK);
             file_put_contents($this->configFile, $content);
         }
     }
