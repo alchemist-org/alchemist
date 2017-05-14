@@ -8,7 +8,6 @@ services:
         class: Symfony\Component\Console\Application
         setup:
             - addCommands([
-                @defaultCommand
                 @installCommand,
                 @touchProjectCommand,
                 @createProjectCommand,
@@ -17,11 +16,9 @@ services:
                 @saveCommand
             ])
             - setDefaultCommand(
-                'default'
+                'touch'
             )
 
-    defaultCommand:
-        class: Alchemist\Console\Command\DefaultCommand
     installCommand:
         class: Alchemist\Console\Command\InstallCommand
     touchProjectCommand:
