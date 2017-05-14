@@ -44,7 +44,7 @@ class InstallCommand extends Command
             ->setName('install')
             ->setDescription('Install projects')
             ->setDefinition(array(
-                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Re-create alredy existing projects')
+                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Re-create already existing projects')
             ));
     }
 
