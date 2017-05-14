@@ -20,7 +20,7 @@ class ConsoleUtils
 {
 
     /**
-     * @param mixed $value
+     * @param mixed $result
      * @param OutputInterface $output
      *
      * @return void
