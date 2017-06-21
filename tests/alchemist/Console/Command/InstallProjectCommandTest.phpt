@@ -24,7 +24,7 @@ class InstallProjectCommandTest extends CommandTestCase  {
     public function testInstallProjects()
     {
         $this->runCommand(
-            $this->container->getByType(InstallCommand::class)
+             $this->getCommand(InstallCommand::class)
         );
     }
 

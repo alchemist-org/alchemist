@@ -25,7 +25,7 @@ class SaveCommandTest extends CommandTestCase
     public function testSave()
     {
         $this->runCommand(
-            $this->container->getByType(SaveCommand::class)
+             $this->getCommand(SaveCommand::class)
         );
     }
 

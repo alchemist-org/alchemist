@@ -100,6 +100,14 @@ abstract class CommandTestCase extends TestCase
         )
     );
 
+    /** @var Container */
+    protected $container;
+
+    /**
+     * CommandTestCase constructor.
+     *
+     * @param Container $container
+     */
     public function __construct(Container $container)
     {
         $this->container = $container;
@@ -135,6 +143,8 @@ abstract class CommandTestCase extends TestCase
     }
 
     /**
+     * Grep under file.
+     *
      * @param string $file
      * @param string $string
      *
@@ -143,6 +153,22 @@ abstract class CommandTestCase extends TestCase
     protected function isStringInFile($file, $string)
     {
         return exec('grep ' . escapeshellarg($string) . " $file") ? true : false;
+    }
+
+    /**
+     * Get command object from string.
+     *
+     * @param string $string
+     *
+     * @return Command|null
+     */
+    protected function getCommand($string)
+    {
+        try {
+            return $this->container->getByType($string);
+        } catch (\Exception $exception) {
+            return null;
+        }
     }
 
 }

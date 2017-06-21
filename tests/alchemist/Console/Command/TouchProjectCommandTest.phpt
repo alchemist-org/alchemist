@@ -28,7 +28,7 @@ class TouchProjectCommandTest extends CommandTestCase
     public function testTouchNoExistProject()
     {
         $this->runCommand(
-            $this->container->getByType(TouchProjectCommand::class),
+            $this->getCommand(TouchProjectCommand::class),
             array(
                 'name' => 'fooo'
             )
@@ -40,7 +40,7 @@ class TouchProjectCommandTest extends CommandTestCase
         $projectName = 'fooo';
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+            $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME,
@@ -49,7 +49,7 @@ class TouchProjectCommandTest extends CommandTestCase
         );
 
         $result = $this->runCommand(
-            $this->container->getByType(TouchProjectCommand::class),
+            $this->getCommand(TouchProjectCommand::class),
             array(
                 'name' => $projectName
             )

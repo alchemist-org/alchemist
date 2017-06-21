@@ -29,7 +29,7 @@ class CreateProjectCommandTest extends CommandTestCase
         $projectName = 'fooo';
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+            $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME
@@ -42,7 +42,7 @@ class CreateProjectCommandTest extends CommandTestCase
         $projectName = 'fooooo';
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+            $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--save' => true,
@@ -62,7 +62,7 @@ class CreateProjectCommandTest extends CommandTestCase
         Assert::truthy($this->isStringInFile(self::NGINX_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName, $rootDir));
 
         $this->runCommand(
-            $this->container->getByType(RemoveProjectCommand::class),
+            $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--save' => false
@@ -78,7 +78,7 @@ class CreateProjectCommandTest extends CommandTestCase
         $projectName = 'fooooooo';
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+            $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--save' => true,
@@ -98,7 +98,7 @@ class CreateProjectCommandTest extends CommandTestCase
         Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf', $rootDir));
 
         $this->runCommand(
-            $this->container->getByType(RemoveProjectCommand::class),
+            $this->getCommand(RemoveProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--save' => false
@@ -117,7 +117,7 @@ class CreateProjectCommandTest extends CommandTestCase
         Assert::truthy(empty($defaultDistanceSourceBefore));
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+             $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--save' => true,
@@ -135,7 +135,7 @@ class CreateProjectCommandTest extends CommandTestCase
         $projectName = 'fooo';
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+             $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME
@@ -144,7 +144,7 @@ class CreateProjectCommandTest extends CommandTestCase
 
         Assert::error(function () use ($projectName) {
             $this->runCommand(
-                $this->container->getByType(CreateProjectCommand::class),
+                 $this->getCommand(CreateProjectCommand::class),
                 array(
                     'name' => $projectName,
                     '--projects-dir' => self::PROJECTS_DIR_NAME
@@ -159,7 +159,7 @@ class CreateProjectCommandTest extends CommandTestCase
 
         Assert::error(function () use ($projectName) {
             $this->runCommand(
-                $this->container->getByType(CreateProjectCommand::class),
+                 $this->getCommand(CreateProjectCommand::class),
                 array(
                     'name' => $projectName,
                     'template' => null
@@ -173,14 +173,14 @@ class CreateProjectCommandTest extends CommandTestCase
         $projectName = 'fooo';
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+             $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME)
         );
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+             $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--force' => true

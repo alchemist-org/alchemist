@@ -30,7 +30,7 @@ class RemoveProjectCommandTest extends CommandTestCase
 
         Assert::error(function () use ($projectName) {
             $this->runCommand(
-                $this->container->getByType(RemoveProjectCommand::class),
+                 $this->getCommand(RemoveProjectCommand::class),
                 array(
                     'name' => $projectName,
                     '--projects-dir' => self::PROJECTS_DIR_NAME
@@ -44,14 +44,14 @@ class RemoveProjectCommandTest extends CommandTestCase
         $projectName = 'foooo';
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+             $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME
             )
         );
         $this->runCommand(
-            $this->container->getByType(RemoveProjectCommand::class),
+             $this->getCommand(RemoveProjectCommand::class),
             array('name' => $projectName)
         );
     }
@@ -64,7 +64,7 @@ class RemoveProjectCommandTest extends CommandTestCase
         Assert::truthy(empty($defaultDistanceSourceBefore));
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
+             $this->getCommand(CreateProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--save' => true,
@@ -76,7 +76,7 @@ class RemoveProjectCommandTest extends CommandTestCase
         Assert::falsey(empty($defaultDistanceSource));
 
         $this->runCommand(
-            $this->container->getByType(RemoveProjectCommand::class),
+             $this->getCommand(RemoveProjectCommand::class),
             array(
                 'name' => $projectName,
                 '--save' => true,
