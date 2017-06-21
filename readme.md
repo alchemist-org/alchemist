@@ -98,7 +98,7 @@ name | Project name
 --force | Re-create already existing project
 --save | Save change to distant sources
 
-###Remove project
+### Remove project
 
 ```sh
 $ alchemist remove-project <name>
