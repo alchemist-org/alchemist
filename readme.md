@@ -5,11 +5,11 @@ Alchemist helps you create, manage and work with your projects, easy to configur
 
 [![Build Status](https://travis-ci.org/alchemist-org/alchemist.svg?branch=master)](https://travis-ci.org/alchemist-org/alchemist)
 
-##Requirements
+## Requirements
 
 Check [composer.json](https://github.com/alchemist-org/alchemist/blob/master/composer.json) for dependencies.
 
-##Installation
+## Installation
 
 Install:
 
@@ -24,9 +24,9 @@ Make temporary or permanent global alias (on Linux put the row to the ~.bash_ali
 $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 ```
 
-##Usage
+## Usage
 
-###Set up
+### Set up
 
 Create and set up `config.local.neon`. For example:
 
@@ -76,13 +76,13 @@ Create template, in default you can set up these blocks:
     save:
 ```
 
-###Self update
+### Self update
 
 ```sh
 $ alchemist self-update
 ```
 
-###Create project
+### Create project
 
 ```sh
 $ alchemist create-project <name> [--template <name>] [--projects-dir <dir>] [--type <type>] [--value <value>] [--force] [--save]
@@ -109,13 +109,13 @@ Name | Comment
 name | Project name
 --save | Save change to distant sources
 
-###Install projects
+### Install projects
 
 ```sh
 $ alchemist install
 ```
 
-###Touch projects
+### Touch projects
 
 ```sh
 $ alchemist
@@ -126,7 +126,7 @@ Name | Comment
 ------------ | -------------
 name | Project name
 
-###Save projects
+### Save projects
 
 ```sh
 $ alchemist save
