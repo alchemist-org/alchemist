@@ -28,15 +28,16 @@ class RemoveProjectCommandTest extends CommandTestCase
     {
         $projectName = 'foott';
 
-        Assert::error(function () use ($projectName) {
+        Assert::error(function() use ($projectName) {
             $this->runCommand(
-                $this->container->getByType(RemoveProjectCommand::class),
-                array(
+                $this->getCommand(RemoveProjectCommand::class),
+                [
                     'name' => $projectName,
                     '--projects-dir' => self::PROJECTS_DIR_NAME
-                )
+                ]
             );
-        }, '\Exception');
+        },
+            '\Exception');
     }
 
     public function testRemoveProjectCommand()
@@ -44,16 +45,25 @@ class RemoveProjectCommandTest extends CommandTestCase
         $projectName = 'foooo';
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
-            array(
+            $this->getCommand(CreateProjectCommand::class),
+            [
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME
-            )
+            ]
         );
+
+        $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+        Assert::truthy(file_exists($projectDir));
+
         $this->runCommand(
-            $this->container->getByType(RemoveProjectCommand::class),
-            array('name' => $projectName)
+            $this->getCommand(RemoveProjectCommand::class),
+            [
+                'name' => $projectName
+            ]
         );
+
+        $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+        Assert::falsey(file_exists($projectDir));
     }
 
     public function testRemoveSavedProject()
@@ -64,24 +74,37 @@ class RemoveProjectCommandTest extends CommandTestCase
         Assert::truthy(empty($defaultDistanceSourceBefore));
 
         $this->runCommand(
-            $this->container->getByType(CreateProjectCommand::class),
-            array(
+            $this->getCommand(CreateProjectCommand::class),
+            [
+                'name' => $projectName,
+                '--save' => false,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            ]
+        );
+
+        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::truthy(empty($defaultDistanceSourceBefore));
+
+        $this->runCommand(
+            $this->getCommand(CreateProjectCommand::class),
+            [
                 'name' => $projectName,
                 '--save' => true,
-                '--projects-dir' => self::PROJECTS_DIR_NAME
-            )
+                '--projects-dir' => self::PROJECTS_DIR_NAME,
+                '--force' => true
+            ]
         );
 
         $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
         Assert::falsey(empty($defaultDistanceSource));
 
         $this->runCommand(
-            $this->container->getByType(RemoveProjectCommand::class),
-            array(
+            $this->getCommand(RemoveProjectCommand::class),
+            [
                 'name' => $projectName,
                 '--save' => true,
                 '--projects-dir' => self::PROJECTS_DIR_NAME
-            )
+            ]
         );
 
         $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource('default');

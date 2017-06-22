@@ -11,7 +11,9 @@
 
 namespace Test\Console\Command;
 
+use Alchemist\Console\Command\CreateProjectCommand;
 use Alchemist\Console\Command\SaveCommand;
+use Tester\Assert;
 
 $container = require_once __DIR__ . '/../../../bootstrap.php';
 
@@ -24,9 +26,29 @@ class SaveCommandTest extends CommandTestCase
 
     public function testSave()
     {
+        $projectName = 'fooo';
+
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::truthy(empty($defaultDistanceSource));
+
         $this->runCommand(
-            $this->container->getByType(SaveCommand::class)
+            $this->getCommand(CreateProjectCommand::class),
+            [
+                'name' => $projectName,
+                '--save' => false,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            ]
         );
+
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::truthy(empty($defaultDistanceSource));
+
+        $this->runCommand(
+            $this->getCommand(SaveCommand::class)
+        );
+
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::equal(1, count($defaultDistanceSource));
     }
 
 }
