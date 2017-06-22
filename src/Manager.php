@@ -440,7 +440,7 @@ class Manager
                     'value' => $originSource['value']
                 ),
                 'core' => array(
-                    'template' => $templates
+                    'template' => count($templates) == 1 ? $templates['0'] : $templates
                 )
             );
             $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
