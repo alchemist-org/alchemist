@@ -15,4 +15,4 @@ touch:
 	- cd <project-dir> && git rev-parse --is-inside-work-tree && git diff --numstat
 
 save:
-	- echo "Project '<project-name>' was successfully saved."
+	- echo "Project '<project-name>' - '<project-dir>' was successfully saved."
