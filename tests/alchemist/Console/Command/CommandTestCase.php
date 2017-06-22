@@ -25,54 +25,42 @@ use Tester\TestCase;
  */
 abstract class CommandTestCase extends TestCase
 {
-    /** @var Application */
-    protected $console;
-
-    /** @var Configurator */
-    protected $configurator;
-
-    /** @var Manager */
-    protected $manager;
 
     /** @var string */
     const PROJECTS_DIR_NAME = 'defaultt';
-
     /** @var string */
     const APP_DATA_DIR = __DIR__ . '/../../../../data';
-
     /** @var string */
     const TEMPLATES = self::APP_DATA_DIR . '/templates';
-
     /** @var string */
     const TEMPLATE_NAME = 'default';
-
     /** @var string */
     const CONFIG_LOCAL = __DIR__ . '/../data/config/config.local.neon';
-
     /** @var string */
     const HOSTS_FILE = __DIR__ . '/../data/hosts';
-
     /** @var string */
     const NGINX_SITES_ENABLED = __DIR__ . '/../data/nginx/sites-enabled';
-
     /** @var string */
     const APACHE_SITES_ENABLED = __DIR__ . '/../data/apache/sites-enabled';
-
     /** @var string */
     const TLD = 'dev';
-
     /** @var integer */
     const PORT = 80;
-
     /** @var string */
     const ROOT = 'www';
-
     /** @var string */
     const LOCALHOST = '127.0.0.1';
-
+    /** @var Application */
+    protected $console;
+    /** @var Configurator */
+    protected $configurator;
+    /** @var Manager */
+    protected $manager;
+    /** @var Container */
+    protected $container;
     /** @var array */
-    private $config = array(
-        'parameters' => array(
+    private $config = [
+        'parameters' => [
             'hosts' => self::HOSTS_FILE,
             'tld' => self::TLD,
             'localhost' => self::LOCALHOST,
@@ -82,26 +70,23 @@ abstract class CommandTestCase extends TestCase
             'apache-virtual-host-default' => self::APP_DATA_DIR . '/virtual-hosts/apache.default',
             'port' => self::PORT,
             'root' => self::ROOT
-        ),
-        'core' => array(
+        ],
+        'core' => [
             'template' => 'default',
             'templates' => self::TEMPLATES,
-            'projects-dirs' => array(
+            'projects-dirs' => [
                 self::PROJECTS_DIR_NAME => TEST_PROJECTS_DIR,
-                'nginx' => array(
+                'nginx' => [
                     'path' => TEST_PROJECTS_DIR,
                     'template' => 'nginx'
-                ),
-                'apache' => array(
+                ],
+                'apache' => [
                     'path' => TEST_PROJECTS_DIR,
                     'template' => 'apache'
-                ),
-            )
-        )
-    );
-
-    /** @var Container */
-    protected $container;
+                ],
+            ]
+        ]
+    ];
 
     /**
      * CommandTestCase constructor.
@@ -134,7 +119,7 @@ abstract class CommandTestCase extends TestCase
      *
      * @return string
      */
-    public function runCommand(Command $command, array $input = array(), array $options = array())
+    public function runCommand(Command $command, array $input = [], array $options = [])
     {
         $command = $this->console->find($command->getName());
         $commandTester = new CommandTester($command);

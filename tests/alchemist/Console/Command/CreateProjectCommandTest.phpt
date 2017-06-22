@@ -30,11 +30,14 @@ class CreateProjectCommandTest extends CommandTestCase
 
         $this->runCommand(
             $this->getCommand(CreateProjectCommand::class),
-            array(
+            [
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME
-            )
+            ]
         );
+
+        $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+        Assert::truthy(file_exists($projectDir));
     }
 
     public function testCreateAndRemoveProjectWithNginxTemplate()
@@ -43,32 +46,38 @@ class CreateProjectCommandTest extends CommandTestCase
 
         $this->runCommand(
             $this->getCommand(CreateProjectCommand::class),
-            array(
+            [
                 'name' => $projectName,
                 '--save' => true,
                 '--template' => 'nginx'
-            )
+            ]
         );
 
         $hostName = $projectName . '.' . self::TLD;
+        $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
         $rootDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName . DIRECTORY_SEPARATOR . self::ROOT;
         $defaultDistanceSources = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::truthy(file_exists($projectDir));
         Assert::falsey(empty($defaultDistanceSources));
         Assert::truthy(file_exists(self::HOSTS_FILE));
         Assert::truthy($this->isStringInFile(self::HOSTS_FILE, $hostName));
         Assert::truthy(file_exists(self::NGINX_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName));
-        Assert::truthy($this->isStringInFile(self::NGINX_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName, self::PORT));
-        Assert::truthy($this->isStringInFile(self::NGINX_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName, $hostName));
+        Assert::truthy($this->isStringInFile(self::NGINX_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName,
+            self::PORT));
+        Assert::truthy($this->isStringInFile(self::NGINX_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName,
+            $hostName));
         Assert::truthy($this->isStringInFile(self::NGINX_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName, $rootDir));
 
         $this->runCommand(
-            $this->getCommand(CreateProjectCommand::class),
-            array(
+            $this->getCommand(RemoveProjectCommand::class),
+            [
                 'name' => $projectName,
                 '--save' => false
-            )
+            ]
         );
 
+        $defaultDistanceSources = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::falsey(empty($defaultDistanceSources));
         Assert::falsey($this->isStringInFile(self::HOSTS_FILE, $hostName));
         Assert::falsey(file_exists(self::NGINX_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName));
     }
@@ -79,11 +88,11 @@ class CreateProjectCommandTest extends CommandTestCase
 
         $this->runCommand(
             $this->getCommand(CreateProjectCommand::class),
-            array(
+            [
                 'name' => $projectName,
                 '--save' => true,
                 '--template' => 'apache'
-            )
+            ]
         );
 
         $hostName = $projectName . '.' . self::TLD;
@@ -93,18 +102,23 @@ class CreateProjectCommandTest extends CommandTestCase
         Assert::truthy(file_exists(self::HOSTS_FILE));
         Assert::truthy($this->isStringInFile(self::HOSTS_FILE, $hostName));
         Assert::truthy(file_exists(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf'));
-        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf', self::PORT));
-        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf', $hostName));
-        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf', $rootDir));
+        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf',
+            self::PORT));
+        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf',
+            $hostName));
+        Assert::truthy($this->isStringInFile(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName . '.conf',
+            $rootDir));
 
         $this->runCommand(
             $this->getCommand(RemoveProjectCommand::class),
-            array(
+            [
                 'name' => $projectName,
                 '--save' => false
-            )
+            ]
         );
 
+        $defaultDistanceSources = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::falsey(empty($defaultDistanceSources));
         Assert::falsey($this->isStringInFile(self::HOSTS_FILE, $hostName));
         Assert::falsey(file_exists(self::APACHE_SITES_ENABLED . DIRECTORY_SEPARATOR . $projectName));
     }
@@ -117,13 +131,13 @@ class CreateProjectCommandTest extends CommandTestCase
         Assert::truthy(empty($defaultDistanceSourceBefore));
 
         $this->runCommand(
-             $this->getCommand(CreateProjectCommand::class),
-            array(
+            $this->getCommand(CreateProjectCommand::class),
+            [
                 'name' => $projectName,
                 '--save' => true,
                 '--template' => 'default',
                 '--projects-dir' => self::PROJECTS_DIR_NAME
-            )
+            ]
         );
 
         $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
@@ -135,37 +149,39 @@ class CreateProjectCommandTest extends CommandTestCase
         $projectName = 'fooo';
 
         $this->runCommand(
-             $this->getCommand(CreateProjectCommand::class),
-            array(
+            $this->getCommand(CreateProjectCommand::class),
+            [
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME
-            )
+            ]
         );
 
-        Assert::error(function () use ($projectName) {
+        Assert::error(function() use ($projectName) {
             $this->runCommand(
-                 $this->getCommand(CreateProjectCommand::class),
-                array(
+                $this->getCommand(CreateProjectCommand::class),
+                [
                     'name' => $projectName,
                     '--projects-dir' => self::PROJECTS_DIR_NAME
-                )
+                ]
             );
-        }, '\Exception');
+        },
+            '\Exception');
     }
 
     public function testCreateProjectNoProjectsDirCatchException()
     {
         $projectName = 'fooo';
 
-        Assert::error(function () use ($projectName) {
+        Assert::error(function() use ($projectName) {
             $this->runCommand(
-                 $this->getCommand(CreateProjectCommand::class),
-                array(
+                $this->getCommand(CreateProjectCommand::class),
+                [
                     'name' => $projectName,
                     'template' => null
-                )
+                ]
             );
-        }, '\Exception');
+        },
+            '\Exception');
     }
 
     public function testCreateProjectWithForce()
@@ -173,19 +189,22 @@ class CreateProjectCommandTest extends CommandTestCase
         $projectName = 'fooo';
 
         $this->runCommand(
-             $this->getCommand(CreateProjectCommand::class),
-            array(
+            $this->getCommand(CreateProjectCommand::class),
+            [
                 'name' => $projectName,
-                '--projects-dir' => self::PROJECTS_DIR_NAME)
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            ]
         );
 
-        $this->runCommand(
-             $this->getCommand(CreateProjectCommand::class),
-            array(
-                'name' => $projectName,
-                '--force' => true
-            )
-        );
+        Assert::noError(function() use ($projectName) {
+            $this->runCommand(
+                $this->getCommand(CreateProjectCommand::class),
+                [
+                    'name' => $projectName,
+                    '--force' => true
+                ]
+            );
+        });
     }
 
 }

@@ -13,7 +13,6 @@ namespace Test\Console\Command;
 
 use Alchemist\Console\Command\CreateProjectCommand;
 use Alchemist\Console\Command\TouchProjectCommand;
-use Alchemist\Template;
 use Tester\Assert;
 
 $container = require_once __DIR__ . '/../../../bootstrap.php';
@@ -27,12 +26,14 @@ class TouchProjectCommandTest extends CommandTestCase
 
     public function testTouchNoExistProject()
     {
-        $this->runCommand(
+        $result = $this->runCommand(
             $this->getCommand(TouchProjectCommand::class),
-            array(
+            [
                 'name' => 'fooo'
-            )
+            ]
         );
+
+        Assert::falsey($result);
     }
 
     public function testTouchProject()
@@ -41,19 +42,20 @@ class TouchProjectCommandTest extends CommandTestCase
 
         $this->runCommand(
             $this->getCommand(CreateProjectCommand::class),
-            array(
+            [
                 'name' => $projectName,
                 '--projects-dir' => self::PROJECTS_DIR_NAME,
                 '--save' => true
-            )
+            ]
         );
 
         $result = $this->runCommand(
             $this->getCommand(TouchProjectCommand::class),
-            array(
+            [
                 'name' => $projectName
-            )
+            ]
         );
+
         Assert::truthy($result);
     }
 

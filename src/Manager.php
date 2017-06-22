@@ -97,7 +97,7 @@ class Manager
                 // create project
                 $projectExist = $this->touchProject($projectName);
 
-                if (!$projectExist || $force) {
+                if (empty($projectExist) || $force) {
                     $result = $this->createProject(
                         $projectName,
                         $templateName,
@@ -115,21 +115,62 @@ class Manager
         return $result;
     }
 
+    /**
+     * @param string $projectName
+     * @param null $projectsDir
+     *
+     * @return array
+     */
     public function touchProject($projectName, $projectsDir = null)
     {
         $results = [];
 
-        foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
-
-            // load templateName
+        // touch only specific directory
+        if($projectsDir) {
             $templates = $this->loadTemplatePerProject($projectName);
+            $results =  $this->touchProjectForTemplates($projectName, $templates, $projectsDir);
+        }
 
-            if(is_array($templates) && count($templates)) {
-                foreach ($templates as $key => $template) {
-                    $results[] = $this->touchProjectInternal($projectName, $projectsDir, $template, $projectsDirName, $projectsDirPath);
+        // touch every directory which is possible
+        foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
+            $templates = $this->loadTemplatePerProject($projectName);
+            $results =  $this->touchProjectForTemplates($projectName, $templates, $projectsDirPath);
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param string $projectName
+     * @param []Template|null|string $templates
+     * @param string $projectsDirPath
+     *
+     * @return array
+     */
+    private function touchProjectForTemplates($projectName, $templates, $projectsDirPath) {
+        $results = [];
+
+        // mane templates => for each template
+        if(is_array($templates) && count($templates)) {
+            foreach ($templates as $key => $template) {
+                $result = $this->touchProjectInternal($projectName, $template, $projectsDirPath);
+                if($result) {
+                    $results[] = $result;
+                }
+            }
+        } else {
+            // no templates = null
+            if(is_array($templates)) {
+                $result = $this->touchProjectInternal($projectName, null, $projectsDirPath);;
+                if ($result) {
+                    $results[] = $result;
                 }
             } else {
-                $results[] = $this->touchProjectInternal($projectName, $projectsDir, null, $projectsDirName, $projectsDirPath);
+            // one template
+                $result = $this->touchProjectInternal($projectName, $templates, $projectsDirPath);
+                if ($result) {
+                    $results[] = $result;
+                }
             }
         }
 
@@ -167,19 +208,23 @@ class Manager
                 }
             }
         }
+
+        // set default template
+        if(is_array($result) && !count($result)) {
+            $result = $this->templateLoader->getTemplate($this->configurator->getConfig()->getTemplateName());
+        }
+
         return $result;
     }
 
     /**
      * @param string $projectName
-     * @param string $projectsDir
      * @param Template|null $template
-     * @param string $projectsDirName
      * @param string $projectsDirPath
      *
      * @return string|null
      */
-    public function touchProjectInternal($projectName, $projectsDir, $template, $projectsDirName, $projectsDirPath)
+    public function touchProjectInternal($projectName, $template, $projectsDirPath)
     {
         $result = null;
 
@@ -194,18 +239,10 @@ class Manager
         $replacementParameters['projects-dir'] = $projectsDirPath;
         $replacementParameters['project-dir'] = $this->getProjectDir($projectName, $projectsDirPath);
 
-        if ($projectsDir) {
-            if ($projectsDir == $projectsDirPath) {
-                $projectDir = $this->getProjectDir($projectName, $projectsDir);
-                if (is_readable($projectDir)) {
-                    $result = $template ? $this->runScript($template->getScript(self::TOUCH), $replacementParameters) : null;
-                }
-            }
-        } else {
-            $projectDir = $this->getProjectDir($projectName, $projectsDirPath);
-            if (is_readable($projectDir)) {
-                $result = $template ? $this->runScript($template->getScript(self::TOUCH), $replacementParameters) : null;
-            }
+        $projectDir = $this->getProjectDir($projectName, $projectsDirPath);
+        if (is_readable($projectDir)) {
+            $touchScript = $this->runScript($template->getScript(self::TOUCH), $replacementParameters);
+            $result = $template ? $touchScript : null;
         }
 
         return $result;
@@ -348,7 +385,10 @@ class Manager
         $result[self::BEFORE_CREATE] = $template ? $this->runScript($template->getScript(self::BEFORE_CREATE), $replacementParameters) : array();
 
         // create project (actually)
-        $result[self::CREATE] = Console::execute("mkdir $projectDir");
+        // used when is called more templates in row, only first create projectDir
+        if ($isFirstCreating) {
+            $result[self::CREATE] = Console::execute("mkdir $projectDir");
+        }
 
         // load origin source
         $originSource = $template && isset($template->getParameters()['origin-source']) ? $template->getParameter('origin-source') : $this->configurator->getConfig()->getParameter('origin-source');
