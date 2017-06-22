@@ -25,11 +25,11 @@ $container = require_once __DIR__ . '/../../../bootstrap.php';
 class InstallProjectCommandTest extends CommandTestCase
 {
 
-    public function testInstallProjects()
+    public function testInstallProjectsAndInstallProjectsWithForce()
     {
         $projectName = 'installProject';
 
-        //create
+        // create
         $this->runCommand(
             $this->getCommand(CreateProjectCommand::class),
             [
@@ -60,9 +60,76 @@ class InstallProjectCommandTest extends CommandTestCase
         Assert::falsey(file_exists($projectDir));
 
         // install
+        Assert::noError(function() {
+            $this->runCommand(
+                $this->getCommand(InstallCommand::class)
+            );
+        });
+
+        // install with --force
+        Assert::noError(function() use ($projectName) {
+            $this->runCommand(
+                $this->getCommand(InstallCommand::class),
+                [
+                    '--force' => true
+                ]
+            );
+        });
+        $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+        Assert::truthy(file_exists($projectDir));
+    }
+
+    public function testInstallProjectsAndTestInstallProjectsWithSuppress()
+    {
+        $projectName = 'installProject2';
+
+        // create
         $this->runCommand(
-            $this->getCommand(InstallCommand::class)
+            $this->getCommand(CreateProjectCommand::class),
+            [
+                'name' => $projectName,
+                '--save' => true,
+                '--template' => 'default',
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            ]
         );
+
+        $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+        Assert::truthy(file_exists($projectDir));
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        Assert::falsey(empty($defaultDistanceSource));
+
+        // remove
+        Assert::noError(function() use ($projectName) {
+            $this->runCommand(
+                $this->getCommand(RemoveProjectCommand::class),
+                [
+                    'name' => $projectName,
+                    '--projects-dir' => self::PROJECTS_DIR_NAME
+                ]
+            );
+        });
+
+        $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+        Assert::falsey(file_exists($projectDir));
+
+        // install with --force
+        Assert::noError(function() use ($projectName) {
+            $this->runCommand(
+                $this->getCommand(InstallCommand::class)
+            );
+        });
+
+        // install with --suppress
+        Assert::noError(function() use ($projectName) {
+            $result = $this->runCommand(
+                $this->getCommand(InstallCommand::class),
+                [
+                    '--suppress' => true
+                ]
+            );
+            Assert::truthy($result);
+        });
 
         $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
         Assert::truthy(file_exists($projectDir));

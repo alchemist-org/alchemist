@@ -44,7 +44,8 @@ class InstallCommand extends Command
             ->setName('install')
             ->setDescription('Install projects')
             ->setDefinition(array(
-                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Re-create already existing projects')
+                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Re-create already existing projects'),
+                new InputOption('suppress', 's', InputOption::VALUE_NONE, 'Suppress re-create already existing projects')
             ));
     }
 
@@ -53,8 +54,13 @@ class InstallCommand extends Command
         $manager = $this->manager;
 
         $force = $input->getOption('force');
+        $suppress = $input->getOption('suppress');
 
-        $result = $manager->install($force);
+        if($force && $suppress) {
+            throw new \InvalidArgumentException("Option -f [force] & -s [suppress] can not be set up once at time.");
+        }
+
+        $result = $manager->install($force, $suppress);
 
         ConsoleUtils::writeln($result, $output);
     }

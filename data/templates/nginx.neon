@@ -2,15 +2,15 @@ parameters:
 	projects-dir: nginx
 
 before_create:
-	- service nginx stop
+	- sudo service nginx stop
+
+after_create:
+	- sudo chmod -R 0777 <projects-dir>/<project-name>
 	- echo "<localhost> <project-name>.<tld>" >> <hosts>
 	- sudo cp <nginx-virtual-host-default> <nginx-sites-enabled>/<project-name>
 	- sudo sed -i 's/port/<port>/g' <nginx-sites-enabled>/<project-name>
 	- sudo sed -i 's/host-name/<project-name>.<tld>/g' <nginx-sites-enabled>/<project-name>
 	- sudo sed -i 's|'project-root'|'<project-dir>/<root>'|g' <nginx-sites-enabled>/<project-name>
-
-after_create:
-	- sudo chmod -R 0777 <projects-dir>/<project-name>
 	- sudo service nginx start
 	- echo "Project '<project-name>' was successfully created."
 
@@ -22,3 +22,6 @@ after_remove:
 	- sudo rm <nginx-sites-enabled>/<project-name>
 	- sudo service nginx start
 	- echo "Project '<project-name>' was successfully removed."
+
+suppress:
+	- echo "Project '<project-name>' - '<project-dir>' already exist."

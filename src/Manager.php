@@ -40,6 +40,8 @@ class Manager
     /** @var string */
     const CREATE = 'create';
     /** @var string */
+    const SUPPRESS = 'suppress';
+    /** @var string */
     const SAVE = 'save';
     /** @var string */
     const TOUCH = 'touch';
@@ -75,10 +77,11 @@ class Manager
 
     /**
      * @param bool $force
+     * @param bool $suppress
      *
      * @return array
      */
-    public function install($force = false)
+    public function install($force = false, $suppress = false)
     {
         $result = [];
 
@@ -94,21 +97,18 @@ class Manager
                 // load originSource
                 $originSource = isset($projectData['origin-source']) ? $projectData['origin-source'] : array();
 
+                // config distant source parameters
+                $parameters = isset($projectData['parameters']) ? $projectData['parameters'] : array();
+
                 // create project
-                $projectExist = $this->touchProject($projectName);
-
-                if (empty($projectExist) || $force) {
-                    $result = $this->createProject(
-                        $projectName,
-                        $templateName,
-                        array('origin-source' => $originSource),
-                        false,
-                        true
-                    );
-                }
-
-                // add result
-                $result[$distantSourceName] = $result;
+                $result[$distantSourceName] = $this->createProject(
+                    $projectName,
+                    $templateName,
+                    array_merge($parameters, array('origin-source' => $originSource)),
+                    false,
+                    $force,
+                    $suppress
+                );
             }
         }
 
@@ -193,7 +193,7 @@ class Manager
         foreach ($this->configurator->getConfig()->getDistantSources() as $distantSource) {
             foreach ($distantSource as $distantSourceProjectName => $projectData) {
                 if ($distantSourceProjectName == $projectName) {
-                    $templateName = isset($projectData['template']) ? $projectData['template'] : array();
+                    $templateName = isset($projectData['core']['template']) ? $projectData['core']['template'] : array();
 
                     // load default template
                     $templates = $templateName ? $templateName : $this->configurator->getConfig()->getTemplateName();
@@ -284,10 +284,11 @@ class Manager
 
     /**
      * @param string $projectName
-     * @param string|Template::DEFAULT_TEMPLATE|null $templateName
+     * @param string|null $templates
      * @param array $parameters
      * @param bool $save
      * @param bool $force
+     * @param bool $suppress
      *
      * @return array
      *
@@ -298,7 +299,8 @@ class Manager
         $templates = Template::DEFAULT_TEMPLATE,
         array $parameters = array(),
         $save = false,
-        $force = false
+        $force = false,
+        $suppress = false
     )
     {
         $results = [];
@@ -306,13 +308,13 @@ class Manager
         $isFirst = true;
         if (is_array($templates) && count($templates)) {
             foreach ($templates as $key => $templateName) {
-                $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force, $isFirst);
+                $results[] = $this->createProjectInternal($projectName, $templateName, $parameters, $save, $force, $isFirst, $suppress);
                 if ($isFirst) {
                     $isFirst = false;
                 }
             }
         } else {
-            $results[] = $this->createProjectInternal($projectName, $templates, $parameters, $save, $force, $isFirst);
+            $results[] = $this->createProjectInternal($projectName, $templates, $parameters, $save, $force, $isFirst, $suppress);
         }
 
         return $results;
@@ -325,6 +327,7 @@ class Manager
      * @param bool $save
      * @param bool $force
      * @param bool $isFirstCreating
+     * @param bool $suppress
      *
      * @return array
      *
@@ -336,7 +339,8 @@ class Manager
         array $parameters = array(),
         $save = false,
         $force = false,
-        $isFirstCreating = true
+        $isFirstCreating = true,
+        $suppress = false
     )
     {
         $result = array();
@@ -360,22 +364,25 @@ class Manager
         // load projectDir
         $projectDir = $this->getProjectDir($projectName, $this->configurator->getConfig()->getProjectsDir());
 
+        // replacement parameters
+        $replacementParameters = $this->configurator->getConfig()->getParameters();
+        $replacementParameters['project-name'] = $projectName;
+        $replacementParameters['project-dir'] = $projectDir;
+
         // used when is called more templates in row, only first create projectDir
         if ($isFirstCreating) {
             // duplicates are not allowed, if is force enable, remove project
             if (file_exists($projectDir)) {
                 if ($force) {
                     $this->removeProject($projectName);
-                } else {
+                } else if (!$suppress) {
                     throw new \Exception("Project '$projectName' ['$projectDir'] already exists.");
+                } else {
+                    $result[self::SUPPRESS] = $template ? $this->runScript($template->getScript(self::SUPPRESS), $replacementParameters) : array();
+                    return $result;
                 }
             }
         }
-
-        // replacement parameters
-        $replacementParameters = $this->configurator->getConfig()->getParameters();
-        $replacementParameters['project-name'] = $projectName;
-        $replacementParameters['project-dir'] = $projectDir;
 
         // run before_create
         // used when is called more templates in row, only first create projectDir
@@ -423,7 +430,7 @@ class Manager
             $config = $this->configurator->getConfig();
 
             // templates
-            $templates = array_merge(isset($distantSourceData[$projectName]['template']) ? $distantSourceData[$projectName]['template'] : array(), $templateName ? array($templateName) : array());
+            $templates = array_merge(isset($distantSourceData[$projectName]['core']['template']) ? $distantSourceData[$projectName]['core']['template'] : array(), $templateName ? array($templateName) : array());
 
             // origin source
             $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
@@ -432,7 +439,9 @@ class Manager
                     'type' => $originSourceType,
                     'value' => $originSource['value']
                 ),
-                'template' => $templates
+                'core' => array(
+                    'template' => $templates
+                )
             );
             $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
 
@@ -621,7 +630,7 @@ class Manager
             $projectsDirTemplate = null;
             if (is_array($projectsDirData)) {
                 $projectsDirPath = $projectsDirData['path'];
-                $projectsDirTemplate = isset($projectsDirData['template']) ? $projectsDirData['template'] : null;
+                $projectsDirTemplate = isset($projectsDirData['core']['template']) ? $projectsDirData['core']['template'] : null;
             } else {
                 $projectsDirPath = $projectsDirData;
             }

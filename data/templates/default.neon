@@ -16,3 +16,6 @@ touch:
 
 save:
 	- echo "Project '<project-name>' - '<project-dir>' was successfully saved."
+
+suppress:
+	- echo "Project '<project-name>' - '<project-dir>' already exist."
