@@ -81,7 +81,8 @@ class InstallProjectCommandTest extends CommandTestCase
 
     public function testInstallProjectsAndTestInstallProjectsWithSuppress()
     {
-        $projectName = 'installProject2';
+        $projectName = 'installProject1';
+        $projectName2 = 'installProject2';
 
         // create
         $this->runCommand(
@@ -89,7 +90,16 @@ class InstallProjectCommandTest extends CommandTestCase
             [
                 'name' => $projectName,
                 '--save' => true,
-                '--template' => 'default',
+                '--template' => 'apache',
+                '--projects-dir' => self::PROJECTS_DIR_NAME
+            ]
+        );
+        $this->runCommand(
+            $this->getCommand(CreateProjectCommand::class),
+            [
+                'name' => $projectName2,
+                '--save' => true,
+                '--template' => 'nginx',
                 '--projects-dir' => self::PROJECTS_DIR_NAME
             ]
         );
@@ -109,11 +119,20 @@ class InstallProjectCommandTest extends CommandTestCase
                 ]
             );
         });
+        Assert::noError(function() use ($projectName2) {
+            $this->runCommand(
+                $this->getCommand(RemoveProjectCommand::class),
+                [
+                    'name' => $projectName2,
+                    '--projects-dir' => self::PROJECTS_DIR_NAME
+                ]
+            );
+        });
 
         $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
         Assert::falsey(file_exists($projectDir));
 
-        // install with --force
+        // install
         Assert::noError(function() use ($projectName) {
             $this->runCommand(
                 $this->getCommand(InstallCommand::class)
@@ -121,7 +140,7 @@ class InstallProjectCommandTest extends CommandTestCase
         });
 
         // install with --suppress
-        Assert::noError(function() use ($projectName) {
+        Assert::noError(function() {
             $result = $this->runCommand(
                 $this->getCommand(InstallCommand::class),
                 [

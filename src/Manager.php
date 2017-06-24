@@ -101,7 +101,7 @@ class Manager
                 $parameters = isset($projectData['parameters']) ? $projectData['parameters'] : array();
 
                 // create project
-                $result[$distantSourceName] = $this->createProject(
+                $result[] = $this->createProject(
                     $projectName,
                     $templateName,
                     array_merge($parameters, array('origin-source' => $originSource)),
@@ -166,7 +166,7 @@ class Manager
                     $results[] = $result;
                 }
             } else {
-            // one template
+                // one template
                 $result = $this->touchProjectInternal($projectName, $templates, $projectsDirPath);
                 if ($result) {
                     $results[] = $result;
@@ -577,7 +577,7 @@ class Manager
      */
     public function selfUpdate()
     {
-        // update
+        // git
         $this->runScript("git pull origin master");
 
         // purge temp dir
