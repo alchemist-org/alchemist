@@ -35,7 +35,7 @@ class InstallProjectCommandTest extends CommandTestCase
             [
                 'name' => $projectName,
                 '--save' => true,
-                '--template' => 'default',
+                '--template' => 'apache',
                 '--projects-dir' => self::PROJECTS_DIR_NAME
             ]
         );
@@ -68,15 +68,17 @@ class InstallProjectCommandTest extends CommandTestCase
 
         // install with --force
         Assert::noError(function() use ($projectName) {
-            $this->runCommand(
+            $result = $this->runCommand(
                 $this->getCommand(InstallCommand::class),
                 [
                     '--force' => true
                 ]
             );
+            Assert::truthy($result);
         });
         $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
-        Assert::truthy(file_exists($projectDir));
+        $projectExists = file_exists($projectDir);
+        Assert::truthy($projectExists);
     }
 
     public function testInstallProjectsAndTestInstallProjectsWithSuppress()

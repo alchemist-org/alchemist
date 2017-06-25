@@ -45,23 +45,14 @@ parameters:
 
 after_create:
 	- cd <project-dir> && git init
-	- cd <project-dir> && git config --global user.name 'super user'
-	- cd <project-dir> && git config --global user.email 'super@user.com'
+	- cd <project-dir> && git config --global user.name 'Lukáš Drahník'
+	- cd <project-dir> && git config --global user.email 'ldrahnik@gmail.com'
 
 core:
 	projects-dirs:
-
-		nginx:
-			path: /usr/share/nginx/
-			template: nginx
-
-		apache:
-			path: /var/www/
-			template: apache
-
-		default:
-			path: /home/ldrahnik/projects
-			template: default
+		nginx: /usr/share/nginx/
+		apache: /var/www/
+		default: /home/ldrahnik/projects
 ```
 
 You can set up your distant sources block from already existing projects with command `alchemist save`.
@@ -74,6 +65,15 @@ Create template, in default you can set up these blocks:
     after_remove:
     touch:
     save:
+    suppress:
+```
+
+## Help
+
+Display command list:
+
+```
+alchemist list
 ```
 
 ### Self update
@@ -85,7 +85,8 @@ $ alchemist self-update
 ### Create project
 
 ```sh
-$ alchemist create-project <name> [--template <name>] [--projects-dir <dir>] [--type <type>] [--value <value>] [--force] [--save]
+$ alchemist create <name> [-t|--template <name>] [-d|--projects-dir <dir>] [--type <type>] [--value <value>] [-f|--force] [-s|--save]
+$ alchemist create-project <name> [-t|--template <name>] [-d|--projects-dir <dir>] [--type <type>] [--value <value>] [-f|--force] [-s|--save]
 ```
 
 Name | Explanation
@@ -101,25 +102,34 @@ name | Project name
 ### Remove project
 
 ```sh
-$ alchemist remove-project <name>
+$ alchemist remove <name> [-s|--save] [-d|--projects-dir <dir>]
+$ alchemist remove-project <name> [-s|--save] [-d|--projects-dir <dir>]
 ```
 
 Name | Comment
 ------------ | -------------
 name | Project name
---save | Save change to distant sources
+save | Save change to distant sources
+project-dir | Projects dir
+
 
 ### Install projects
 
 ```sh
-$ alchemist install
+$ alchemist install [-f|--force] [--s|suppress]
 ```
 
-### Touch projects
+Name | Comment
+------------ | -------------
+Name | Project name
+force | Re-create already existing projects
+suppress | Suppress re-create already existing projects
+
+### Touch project|projects
 
 ```sh
-$ alchemist
-$ alchemist touch <name>
+$ alchemist touch [<name>]
+$ alchemist touch-project [<name>]
 ```
 
 Name | Comment
@@ -131,7 +141,3 @@ name | Project name
 ```sh
 $ alchemist save
 ```
-
-Name | Comment
------------- | -------------
-name | Project name

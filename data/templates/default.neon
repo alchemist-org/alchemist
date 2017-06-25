@@ -1,3 +1,6 @@
+parameters:
+	projects-dir: default
+
 before_create:
 	- echo "Project '<project-name>' will be created."
 
@@ -18,4 +21,4 @@ save:
 	- echo "Project '<project-name>' - '<project-dir>' was successfully saved."
 
 suppress:
-	- echo "Project '<project-name>' - '<project-dir>' already exist."
+	- echo "Project '<project-name>' - '<project-dir>' already exists."
