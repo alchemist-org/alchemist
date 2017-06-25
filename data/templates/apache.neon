@@ -24,4 +24,4 @@ after_remove:
 	- echo "Project '<project-name>' was successfully removed."
 
 suppress:
-	- echo "Project '<project-name>' - '<project-dir>' already exist."
+	- echo "Project '<project-name>' - '<project-dir>' already exists."
