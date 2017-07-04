@@ -101,7 +101,7 @@ class Manager
                 $parameters = isset($projectData['parameters']) ? $projectData['parameters'] : array();
 
                 // create project
-                $result[$distantSourceName] = $this->createProject(
+                $result[] = $this->createProject(
                     $projectName,
                     $templateName,
                     array_merge($parameters, array('origin-source' => $originSource)),
@@ -166,7 +166,7 @@ class Manager
                     $results[] = $result;
                 }
             } else {
-            // one template
+                // one template
                 $result = $this->touchProjectInternal($projectName, $templates, $projectsDirPath);
                 if ($result) {
                     $results[] = $result;
@@ -276,8 +276,15 @@ class Manager
             $replaceParametersFiltered = array_filter($replaceParameters, function ($value) {
                 return is_string($value) || is_integer($value) ? $value : null;
             });
-            $scriptLine = Parser::parse($scriptLine, $replaceParametersFiltered);
-            $result[] = Console::execute($scriptLine);
+
+            if(is_array($scriptLine)) {
+                foreach($scriptLine as $line) {
+                    $parsedLine = Parser::parse($line, $replaceParametersFiltered);
+                    $result[] = Console::execute($parsedLine);
+                }
+            } else {
+                $result[] = Console::execute(Parser::parse($scriptLine, $replaceParametersFiltered));
+            }
         }
         return $result;
     }
@@ -440,7 +447,7 @@ class Manager
                     'value' => $originSource['value']
                 ),
                 'core' => array(
-                    'template' => $templates
+                    'template' => count($templates) == 1 ? $templates['0'] : $templates
                 )
             );
             $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
@@ -577,7 +584,7 @@ class Manager
      */
     public function selfUpdate()
     {
-        // update
+        // git
         $this->runScript("git pull origin master");
 
         // purge temp dir
