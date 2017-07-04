@@ -276,8 +276,15 @@ class Manager
             $replaceParametersFiltered = array_filter($replaceParameters, function ($value) {
                 return is_string($value) || is_integer($value) ? $value : null;
             });
-            $scriptLine = Parser::parse($scriptLine, $replaceParametersFiltered);
-            $result[] = Console::execute($scriptLine);
+
+            if(is_array($scriptLine)) {
+                foreach($scriptLine as $line) {
+                    $parsedLine = Parser::parse($line, $replaceParametersFiltered);
+                    $result[] = Console::execute($parsedLine);
+                }
+            } else {
+                $result[] = Console::execute(Parser::parse($scriptLine, $replaceParametersFiltered));
+            }
         }
         return $result;
     }

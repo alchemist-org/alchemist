@@ -23,7 +23,13 @@ class Console
    * @return string
    */
   public static function execute($cmd) {
-    return shell_exec($cmd);
+      if(is_array($cmd)) {
+          foreach($cmd as $line) {
+              return shell_exec($line);
+          }
+      } else {
+          return shell_exec($cmd);
+      }
   }
 
 }

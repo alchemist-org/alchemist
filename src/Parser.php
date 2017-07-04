@@ -27,7 +27,10 @@ class Parser
      */
     static function parse($line, array $args = array())
     {
-        $parser = new Matcher($line, $args);
+        $parser = new Matcher($line, $args, [
+            'optional_lft' => '@',
+            'optional_rgt' => '#'
+        ]);
         return $parser->parse();
     }
 
