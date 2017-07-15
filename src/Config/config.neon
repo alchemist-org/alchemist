@@ -13,7 +13,8 @@ services:
                 @createProjectCommand,
                 @removeProjectCommand,
                 @selfUpdateCommand,
-                @saveCommand
+                @saveCommand,
+                @whichCommand
             ])
             - setDefaultCommand(
                 'touch'
@@ -31,3 +32,5 @@ services:
         class: Alchemist\Console\Command\SelfUpdateCommand
     saveCommand:
         class: Alchemist\Console\Command\SaveCommand
+    whichCommand:
+        class: Alchemist\Console\Command\WhichCommand

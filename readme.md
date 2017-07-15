@@ -35,6 +35,8 @@ Make temporary or permanent global alias (on Linux put the row to the ~.bash_ali
 $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 ```
 
+For `<alchemist/location>` you can use command `$ alchemist which`.
+
 ## Usage
 
 ### Set up
@@ -151,4 +153,10 @@ name | Project name
 
 ```sh
 $ alchemist save
+```
+
+### Which
+
+```sh
+$ alchemist which
 ```
