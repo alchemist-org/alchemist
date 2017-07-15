@@ -695,4 +695,11 @@ class Manager
 
         return $result;
     }
+
+    /**
+     * @return array
+     */
+    function which() {
+        return $this->runScript("git rev-parse --show-toplevel");
+    }
 }
