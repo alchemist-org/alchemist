@@ -11,7 +11,7 @@ Check [composer.json](https://github.com/alchemist-org/alchemist/blob/master/com
 
 ## Installation
 
-Install:
+Install alchemist manually:
 
 ```sh
 $ git clone https://github.com/alchemist-org/alchemist.git <alchemist/location>
@@ -19,7 +19,18 @@ $ cd <alchemist/location>
 $ composer install
 ```
 
+or using `alchemist-setup.php` located in root of repository:
+
+```sh
+$ bash php alchemist-setup.php --install-dir=/usr/local/bin [--filename=[default='alchemist']] [--force]
+```
+
+Will be installed in path `/usr/local/bin/alchemist/<repository>` so path for alias is in this case `/usr/local/bin/alchemist/bin/alchemist.php`.
+
+## Alias
+
 Make temporary or permanent global alias (on Linux put the row to the ~.bash_aliases or directly ~.bashrc file):
+
 ```
 $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
 ```
