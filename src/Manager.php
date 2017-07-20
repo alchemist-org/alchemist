@@ -700,6 +700,7 @@ class Manager
      * @return array
      */
     function which() {
-        return $this->runScript("git rev-parse --show-toplevel");
+        $path = realpath(dirname(__FILE__));
+        return $this->runScript("cd $path && git rev-parse --show-toplevel");
     }
 }
