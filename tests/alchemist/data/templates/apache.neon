@@ -1,5 +1,5 @@
 parameters:
-	projects-dir: apache
+	projects-dir: defaultt
 
 before_create:
 	- sudo service apache2 stop
@@ -13,6 +13,10 @@ after_create:
 	- sudo sed -i 's|'project-root'|'<project-dir>/<root>'|g' <apache-sites-enabled>/<project-name>.conf
 	- sudo service apache2 start
 	- echo "Project '<project-name>' was successfully created."
+
+touch:
+	- echo "'<project-name>' - '<project-dir>'"
+	- "cd <project-dir> && if [ $(git rev-parse --is-inside-work-tree) = 'true' ]; then git diff HEAD --numstat; fi 2>/dev/null"
 
 before_remove:
 	- sudo service apache2 stop

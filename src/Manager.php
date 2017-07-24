@@ -129,12 +129,15 @@ class Manager
         if($projectsDir) {
             $templates = $this->loadTemplatePerProject($projectName);
             $results =  $this->touchProjectForTemplates($projectName, $templates, $projectsDir);
-        }
-
-        // touch every directory which is possible
-        foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
-            $templates = $this->loadTemplatePerProject($projectName);
-            $results =  $this->touchProjectForTemplates($projectName, $templates, $projectsDirPath);
+        } else {
+            // touch every directory which is possible
+            foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
+                $templates = $this->loadTemplatePerProject($projectName);
+                $resultInCurrentProjectsDir = $this->touchProjectForTemplates($projectName, $templates, $projectsDirPath);;
+                if($resultInCurrentProjectsDir) {
+                    $results[$projectsDirName] = $resultInCurrentProjectsDir;
+                }
+            }
         }
 
         return $results;
@@ -453,7 +456,9 @@ class Manager
             $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
 
             // projects-dir
-            if (!isset(array_values($config->getProjectsDirs())[$projectDir])) {
+            $projectDirPath = $this->configurator->getConfig()->getProjectsDir();
+            $alreadySetUpProjectDirPaths = array_flip($config->getProjectsDirs());
+            if (!array_key_exists($projectDirPath, $alreadySetUpProjectDirPaths)) {
                 $projectsDirs = $config->getProjectsDirs();
 
                 $projectsDirPath = $this->configurator->getConfig()->getProjectsDir();
@@ -592,6 +597,8 @@ class Manager
     }
 
     /**
+     * @param string|null $filterProjectName
+     *
      * @return array
      */
     public function touchProjects($filterProjectName = null)

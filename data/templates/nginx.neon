@@ -17,6 +17,10 @@ after_create:
 before_remove:
 	- sudo service nginx stop
 
+touch:
+	- echo "'<project-name>' - '<project-dir>'"
+	- "cd <project-dir> && if [ $(git rev-parse --is-inside-work-tree) = 'true' ]; then git diff HEAD --numstat; fi 2>/dev/null"
+
 after_remove:
 	- sudo sed -i "/<localhost> <project-name>.<tld>/d" <hosts>
 	- sudo rm <nginx-sites-enabled>/<project-name>

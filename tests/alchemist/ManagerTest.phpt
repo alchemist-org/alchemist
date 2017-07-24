@@ -31,6 +31,7 @@ class ManagerTest extends TestCase
 
     /** @var string */
     const PROJECTS_DIR_NAME = 'defaultt';
+    const PROJECTS_DIR2_NAME = 'defaultt2';
 
     /** @var string */
     const CONFIG_LOCAL = __DIR__ . '/data/config/config.local.neon';
@@ -80,7 +81,8 @@ class ManagerTest extends TestCase
                 ]
             ],
             'projects-dirs' => [
-                self::PROJECTS_DIR_NAME => TEST_PROJECTS_DIR
+                self::PROJECTS_DIR_NAME => TEST_PROJECTS_DIR,
+                self::PROJECTS_DIR2_NAME => TEST_PROJECTS_DIR2
             ],
             'test' => [
                 'test' => [
@@ -127,7 +129,11 @@ class ManagerTest extends TestCase
         } else {
             \Tester\Helpers::purge(TEST_PROJECTS_DIR);
         }
-
+        if (!file_exists(TEST_PROJECTS_DIR2)) {
+            mkdir(TEST_PROJECTS_DIR2);
+        } else {
+            \Tester\Helpers::purge(TEST_PROJECTS_DIR2);
+        }
         if (!file_exists(TEST_TEMP_DIR)) {
             mkdir(TEST_TEMP_DIR);
         } else {
@@ -202,7 +208,6 @@ class ManagerTest extends TestCase
                 true);
             Assert::equal(TEST_PROJECTS_DIR, $this->configurator->getConfig()->getProjectsDir());
             Assert::truthy($this->configurator->getConfig()->getProjectsDir());
-            Assert::truthy($this->configurator->getConfig()->getProjectsDirPath('projects-dir'));
             Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
             Assert::truthy($this->configurator->getConfig()
                 ->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
@@ -384,16 +389,26 @@ class ManagerTest extends TestCase
     public function testTouchProjects()
     {
         $projectName = 'fooooooooo';
+        $projectName2 = 'fooooooooo2';
 
         Assert::falsey($this->manager->touchProjects($projectName));
+        Assert::falsey($this->manager->touchProjects($projectName2));
 
-        $this->manager->createProject($projectName);
+        $this->manager->createProject($projectName, 'nginx', array(), true);
 
-        Assert::truthy($this->manager->touchProjects($projectName));
+        $results = $this->manager->touchProjects($projectName);
+        Assert::truthy($results);
+
+        $this->manager->createProject($projectName2, 'apache', array(), true);
+
+        $results2 = $this->manager->touchProjects();
+        Assert::truthy($results2);
 
         $this->manager->removeProject($projectName);
+        $this->manager->removeProject($projectName2);
 
-        Assert::falsey($this->manager->touchProjects($projectName));
+        $result3 = $this->manager->touchProjects();
+        Assert::falsey($result3);
     }
 
     public function testSaveAndInstall()
