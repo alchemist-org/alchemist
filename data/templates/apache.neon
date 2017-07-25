@@ -18,8 +18,8 @@ before_remove:
 	- sudo service apache2 stop
 
 touch:
-	- echo "'<project-name>' - '<project-dir>'"
-	- "cd <project-dir> && if [ $(git rev-parse --is-inside-work-tree) = 'true' ]; then git diff HEAD --numstat; fi 2>/dev/null"
+	- echo "\t'<project-name>' - '<project-dir>'"
+	- "cd <project-dir> && if [ $(git rev-parse --is-inside-work-tree) = 'true' ]; then git diff HEAD --color --stat | sed 's/^/\t/'; fi 2>/dev/null"
 
 after_remove:
 	- sudo sed -i "/<localhost> <project-name>.<tld>/d" <hosts>
