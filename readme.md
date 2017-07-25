@@ -4,6 +4,8 @@ ALCHEMIST - Console Project Manager
 Alchemist helps you create, manage and work with your projects, easy to configure and fast to use anywhere, configuration is portable.
 
 [![Build Status](https://travis-ci.org/alchemist-org/alchemist.svg?branch=master)](https://travis-ci.org/alchemist-org/alchemist)
+![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/alchemist.png)
+![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/alchemist_config.local.neon.png)
 
 ## Requirements
 
