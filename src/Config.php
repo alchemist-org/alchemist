@@ -69,11 +69,6 @@ class Config extends Object
         return $this->config['core']['templates'];
     }
 
-    public function setTemplates()
-    {
-        $this->config['core']['tepmplates'];
-    }
-
     public function getSourceTypes()
     {
         return $this->config['core']['source-types'];
@@ -110,6 +105,18 @@ class Config extends Object
                 return $this->getProjectsDirs()[$name];
             } else {
                 return $this->getProjectsDirs()[$name]['path'];
+            }
+        }
+        return null;
+    }
+
+    public function getProjectsDirTemplate($name)
+    {
+        if (isset($this->getProjectsDirs()[$name])) {
+            if(is_string($this->getProjectsDirs()[$name])) {
+                return null;
+            } else {
+                return $this->getProjectsDirs()[$name]['template'];
             }
         }
         return null;

@@ -118,24 +118,32 @@ class Manager
     /**
      * @param string $projectName
      * @param null $projectsDir
+     * @param bool $isFirstAddedProjectInProjectsDir
      *
      * @return array
      */
-    public function touchProject($projectName, $projectsDir = null)
+    public function touchProject($projectName, $projectsDir = null, $isFirstAddedProjectInProjectsDir = false)
     {
         $results = [];
 
         // touch only specific directory
         if($projectsDir) {
+            if($isFirstAddedProjectInProjectsDir) {
+                $projectsDirName = $this->configurator->getConfig()->getProjectsDirName($projectsDir);
+                $results[$projectsDir] = $this->runScript("echo $projectsDirName:");
+            }
             $templates = $this->loadTemplatePerProject($projectName);
-            $results =  $this->touchProjectForTemplates($projectName, $templates, $projectsDir);
+            $results[$projectsDir][$projectName] =  $this->touchProjectForTemplates($projectName, $templates, $projectsDir);
         } else {
             // touch every directory which is possible
             foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
                 $templates = $this->loadTemplatePerProject($projectName);
                 $resultInCurrentProjectsDir = $this->touchProjectForTemplates($projectName, $templates, $projectsDirPath);;
                 if($resultInCurrentProjectsDir) {
-                    $results[$projectsDirName] = $resultInCurrentProjectsDir;
+                    if($isFirstAddedProjectInProjectsDir) {
+                        $results[$projectsDirName] = $this->runScript("echo $projectsDirName:");
+                    }
+                    $results[$projectsDirName][$projectName] = $resultInCurrentProjectsDir;
                 }
             }
         }
@@ -153,7 +161,7 @@ class Manager
     private function touchProjectForTemplates($projectName, $templates, $projectsDirPath) {
         $results = [];
 
-        // mane templates => for each template
+        // many templates => for each template
         if(is_array($templates) && count($templates)) {
             foreach ($templates as $key => $template) {
                 $result = $this->touchProjectInternal($projectName, $template, $projectsDirPath);
@@ -164,7 +172,7 @@ class Manager
         } else {
             // no templates = null
             if(is_array($templates)) {
-                $result = $this->touchProjectInternal($projectName, null, $projectsDirPath);;
+                $result = $this->touchProjectInternal($projectName, null, $projectsDirPath);
                 if ($result) {
                     $results[] = $result;
                 }
@@ -193,20 +201,36 @@ class Manager
 
         // load template
         $templateName = null;
-        foreach ($this->configurator->getConfig()->getDistantSources() as $distantSource) {
+        $distantSources = $this->configurator->getConfig()->getDistantSources();
+        foreach ($distantSources as $distantSource) {
             foreach ($distantSource as $distantSourceProjectName => $projectData) {
                 if ($distantSourceProjectName == $projectName) {
                     $templateName = isset($projectData['core']['template']) ? $projectData['core']['template'] : array();
 
                     // load default template
-                    $templates = $templateName ? $templateName : $this->configurator->getConfig()->getTemplateName();
+                    $templates = $templateName;
 
-                    if(is_array($templates) && count($templates)) {
+                    if(is_array($templates)) {
                         foreach($templates as $template) {
                             $result[] = $this->templateLoader->getTemplate($template);
                         }
                     } else {
                         $result[] = $this->templateLoader->getTemplate($templates);
+                    }
+
+                    if(empty($result)) {
+                        $projectsDirName = isset($projectData['parameters']['projects-dir']) ? $projectData['parameters']['projects-dir'] : null;
+                        if ($projectsDirName) {
+                            $projectsDirTemplate = $this->configurator->getConfig()->getProjectsDirTemplate($projectsDirName);
+                            if ($projectsDirTemplate) {
+                                $result[] = $this->templateLoader->getTemplate($projectsDirTemplate);
+                            }
+                        }
+                    }
+
+                    if(empty($result)) {
+                        $templateDefaultName = $this->configurator->getConfig()->getTemplateName();
+                        $result[] = $this->templateLoader->getTemplate($templateDefaultName);
                     }
                 }
             }
@@ -457,7 +481,7 @@ class Manager
 
             // projects-dir
             $projectDirPath = $this->configurator->getConfig()->getProjectsDir();
-            $alreadySetUpProjectDirPaths = array_flip($config->getProjectsDirs());
+            $alreadySetUpProjectDirPaths = array_flip($config->getProjectsDirsPaths());
             if (!array_key_exists($projectDirPath, $alreadySetUpProjectDirPaths)) {
                 $projectsDirs = $config->getProjectsDirs();
 
@@ -606,27 +630,31 @@ class Manager
         $result = array();
 
         // load all projects
+        $isFirstAddedProjectInProjectsDir = true;
         foreach ($this->configurator->getConfig()->getProjectsDirsPaths() as $projectsDirName => $projectsDirPath) {
             $mask = $projectsDirPath . DIRECTORY_SEPARATOR . '*';
             $projects = glob($mask, GLOB_ONLYDIR);
 
             if (!empty($projects)) {
-
-                // run
-                $result[$projectsDirName] = $this->runScript("echo $projectsDirName:");
-
                 foreach ($projects as $projectDir) {
                     $projectName = basename($projectDir);
 
                     if ($filterProjectName) {
                         if ($projectName == $filterProjectName) {
-                            $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath);
+                            $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath, $isFirstAddedProjectInProjectsDir);
+                        }
+                        if($isFirstAddedProjectInProjectsDir) {
+                            $isFirstAddedProjectInProjectsDir = false;
                         }
                     } else {
-                        $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath);
+                        $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath, $isFirstAddedProjectInProjectsDir);
+                        if($isFirstAddedProjectInProjectsDir) {
+                            $isFirstAddedProjectInProjectsDir = false;
+                        }
                     }
                 }
             }
+            $isFirstAddedProjectInProjectsDir = true;
         }
 
         return $result;
@@ -667,7 +695,9 @@ class Manager
                     // origin source
                     $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
                     $distantSourceData[$projectName] = array(
-                        'projects-dir' => $projectsDirName,
+                        'parameters' => array(
+                            'projects-dir' => $projectsDirName
+                        ),
                         'core' => array(
                             'template' => $projectsDirTemplate
                         ),

@@ -38,6 +38,7 @@ class ManagerTest extends TestCase
 
     /** @var string */
     const TEST_PROJECT = 'test';
+    const TEST_PROJECT_2 = 'test_2';
 
     /** @var string */
     const TEST_PROJECT_SOURCE_TYPE = 'fooType';
@@ -81,9 +82,15 @@ class ManagerTest extends TestCase
                 ]
             ],
             'projects-dirs' => [
-                self::PROJECTS_DIR_NAME => TEST_PROJECTS_DIR,
-                self::PROJECTS_DIR2_NAME => TEST_PROJECTS_DIR2
-            ],
+                self::PROJECTS_DIR_NAME => [
+                    'path' => TEST_PROJECTS_DIR,
+                    'template' => 'nginx'
+                ],
+                self::PROJECTS_DIR2_NAME => [
+                    'path' => TEST_PROJECTS_DIR2,
+                    'template' => 'apache'
+                ],
+             ],
             'test' => [
                 'test' => [
                     'test' => [
@@ -102,6 +109,11 @@ class ManagerTest extends TestCase
                     'origin-source' => [
                         'type' => self::TEST_PROJECT_SOURCE_TYPE
                     ]
+                ],
+                self::TEST_PROJECT_2 => [
+                    'parameters' => [
+                        'projects-dir' => self::PROJECTS_DIR2_NAME
+                     ]
                 ]
             ]
         ]
@@ -384,6 +396,16 @@ class ManagerTest extends TestCase
         $this->manager->install();
 
         Assert::truthy($this->manager->touchProject($projectName));
+    }
+
+    public function testInstallAndTouch()
+    {
+        $projectName = self::TEST_PROJECT_2;
+
+        $this->manager->install();
+
+        $result = $this->manager->touchProject($projectName);
+        Assert::truthy($result);
     }
 
     public function testTouchProjects()

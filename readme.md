@@ -63,9 +63,17 @@ after_create:
 
 core:
 	projects-dirs:
-		nginx: /usr/share/nginx/
-		apache: /var/www/
-		default: /home/ldrahnik/projects
+		nginx:
+			path: /usr/share/nginx
+			template: nginx
+
+		apache:
+			path: /var/www
+			template: apache
+
+		default:
+			path: /home/ldrahnik/projects
+			template: default
 ```
 
 You can set up your distant sources block from already existing projects with command `alchemist save`.
