@@ -140,9 +140,7 @@ class Manager
                 $templates = $this->loadTemplatePerProject($projectName);
                 $resultInCurrentProjectsDir = $this->touchProjectForTemplates($projectName, $templates, $projectsDirPath);;
                 if($resultInCurrentProjectsDir) {
-                    if($isFirstAddedProjectInProjectsDir) {
-                        $results[$projectsDirName] = $this->runScript("echo $projectsDirName:");
-                    }
+                    $results[$projectsDirName] = $this->runScript("echo $projectsDirName:");
                     $results[$projectsDirName][$projectName] = $resultInCurrentProjectsDir;
                 }
             }
@@ -642,13 +640,13 @@ class Manager
                     if ($filterProjectName) {
                         if ($projectName == $filterProjectName) {
                             $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath, $isFirstAddedProjectInProjectsDir);
-                        }
-                        if($isFirstAddedProjectInProjectsDir) {
-                            $isFirstAddedProjectInProjectsDir = false;
+                            if($result[$projectsDirName][$projectName]) {
+                                $isFirstAddedProjectInProjectsDir = false;
+                            }
                         }
                     } else {
                         $result[$projectsDirName][$projectName] = $this->touchProject($projectName, $projectsDirPath, $isFirstAddedProjectInProjectsDir);
-                        if($isFirstAddedProjectInProjectsDir) {
+                        if($result[$projectsDirName][$projectName]) {
                             $isFirstAddedProjectInProjectsDir = false;
                         }
                     }
