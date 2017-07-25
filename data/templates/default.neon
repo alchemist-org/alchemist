@@ -14,8 +14,8 @@ after_remove:
 	- echo "Project '<project-name>' was successfully removed."
 
 touch:
-	- echo "\t'<project-name>' - '<project-dir>'"
-	- "cd <project-dir> && if [ $(git rev-parse --is-inside-work-tree) = 'true' ]; then git diff HEAD --color --stat | sed 's/^/\t/'; fi 2>/dev/null"
+	- echo "\t'<project-name>'"
+	- "cd <project-dir> && if [ $(git rev-parse --is-inside-work-tree) = 'true' ]; then git diff HEAD --color --stat | sed 's/^/\t\t/'; fi 2>/dev/null"
 
 save:
 	- echo "Project '<project-name>' - '<project-dir>' was successfully saved."
