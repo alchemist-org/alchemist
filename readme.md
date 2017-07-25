@@ -24,7 +24,7 @@ $ composer install
 or using `alchemist-setup.php` located in root of repository:
 
 ```sh
-$ bash php alchemist-setup.php --install-dir=/usr/local/bin [--filename=[default='alchemist']] [--force]
+$ php alchemist-setup.php --install-dir=/usr/local/bin [--filename=[default='alchemist']] [--force]
 ```
 
 Will be installed in path `/usr/local/bin/alchemist/<repository>` so path for alias is in this case `/usr/local/bin/alchemist/bin/alchemist.php`.
