@@ -218,9 +218,11 @@ class ManagerTest extends TestCase
                     'projects-dir' => TEST_PROJECTS_DIR
                 ],
                 true);
-            Assert::equal(TEST_PROJECTS_DIR, $this->configurator->getConfig()->getProjectsDir());
+            $result = $this->configurator->getConfig()->getProjectsDir();
+            Assert::equal(TEST_PROJECTS_DIR, $result);
             Assert::truthy($this->configurator->getConfig()->getProjectsDir());
-            Assert::truthy($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
+            $result = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+            Assert::truthy($result);
             Assert::truthy($this->configurator->getConfig()
                 ->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE)[$projectName]);
         });

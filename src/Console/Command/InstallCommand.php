@@ -57,7 +57,7 @@ class InstallCommand extends Command
         $suppress = $input->getOption('suppress');
 
         if($force && $suppress) {
-            throw new \InvalidArgumentException("Option -f [force] & -s [suppress] can not be set up once at time.");
+            throw new \InvalidArgumentException("Option -f [force] & -s [suppress] can not be set up together.");
         }
 
         $result = $manager->install($force, $suppress);

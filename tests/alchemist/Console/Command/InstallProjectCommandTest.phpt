@@ -66,6 +66,10 @@ class InstallProjectCommandTest extends CommandTestCase
             );
         });
 
+        $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
+        $projectExists = file_exists($projectDir);
+        Assert::truthy($projectExists);
+
         // install with --force
         Assert::noError(function() use ($projectName) {
             $result = $this->runCommand(
@@ -153,7 +157,8 @@ class InstallProjectCommandTest extends CommandTestCase
         });
 
         $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
-        Assert::truthy(file_exists($projectDir));
+        $projectExist = file_exists($projectDir);
+        Assert::truthy($projectExist);
     }
 
 }
