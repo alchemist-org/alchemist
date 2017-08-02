@@ -43,7 +43,7 @@ class CreateProjectCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('create-project')
+            ->setName('create')
             ->setDescription('Create project')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'Project name'),

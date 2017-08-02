@@ -42,7 +42,7 @@ class RemoveProjectCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('remove-project')
+            ->setName('remove')
             ->setDescription('Remove project')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'Project name'),

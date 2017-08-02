@@ -110,7 +110,6 @@ $ alchemist self-update
 
 ```sh
 $ alchemist create <name> [-t|--template <name>] [-d|--projects-dir <dir>] [--type <type>] [--value <value>] [-f|--force] [-s|--save]
-$ alchemist create-project <name> [-t|--template <name>] [-d|--projects-dir <dir>] [--type <type>] [--value <value>] [-f|--force] [-s|--save]
 ```
 
 Name | Explanation
@@ -127,7 +126,6 @@ name | Project name
 
 ```sh
 $ alchemist remove <name> [-s|--save] [-d|--projects-dir <dir>]
-$ alchemist remove-project <name> [-s|--save] [-d|--projects-dir <dir>]
 ```
 
 Name | Comment
@@ -153,7 +151,6 @@ suppress | Suppress re-create already existing projects
 
 ```sh
 $ alchemist touch [<name>]
-$ alchemist touch-project [<name>]
 ```
 
 Name | Comment
