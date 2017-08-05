@@ -91,8 +91,12 @@ class Manager
             // [ CLEAR INSTALL ]
             foreach ($distantSource as $projectName => $projectData) {
 
-                // load templateName
-                $templateName = isset($projectData['core']['template']) ? $projectData['core']['template'] : null;
+                // load templateNames
+                $templateNames = array();
+                $templates = $this->loadTemplatePerProject($projectName);
+                foreach ($templates as $template) {
+                    $templateNames[] = $template->getName();
+                }
 
                 // load originSource
                 $originSource = isset($projectData['origin-source']) ? $projectData['origin-source'] : [];
@@ -103,7 +107,7 @@ class Manager
                 // create project
                 $result[] = $this->createProject(
                     $projectName,
-                    $templateName,
+                    $templateNames,
                     array_merge($parameters, ['origin-source' => $originSource]),
                     false,
                     $force,
