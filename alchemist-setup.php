@@ -30,7 +30,7 @@ function process($argv)
     }
 
     $repositoryDir = $installDir . DIRECTORY_SEPARATOR . $filename;
-    if (!isDirEmpty($repositoryDir)) {
+    if (file_exists($repositoryDir) && !isDirEmpty($repositoryDir)) {
         if ($force) {
             exec("rm -rf $repositoryDir");
         } else {
