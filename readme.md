@@ -17,7 +17,7 @@ Check [composer.json](https://github.com/alchemist-org/alchemist/blob/master/com
 Install alchemist manually:
 
 ```sh
-$ git clone https://github.com/alchemist-org/alchemist.git <alchemist/location>
+$ git clone git@github.com:alchemist-org/alchemist.git <alchemist/location>
 $ cd <alchemist/location>
 $ composer install
 ```
