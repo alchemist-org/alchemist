@@ -23,7 +23,7 @@ touch:
 
 after_remove:
 	- sudo sed -i "/<localhost> <project-name>.<tld>/d" <hosts>
-	- sudo rm <nginx-sites-enabled>/<project-name>
+	- sudo rm -f <nginx-sites-enabled>/<project-name>
 	- sudo service nginx start
 	- echo "Project '<project-name>' was successfully removed."
 

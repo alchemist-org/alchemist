@@ -23,7 +23,7 @@ touch:
 
 after_remove:
 	- sudo sed -i "/<localhost> <project-name>.<tld>/d" <hosts>
-	- sudo rm <apache-sites-enabled>/<project-name>
+	- sudo rm -f <apache-sites-enabled>/<project-name>
 	- sudo service apache2 start
 	- echo "Project '<project-name>' was successfully removed."
 
