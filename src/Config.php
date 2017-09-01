@@ -167,6 +167,11 @@ class Config extends Object
         return $parameters;
     }
 
+    public function disApplyParameters()
+    {
+
+    }
+
     public function applyParameters(array $parameters = array())
     {
         $filteredParameters = $parameters;

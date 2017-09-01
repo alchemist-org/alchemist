@@ -70,11 +70,13 @@ class Configurator
     }
 
     /**
+     * @param bool $force
+     *
      * @return Config
      *
      * @throws \Exception
      */
-    public function getConfig()
+    public function getConfig($force = false)
     {
         if ($this->config == null) {
             $this->config = new Config($this->loadConfigData());
@@ -83,6 +85,11 @@ class Configurator
         if ($this->config == null) {
             throw new \Exception("Config is missing.");
         }
+
+        if($force) {
+            $this->config = new Config($this->loadConfigData());
+        }
+
         return $this->config;
     }
 

@@ -635,7 +635,8 @@ class Manager
 
         // template & console parameters merge to parameters loaded by config
         if ($template) {
-            $this->configurator->getConfig()->applyParameters($template->getParameters());
+            $this->configurator->getConfig(true)->applyParameters($template->getParameters());
+            // get config force because apply parameters are there from previous createProjectInternal
         }
         if ($parameters) {
             $this->configurator->getConfig()->applyParameters($parameters);
