@@ -17,22 +17,9 @@ define('TEST_PROJECTS_DIR', TEMP__DIR__ . '/projects-dir');
 define('TEST_PROJECTS_DIR2', TEMP__DIR__ . '/projects-dir2');
 
 // clear test directories
-if(!file_exists(TEST_PROJECTS_DIR)) {
-    mkdir(TEST_PROJECTS_DIR);
-} else {
-    \Tester\Helpers::purge(TEST_PROJECTS_DIR);
-}
-if(!file_exists(TEST_PROJECTS_DIR2)) {
-    mkdir(TEST_PROJECTS_DIR2);
-} else {
-    \Tester\Helpers::purge(TEST_PROJECTS_DIR2);
-}
-if(!file_exists(TEST_TEMP_DIR)) {
-    mkdir(TEST_TEMP_DIR);
-} else {
-    \Tester\Helpers::purge(TEST_TEMP_DIR);
-}
-
+\Tester\Helpers::purge(TEST_PROJECTS_DIR);
+\Tester\Helpers::purge(TEST_PROJECTS_DIR2);
+\Tester\Helpers::purge(TEST_TEMP_DIR);
 
 $loader->setTempDirectory(TEST_TEMP_DIR);
 $loader->register(true);

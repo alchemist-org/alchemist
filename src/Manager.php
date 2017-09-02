@@ -625,6 +625,9 @@ class Manager
     ) {
         $result = [];
 
+        // get config force because apply parameters are there from previous createProjectInternal
+        $this->configurator->getConfig()->setUpCachedParameters();
+
         // use default template
         if ($templateName == Template::DEFAULT_TEMPLATE) {
             $templateName = $this->configurator->getConfig()->getTemplateName();
@@ -726,6 +729,9 @@ class Manager
             }
             $this->save($templateName, $projectsDirNameOrPath, $projectDir);
         }
+
+        // get config force because apply parameters are there from previous createProjectInternal
+        $this->configurator->getConfig()->setUpCachedParameters();
 
         return $result;
     }

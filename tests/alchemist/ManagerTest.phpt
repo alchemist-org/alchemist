@@ -19,6 +19,7 @@ use Alchemist\Template;
 use Nette\DI\Container;
 use Tester\Assert;
 use Tester\TestCase;
+use Nette\Neon\Neon;
 
 $container = require_once __DIR__ . '/../bootstrap.php';
 
@@ -35,6 +36,22 @@ class ManagerTest extends TestCase
 
     /** @var string */
     const CONFIG_LOCAL = __DIR__ . '/data/config/config.local.neon';
+    /** @var string */
+    const HOSTS_FILE = __DIR__ . '/data/hosts';
+    /** @var string */
+    const NGINX_SITES_ENABLED = __DIR__ . '/data/nginx/sites-enabled';
+    /** @var string */
+    const APACHE_SITES_ENABLED = __DIR__ . '/data/apache/sites-enabled';
+    /** @var string */
+    const TLD = 'dev';
+    /** @var integer */
+    const PORT = 80;
+    /** @var string */
+    const ROOT = 'www';
+    /** @var string */
+    const LOCALHOST = '127.0.0.1';
+    /** @var string */
+    const APP_DATA_DIR = __DIR__ . '/../../data';
 
     /** @var string */
     const TEST_PROJECT = 'test';
@@ -65,7 +82,16 @@ class ManagerTest extends TestCase
         'parameters' => [
             'projects-dir' => self::PROJECTS_DIR_NAME,
             'origin-source' => [],
-            'test' => 'test'
+            'test' => 'test',
+            'hosts' => self::HOSTS_FILE,
+            'tld' => self::TLD,
+            'localhost' => self::LOCALHOST,
+            'nginx-sites-enabled' => self::NGINX_SITES_ENABLED,
+            'nginx-virtual-host-default' => self::APP_DATA_DIR . '/virtual-hosts/nginx.default',
+            'apache-sites-enabled' => self::APACHE_SITES_ENABLED,
+            'apache-virtual-host-default' => self::APP_DATA_DIR . '/virtual-hosts/apache.default',
+            'port' => self::PORT,
+            'root' => self::ROOT
         ],
         'after_create' => [
             "cd <project-dir> && git init",
@@ -98,24 +124,6 @@ class ManagerTest extends TestCase
                     ]
                 ]
             ]
-        ],
-        'distant-sources' => [
-            'default' => [],
-            'github' => [
-                self::TEST_PROJECT => [
-                    'core' => [
-                        'template' => 'common'
-                    ],
-                    'origin-source' => [
-                        'type' => self::TEST_PROJECT_SOURCE_TYPE
-                    ]
-                ],
-                self::TEST_PROJECT_2 => [
-                    'parameters' => [
-                        'projects-dir' => self::PROJECTS_DIR2_NAME
-                     ]
-                ]
-            ]
         ]
     ];
 
@@ -129,34 +137,54 @@ class ManagerTest extends TestCase
         $this->container = $container;
     }
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
+        $this->clean();
+
         $this->configurator = $this->container->getByType(Configurator::class);
-
-        // clear test directories
-        if (!file_exists(TEST_PROJECTS_DIR)) {
-            mkdir(TEST_PROJECTS_DIR);
-        } else {
-            \Tester\Helpers::purge(TEST_PROJECTS_DIR);
-        }
-        if (!file_exists(TEST_PROJECTS_DIR2)) {
-            mkdir(TEST_PROJECTS_DIR2);
-        } else {
-            \Tester\Helpers::purge(TEST_PROJECTS_DIR2);
-        }
-        if (!file_exists(TEST_TEMP_DIR)) {
-            mkdir(TEST_TEMP_DIR);
-        } else {
-            \Tester\Helpers::purge(TEST_TEMP_DIR);
-        }
-
-        // set array (because const used above in tests) but self::CONFIG_LOCAL reflect any change
+        $this->manager = $this->container->getByType(Manager::class);
         $this->configurator->setConfigFile(self::CONFIG_LOCAL);
         $this->configurator->setConfig(new Config($this->config));
+    }
 
-        $this->manager = $this->container->getByType(Manager::class);
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        $this->clean();
+    }
+
+    public function clean()
+    {
+        \Tester\Helpers::purge(TEST_PROJECTS_DIR);
+        \Tester\Helpers::purge(TEST_PROJECTS_DIR2);
+        \Tester\Helpers::purge(TEST_TEMP_DIR);
+
+        // nginx files
+        foreach(glob(self::NGINX_SITES_ENABLED . '/*') as $file) {
+            if(is_file($file) && $file != '.gitkeep') {
+                unlink($file);
+            }
+        }
+
+        // apache files
+        foreach(glob(self::APACHE_SITES_ENABLED . '/*') as $file) {
+            if(is_file($file) && $file != '.gitkeep') {
+                unlink($file);
+            }
+        }
+
+        // hosts
+        if(is_file(self::HOSTS_FILE)) {
+            unlink(self::HOSTS_FILE);
+        }
+
+        // config local
+        if(is_file(self::CONFIG_LOCAL)) {
+            unlink(self::CONFIG_LOCAL);
+        }
     }
 
     public function testCreateProject()
@@ -395,19 +423,13 @@ class ManagerTest extends TestCase
     {
         $projectName = 'test';
 
+        $this->manager->createProject(
+            $projectName
+        );
+
         $this->manager->install();
 
         Assert::truthy($this->manager->touchProject($projectName));
-    }
-
-    public function testInstallAndTouch()
-    {
-        $projectName = self::TEST_PROJECT_2;
-
-        $this->manager->install();
-
-        $result = $this->manager->touchProject($projectName);
-        Assert::truthy($result);
     }
 
     public function testTouchProjects()
@@ -439,7 +461,8 @@ class ManagerTest extends TestCase
     {
         $projectName = 'testSaveCommand';
 
-        Assert::falsey($this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE));
+        $distantSources = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+        Assert::falsey($distantSources);
 
         $this->manager->createProject($projectName, ['common', 'empty', 'empty2'], [], true);
 
@@ -449,7 +472,18 @@ class ManagerTest extends TestCase
         Assert::truthy($result);
     }
 
+    public function testBugNotReaoadingConfigParameters()
+    {
+        $projectName1 = 'foo';
+        $projectName2 = 'bar';
+
+        $this->manager->createProject($projectName1, null, array('root' => 'juchu'));
+
+        $this->manager->createProject($projectName2, null);
+
+        Assert::notEqual('juchu', $this->configurator->getConfig()->getParameter('root'));
+    }
+
 }
 
-$testCase = new ManagerTest($container);
-$testCase->run();
+(new ManagerTest($container))->run();

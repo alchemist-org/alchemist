@@ -24,6 +24,9 @@ class Config extends Object
     private $config;
 
     /** @var array */
+    private $cachedParameters;
+
+    /** @var array */
     private $default = array(
         'parameters' => array(
             'projects-dir' => null,
@@ -40,14 +43,13 @@ class Config extends Object
                 'git' => array(
                     'git clone <value> <project-dir>',
                     'cd <project-dir> && git config user.name <name>',
-                    'cd <project-dir> && git config user.email <email>',
-                    'printf \n'
+                    'cd <project-dir> && git config user.email <email>'
                 )
             ),
             'projects-dirs' => array()
         ),
         'distant-sources' => array(
-            'default' => array()
+            DistantSource::DEFAULT_DISTANT_SOURCE => array()
         )
     );
 
@@ -57,6 +59,11 @@ class Config extends Object
     public function __construct(array $config)
     {
         $this->config = Arrays::merge($this->default, $config);
+        $this->cachedParameters = $this->config['parameters'];
+    }
+
+    public function setUpCachedParameters() {
+        $this->config['parameters'] = $this->cachedParameters;
     }
 
     public function getTemplateName()

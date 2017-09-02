@@ -13,6 +13,7 @@ namespace Test\Console\Command;
 
 use Alchemist\Console\Command\CreateProjectCommand;
 use Alchemist\Console\Command\SaveCommand;
+use Alchemist\DistantSource;
 use Tester\Assert;
 
 $container = require_once __DIR__ . '/../../../bootstrap.php';
@@ -28,7 +29,7 @@ class SaveCommandTest extends CommandTestCase
     {
         $projectName = 'fooo';
 
-        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::truthy(empty($defaultDistanceSource));
 
         $this->runCommand(
@@ -40,18 +41,17 @@ class SaveCommandTest extends CommandTestCase
             ]
         );
 
-        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::truthy(empty($defaultDistanceSource));
 
         $this->runCommand(
             $this->getCommand(SaveCommand::class)
         );
 
-        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::equal(1, count($defaultDistanceSource));
     }
 
 }
 
-$testCase = new SaveCommandTest($container);
-$testCase->run();
+(new SaveCommandTest($container))->run();
