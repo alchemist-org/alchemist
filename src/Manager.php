@@ -794,7 +794,7 @@ class Manager
         // remove project (actually)
         // used when is called more templates in row, only first create projectDir
         if ($isFirstCreating) {
-            $result[self::REMOVE] = Console::execute("rm -rf $projectDir");
+            $result[self::REMOVE] = Console::execute("sudo rm -rf $projectDir");
         }
 
         // run after remove
