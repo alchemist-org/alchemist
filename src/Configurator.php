@@ -83,6 +83,7 @@ class Configurator
         if ($this->config == null) {
             throw new \Exception("Config is missing.");
         }
+
         return $this->config;
     }
 

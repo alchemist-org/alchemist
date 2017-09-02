@@ -61,5 +61,5 @@ class TouchProjectCommandTest extends CommandTestCase
 
 }
 
-$testCase = new TouchProjectCommandTest($container);
-$testCase->run();
+(new TouchProjectCommandTest($container))->run();
+

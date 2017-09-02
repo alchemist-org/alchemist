@@ -13,6 +13,7 @@ namespace Test\Console\Command;
 
 use Alchemist\Console\Command\CreateProjectCommand;
 use Alchemist\Console\Command\RemoveProjectCommand;
+use Alchemist\DistantSource;
 use Tester\Assert;
 
 $container = require_once __DIR__ . '/../../../bootstrap.php';
@@ -58,19 +59,21 @@ class RemoveProjectCommandTest extends CommandTestCase
         $this->runCommand(
             $this->getCommand(RemoveProjectCommand::class),
             [
-                'name' => $projectName
+                'name' => $projectName,
+                '--projects-dir' => self::PROJECTS_DIR_NAME
             ]
         );
 
         $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
-        Assert::falsey(file_exists($projectDir));
+        $fileExist = file_exists($projectDir);
+        Assert::falsey($fileExist);
     }
 
     public function testRemoveSavedProject()
     {
         $projectName = 'baaaaar';
 
-        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::truthy(empty($defaultDistanceSourceBefore));
 
         $this->runCommand(
@@ -82,7 +85,7 @@ class RemoveProjectCommandTest extends CommandTestCase
             ]
         );
 
-        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::truthy(empty($defaultDistanceSourceBefore));
 
         $this->runCommand(
@@ -95,7 +98,7 @@ class RemoveProjectCommandTest extends CommandTestCase
             ]
         );
 
-        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::falsey(empty($defaultDistanceSource));
 
         $this->runCommand(
@@ -107,11 +110,10 @@ class RemoveProjectCommandTest extends CommandTestCase
             ]
         );
 
-        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSourceBefore = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::truthy(empty($defaultDistanceSourceBefore));
     }
 
 }
 
-$testCase = new RemoveProjectCommandTest($container);
-$testCase->run();
+(new RemoveProjectCommandTest($container))->run();

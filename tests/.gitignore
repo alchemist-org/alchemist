@@ -1,7 +1,12 @@
 output
 /temp
-/alchemist/data/config/config.local.neon
+
+/alchemist/data/apache/sites-enabled/*
+/alchemist/data/nginx/sites-enabled/*
+/alchemist/data/hosts
+
 /alchemist/Console/data/apache/sites-enabled/*
 /alchemist/Console/data/nginx/sites-enabled/*
 /alchemist/Console/data/hosts
+
 !.gitkeep

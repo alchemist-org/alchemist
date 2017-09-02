@@ -14,6 +14,7 @@ namespace Test\Console\Command;
 use Alchemist\Config;
 use Alchemist\Configurator;
 use Alchemist\Manager;
+use Alchemist\Template;
 use Nette\DI\Container;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -33,7 +34,7 @@ abstract class CommandTestCase extends TestCase
     /** @var string */
     const TEMPLATES = self::APP_DATA_DIR . '/templates';
     /** @var string */
-    const TEMPLATE_NAME = 'default';
+    const TEMPLATE_NAME = Template::DEFAULT_TEMPLATE;
     /** @var string */
     const CONFIG_LOCAL = __DIR__ . '/../data/config/config.local.neon';
     /** @var string */
@@ -72,7 +73,7 @@ abstract class CommandTestCase extends TestCase
             'root' => self::ROOT
         ],
         'core' => [
-            'template' => 'default',
+            'template' => Template::DEFAULT_TEMPLATE,
             'templates' => self::TEMPLATES,
             'projects-dirs' => [
                 self::PROJECTS_DIR_NAME => TEST_PROJECTS_DIR,
@@ -102,12 +103,50 @@ abstract class CommandTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->console = $this->container->getByType(Application::class);
+        $this->clean();
 
-        /** @var Configurator $configurator */
+        $this->console = $this->container->getByType(Application::class);
         $this->configurator = $this->container->getByType(Configurator::class);
         $this->configurator->setConfigFile(self::CONFIG_LOCAL);
         $this->configurator->setConfig(new Config($this->config));
+    }
+
+    public function tearDown() {
+        parent::tearDown();
+
+        $this->clean();
+    }
+
+    public function clean()
+    {
+        // test project dirs
+        \Tester\Helpers::purge(TEST_PROJECTS_DIR);
+        \Tester\Helpers::purge(TEST_PROJECTS_DIR2);
+        \Tester\Helpers::purge(TEST_TEMP_DIR);
+
+        // nginx files
+        foreach(glob(self::NGINX_SITES_ENABLED . '/*') as $file) {
+            if(is_file($file) && $file != '.gitkeep') {
+                unlink($file);
+            }
+        }
+
+        // apache files
+        foreach(glob(self::APACHE_SITES_ENABLED . '/*') as $file) {
+            if(is_file($file) && $file != '.gitkeep') {
+                unlink($file);
+            }
+        }
+
+        // hosts
+        if(is_file(self::HOSTS_FILE)) {
+            unlink(self::HOSTS_FILE);
+        }
+
+        // config local
+        if(is_file(self::CONFIG_LOCAL)) {
+            unlink(self::CONFIG_LOCAL);
+        }
     }
 
     /**

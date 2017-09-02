@@ -14,6 +14,7 @@ namespace Test\Console\Command;
 use Alchemist\Console\Command\CreateProjectCommand;
 use Alchemist\Console\Command\InstallCommand;
 use Alchemist\Console\Command\RemoveProjectCommand;
+use Alchemist\DistantSource;
 use Tester\Assert;
 
 $container = require_once __DIR__ . '/../../../bootstrap.php';
@@ -42,7 +43,7 @@ class InstallProjectCommandTest extends CommandTestCase
 
         $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
         Assert::truthy(file_exists($projectDir));
-        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::falsey(empty($defaultDistanceSource));
 
         // remove
@@ -112,7 +113,7 @@ class InstallProjectCommandTest extends CommandTestCase
 
         $projectDir = TEST_PROJECTS_DIR . DIRECTORY_SEPARATOR . $projectName;
         Assert::truthy(file_exists($projectDir));
-        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource('default');
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
         Assert::falsey(empty($defaultDistanceSource));
 
         // remove
@@ -163,5 +164,4 @@ class InstallProjectCommandTest extends CommandTestCase
 
 }
 
-$testCase = new InstallProjectCommandTest($container);
-$testCase->run();
+(new InstallProjectCommandTest($container))->run();
