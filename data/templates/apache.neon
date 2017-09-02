@@ -5,7 +5,6 @@ before_create:
 	- sudo service apache2 stop
 
 after_create:
-	- sudo chmod -R 0777 <projects-dir>/<project-name>
 	- sudo sh -c "echo '<localhost> <project-name>.<tld>' >> <hosts>"
 	- sudo cp <apache-virtual-host-default> <apache-sites-enabled>/<project-name>.conf
 	- sudo sed -i 's/port/<port>/g' <apache-sites-enabled>/<project-name>.conf

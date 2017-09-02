@@ -5,8 +5,8 @@ before_create:
 	- sudo service nginx stop
 
 after_create:
-	- sudo chmod -R 0777 <projects-dir>/<project-name>
 	- sudo sh -c "echo '<localhost> <project-name>.<tld>' >> <hosts>"
+	- echo "<localhost> <project-name>.<tld>" >> <hosts>
 	- sudo cp <nginx-virtual-host-default> <nginx-sites-enabled>/<project-name>
 	- sudo sed -i 's/port/<port>/g' <nginx-sites-enabled>/<project-name>
 	- sudo sed -i 's/host-name/<project-name>.<tld>/g' <nginx-sites-enabled>/<project-name>
