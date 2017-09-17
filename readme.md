@@ -8,7 +8,7 @@ Alchemist helps you create, manage and work with your projects, easy to configur
 
 ![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/alchemist.png)
 
-## Used
+## Reference
 
 [Elementary OS Loki Ubuntu 16.04 - post installation script](https://gist.github.com/ldrahnik/06d13c7707e1f3c1bfdade2f054b71e8)
 
