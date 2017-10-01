@@ -146,7 +146,7 @@ class Manager
                 $templates = $this->loadTemplatePerProject($projectName);
                 $resultInCurrentProjectsDir = $this->touchProjectForTemplates($projectName,
                     $templates,
-                    $projectsDirPath);;
+                    $projectsDirPath);
                 if ($resultInCurrentProjectsDir) {
                     $results[$projectsDirName] = $this->runScript("echo $projectsDirName:");
                     $results[$projectsDirName][$projectName] = $resultInCurrentProjectsDir;
