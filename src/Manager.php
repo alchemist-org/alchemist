@@ -721,6 +721,9 @@ class Manager
         $result[self::AFTER_CREATE] = $template ? $this->runScript($template->getScript(self::AFTER_CREATE),
             $replacementParameters) : [];
 
+        // get config force because apply parameters are there from previous createProjectInternal
+        $this->configurator->getConfig()->setUpCachedParameters();
+
         // save
         if ($save) {
             $projectsDirNameOrPath = isset($parameters['projects-dir']) ? $parameters['projects-dir'] : null;
@@ -729,9 +732,6 @@ class Manager
             }
             $this->save($templateName, $projectsDirNameOrPath, $projectDir);
         }
-
-        // get config force because apply parameters are there from previous createProjectInternal
-        $this->configurator->getConfig()->setUpCachedParameters();
 
         return $result;
     }
