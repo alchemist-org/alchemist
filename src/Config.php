@@ -284,6 +284,7 @@ class Config extends Object
     /**
      * @param string $key
      * @param array|string|null $value
+     * @param array $defaultValue
      *
      * @return bool
      */
