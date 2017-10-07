@@ -38,7 +38,6 @@ Will be installed in path `/usr/local/bin/alchemist/<repository>` so path for al
 
 ```
 sudo ln -sf /home/ldrahnik/projects/alchemist/bin/alchemist.php /usr/local/bin/alchemist
-sudo chmod 0755 /usr/local/bin/alchemist
 ```
 
 Or make temporary or permanent global alias (on Linux put the row to the ~.bash_aliases or directly ~.bashrc file):
