@@ -34,9 +34,14 @@ $ php alchemist-setup.php --install-dir=/usr/local/bin [--filename=[default='alc
 
 Will be installed in path `/usr/local/bin/alchemist/<repository>` so path for alias is in this case `/usr/local/bin/alchemist/bin/alchemist.php`.
 
-## Alias
+## Symlink or temporary / permanent alias
 
-Make temporary or permanent global alias (on Linux put the row to the ~.bash_aliases or directly ~.bashrc file):
+```
+sudo ln -sf /home/ldrahnik/projects/alchemist/bin/alchemist.php /usr/local/bin/alchemist
+sudo chmod 0755 /usr/local/bin/alchemist
+```
+
+Or make temporary or permanent global alias (on Linux put the row to the ~.bash_aliases or directly ~.bashrc file):
 
 ```
 $ alias alchemist='php <alchemist/location>/bin/alchemist.php'
