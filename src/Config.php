@@ -41,7 +41,9 @@ class Config extends Object
             'source-types' => array(
                 'composer' => 'composer create-project <value> <project-dir>',
                 'git' => array(
-                    'git clone <value> <project-dir> && cd <project-dir> && git config user.name <name> && git config user.email <email>'
+                    'git clone <value> <project-dir>',
+                    'cd <project-dir> && git config user.name <name>',
+                    'cd <project-dir> && git config user.email <email>'
                 )
             ),
             'projects-dirs' => array()
