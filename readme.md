@@ -8,6 +8,12 @@ Alchemist helps you create, manage and work with your projects, easy to configur
 
 ![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/alchemist.png)
 
+## Example of usage
+
+- i want reinstall and after that i want immediately again work on projects (see link below)
+- i have repositories which i want install to someone (e.g. newbie in company)
+- i want to have overview over my all projects (uncommited changes etc.)
+
 ## Reference
 
 [Elementary OS Loki Ubuntu 16.04 - post installation script](https://gist.github.com/ldrahnik/06d13c7707e1f3c1bfdade2f054b71e8)
