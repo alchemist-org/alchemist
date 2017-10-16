@@ -72,12 +72,12 @@ parameters:
 	apache-virtual-host-default: <alchemist-location>/data/virtual-hosts/apache.default
 	port: 80
 	root: www
+	name: 'Lukáš Drahník'
+	email: ldrahnik@gmail.com
 core:
 	source-types:
 		git:
 			- 'git clone --depth=50 <value> <project-dir>'
-			- 'cd <project-dir> && git config user.name <name>'
-			- 'cd <project-dir> && git config user.email <email>'
 	projects-dirs:
 		nginx:
 			path: /usr/share/nginx
