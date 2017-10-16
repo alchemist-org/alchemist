@@ -77,7 +77,7 @@ parameters:
 core:
 	source-types:
 		git:
-			- 'git clone --depth=50 <value> <project-dir>'
+			- 'git clone --depth=50 <value> <project-dir>' # --depth=50 is not included by default 
 	projects-dirs:
 		nginx:
 			path: /usr/share/nginx
