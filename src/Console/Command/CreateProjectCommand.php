@@ -77,6 +77,8 @@ class CreateProjectCommand extends Command
         $result = $manager->createProject($name, $templates, $options, $save, $force);
 
         ConsoleUtils::writeln($result, $output);
+
+        return 0;
     }
 
 }

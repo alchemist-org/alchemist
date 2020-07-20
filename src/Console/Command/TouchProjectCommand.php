@@ -61,6 +61,8 @@ class TouchProjectCommand extends Command
         }
 
         ConsoleUtils::writeln($result, $output);
+
+        return 0;
     }
 
 }

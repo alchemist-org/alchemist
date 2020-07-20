@@ -48,6 +48,8 @@ class SelfUpdateCommand extends Command
         $manager = $this->manager;
 
         $manager->selfUpdate();
+
+        return 0;
     }
 
 }

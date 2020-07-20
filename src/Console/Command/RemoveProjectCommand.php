@@ -65,6 +65,8 @@ class RemoveProjectCommand extends Command
         $result = $manager->removeProject($name, $save, $options);
 
         ConsoleUtils::writeln($result, $output);
+
+        return 0;
     }
 
 }

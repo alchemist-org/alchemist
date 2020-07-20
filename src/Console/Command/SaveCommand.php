@@ -51,6 +51,8 @@ class SaveCommand extends Command
         $result = $manager->save();
 
         ConsoleUtils::writeln($result, $output);
+
+        return 0;
     }
 
 }

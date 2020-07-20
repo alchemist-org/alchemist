@@ -51,6 +51,8 @@ class WhichCommand extends Command
         $result = $manager->which();
 
         ConsoleUtils::writeln($result, $output);
+
+        return 0;
     }
 
 }

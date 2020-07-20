@@ -63,6 +63,8 @@ class InstallCommand extends Command
         $result = $manager->install($force, $suppress);
 
         ConsoleUtils::writeln($result, $output);
+
+        return 0;
     }
 
 }
