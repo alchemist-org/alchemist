@@ -12,13 +12,14 @@
 namespace Alchemist;
 
 use Alchemist\Utils\Arrays;
-use Nette\Object;
 
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class Config extends Object
+class Config
 {
+
+    use \Nette\SmartObject;
 
     /** @var array */
     private $config;

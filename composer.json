@@ -15,13 +15,14 @@
     "issues": "https://github.com/Alchemist-org/Alchemist/issues"
   },
   "require": {
-    "php": ">=7.0",
+    "php": ">=7.2.5",
     "nette/neon": "dev-master",
     "nette/di": "dev-master",
     "nette/robot-loader": "dev-master",
     "symfony/console": "dev-master",
     "curl/curl": "dev-master",
-    "ldrahnik/url-matcher": "dev-master"
+    "ldrahnik/url-matcher": "dev-master",
+    "nette/utils": "dev-master"
   },
   "require-dev": {
     "nette/caching": "@dev",
