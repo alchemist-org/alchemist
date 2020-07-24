@@ -14,13 +14,14 @@ namespace Alchemist\Console\Command;
 use Alchemist\Console\Utils\ConsoleUtils;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Command\Command;
 use Alchemist\Manager;
 
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
  */
-class SaveCommand extends Command
+class LoadProjectsDirsCommand extends Command
 {
 
     /** @var Manager $manager */
@@ -40,15 +41,24 @@ class SaveCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('save')
-            ->setDescription('Save projects');
+            ->setName('load-projects-dirs')
+            ->setDescription('Load projects dirs')
+            ->setDefinition(array(
+                new InputArgument('name', InputArgument::OPTIONAL, 'Projects dir name'),
+                new InputArgument('path', InputArgument::OPTIONAL, 'Projects dir path'),
+                new InputArgument('template', InputArgument::OPTIONAL, 'Projects dir template name(s)'),
+            ));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $manager = $this->manager;
 
-        $result = $manager->save();
+        $name = $input->getArgument('name');
+        $path = $input->getArgument('path');
+        $template = $input->getArgument('template');
+ 
+        $result = $manager->loadProjectsDirs($name, $path, $template);
 
         ConsoleUtils::writeln($result, $output);
 

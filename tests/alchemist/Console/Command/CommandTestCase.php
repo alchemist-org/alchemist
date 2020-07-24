@@ -14,12 +14,15 @@ namespace Test\Console\Command;
 use Alchemist\Config;
 use Alchemist\Configurator;
 use Alchemist\Manager;
+use Alchemist\DistantSource;
 use Alchemist\Template;
 use Nette\DI\Container;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Alchemist\Console\Command\CreateProjectCommand;
 use Tester\TestCase;
+use Tester\Assert;
 
 /**
  * @author Lukáš Drahník (http://ldrahnik.com)
@@ -99,6 +102,35 @@ abstract class CommandTestCase extends TestCase
         $this->container = $container;
     }
 
+    protected function createProject($projectName, $save, $projectsDir = null)
+    {
+
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+        Assert::truthy(empty($defaultDistanceSource));
+
+        if($projectsDir) {
+            $this->runCommand(
+                $this->getCommand(CreateProjectCommand::class),
+                [
+                    'name' => $projectName,
+                    '--save' => $save,
+                    '--projects-dir' => $projectsDir
+                ]
+            );
+        } else {
+            $this->runCommand(
+                $this->getCommand(CreateProjectCommand::class),
+                [
+                    'name' => $projectName,
+                    '--save' => $save
+                ]
+            );
+        }
+
+        $defaultDistanceSource = $this->configurator->getConfig()->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+        Assert::truthy(empty($defaultDistanceSource));
+    }
+
     public function setUp()
     {
         parent::setUp();
@@ -122,6 +154,7 @@ abstract class CommandTestCase extends TestCase
         // test project dirs
         \Tester\Helpers::purge(TEST_PROJECTS_DIR);
         \Tester\Helpers::purge(TEST_PROJECTS_DIR2);
+        \Tester\Helpers::purge(TEST_PROJECTS_DIR_NEW);
         \Tester\Helpers::purge(TEST_TEMP_DIR);
 
         // nginx files

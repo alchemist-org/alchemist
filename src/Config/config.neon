@@ -13,7 +13,7 @@ services:
                 @createProjectCommand,
                 @removeProjectCommand,
                 @selfUpdateCommand,
-                @saveCommand,
+                @loadProjectsDirsCommand,
                 @whichCommand
             ])
             - setDefaultCommand(
@@ -30,7 +30,7 @@ services:
         class: Alchemist\Console\Command\RemoveProjectCommand
     selfUpdateCommand:
         class: Alchemist\Console\Command\SelfUpdateCommand
-    saveCommand:
-        class: Alchemist\Console\Command\SaveCommand
+    loadProjectsDirsCommand:
+        class: Alchemist\Console\Command\LoadProjectsDirsCommand
     whichCommand:
         class: Alchemist\Console\Command\WhichCommand

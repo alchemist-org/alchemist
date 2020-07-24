@@ -13,12 +13,14 @@ $loader->addDirectory(__DIR__ . '/alchemist');
 
 // test directories
 define('TEST_TEMP_DIR', TEMP__DIR__ . '/temp');
-define('TEST_PROJECTS_DIR', TEMP__DIR__ . '/projects-dir');
-define('TEST_PROJECTS_DIR2', TEMP__DIR__ . '/projects-dir2');
+define('TEST_PROJECTS_DIR', TEMP__DIR__ . '/projects-dir/');
+define('TEST_PROJECTS_DIR2', TEMP__DIR__ . '/projects-dir2/');
+define('TEST_PROJECTS_DIR_NEW', TEMP__DIR__ . '/projects-dir-new/'); # not added to config
 
 // clear test directories
 \Tester\Helpers::purge(TEST_PROJECTS_DIR);
 \Tester\Helpers::purge(TEST_PROJECTS_DIR2);
+\Tester\Helpers::purge(TEST_PROJECTS_DIR_NEW);
 \Tester\Helpers::purge(TEST_TEMP_DIR);
 
 $loader->setTempDirectory(TEST_TEMP_DIR);

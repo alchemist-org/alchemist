@@ -5,6 +5,7 @@ Alchemist helps you create, manage and work with your projects, easy to configur
 
 [![Build Status](https://travis-ci.org/alchemist-org/alchemist.svg?branch=master)](https://travis-ci.org/alchemist-org/alchemist)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+[![PHP stan](https://img.shields.io/badge/PHPStan-default-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
 
 ![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/alchemist.png)
 
@@ -56,6 +57,8 @@ For `<alchemist/location>` you can later use command `$ alchemist which`.
 
 ## Usage
 
+![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/sequence_diagram.png)
+
 ### Set up
 
 Create and set up `config.local.neon`. For example:
@@ -92,7 +95,7 @@ core:
 			template: default
 ```
 
-You can set up your distant sources block from already existing projects with command `alchemist save`.
+You can set up your distant sources block from already existing projects with command `alchemist load-projects-dirs`.
 
 Create template, in default you can set up these blocks:
 ```
@@ -172,11 +175,18 @@ name | Project name
 
 ### Save projects
 
-All projects reached on destination `project-dirs` are automatically saved to `distant sources`.
+Find path for given projects dirs name in `project dirs` block or add new with name `basename(given path)` if for that path not exists already. All projects reached on `project-dirs` destinations are automatically saved to `distant sources`.
 
 ```sh
-$ alchemist save
+$ alchemist load-projects-dirs [--name <projects-dir-name>] [--path <projets-dir-path>] [--template <name|names>]
 ```
+
+Name | Comment
+------------ | -------------
+Name | Project name
+--name | Find name in config projects-dirs block
+--path | If not found in config projects-dirs block add with name basename(path) 
+--template <name> | Template name or names
 
 ![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/alchemist_config.local.neon.png)
 

@@ -412,9 +412,120 @@ class Manager
         return $result;
     }
 
+    /*
+     * Function loads projects to config.local.neon via $projectsDirsName
+     *
+     * string|null $projectsDirsName
+     * string|null $projectsDirsPath
+     *
+     * @return array
+     */
+    public function loadProjectsDirs($projectsDirsName = null, $projectsDirsPath = null, $projectsDirTemplate = null)
+    {
+        if($projectsDirsPath != null) {
+
+            $associatedProjectsDirName = $this->configurator->getConfig()->getProjectsDirName($projectsDirsPath);
+
+            // for given $projectDirsPath is already a record in config file
+            if($associatedProjectsDirName != null) {
+                $projectsDirsName = $associatedProjectsDirName;
+            } else {
+                // if is not in config yet, try add with name basename($projectDirsPath)
+                $nameOfNewProjectsDir = basename($projectsDirsPath);
+                $projectsDirs = $this->configurator->getConfig()->getProjectsDirs();
+                if(!isset($projectsDirs[$nameOfNewProjectsDir])) {
+                    $projectsDirs = $this->configurator->getConfig()->getProjectsDirs();
+                    $projectsDirs[$nameOfNewProjectsDir] = array(
+                        'path' => $projectsDirsPath,
+                    );
+                    $this->configurator->getConfig()->setProjectsDirs($projectsDirs);
+                    $projectsDirsName = $nameOfNewProjectsDir;
+                } else {
+                    // TODO: not added projectsDirPath, basename is in collision with already existing record
+                }
+            }
+            $projectsDirsPath = null;
+        }
+
+        // overwrite $projectsDirTemplate if is set
+        if($projectsDirTemplate != null) {
+            $projectsDirs = $this->configurator->getConfig()->getProjectsDirs();
+            $projectsDirData = $projectsDirs[$projectsDirsName];
+            $projectsDirData['template'] = $projectsDirTemplate;
+            $projectsDirs[$projectsDirsName] = $projectsDirData;
+            $this->configurator->getConfig()->setProjectsDirs($projectsDirs);
+        }
+
+        // load all projects
+        foreach ($this->configurator->getConfig()->getProjectsDirs() as $projectsDirName => $projectsDirData) {
+            if ($projectsDirsName == null || $projectsDirName == $projectsDirsName) {
+                $projectsDirTemplate = null;
+                if (is_array($projectsDirData)) {
+                    $projectsDirPath = $projectsDirData['path'];
+                    $projectsDirTemplate = isset($projectsDirData['core']['template']) ? $projectsDirData['core']['template'] : null;
+                } else {
+                    $projectsDirPath = $projectsDirData;
+                }
+
+                $mask = $projectsDirPath . DIRECTORY_SEPARATOR . '*';
+                $projects = glob($mask, GLOB_ONLYDIR);
+
+                foreach ($projects as $projectDir) {
+                    $projectName = basename($projectDir);
+
+                    $remoteOriginUrl = exec("cd $projectDir && git config --get remote.origin.url");
+
+                    // add git project
+                    if ($remoteOriginUrl) {
+                        $config = $this->configurator->getConfig();
+
+                        $email = exec("cd $projectDir && git config user.email");
+                        $name = exec("cd $projectDir && git config user.name");
+
+                        // origin source
+                        $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
+                        $distantSourceData[$projectName] = [
+                            'parameters' => [
+                                'projects-dir' => $projectsDirName
+                            ],
+                            'core' => [
+                                'template' => $projectsDirTemplate
+                            ],
+                            'origin-source' => [
+                                'type' => 'git',
+                                'value' => $remoteOriginUrl,
+                                'email' => $email,
+                                'name' => $name
+                            ]
+                        ];
+                        $config->setDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE, $distantSourceData);
+
+                        // load template
+                        $templates = $this->loadTemplatePerProject($projectName);
+
+                        // template parameters merge to parameters loaded by config
+                        if ($templates) {
+                            $this->configurator->getConfig()->applyParameters($templates[0]->getParameters());
+                        }
+
+                        // replacement parameters
+                        $replacementParameters = $this->configurator->getConfig()->getParameters();
+                        $replacementParameters['project-name'] = $projectName;
+                        $replacementParameters['project-dir'] = $projectDir;
+
+                        $result[] = $templates ? $this->runScript($templates[0]->getScript(self::SAVE),
+                            $replacementParameters) : null;
+
+                        $this->configurator->setConfig($config);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * @param null|string $templateName
-     * @param null|string $projectDir
+     * @param null|string $projectDir Specific one project dir.
      * @param null|string $projectsDirName
      *
      * @return array
