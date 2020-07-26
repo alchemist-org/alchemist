@@ -422,6 +422,8 @@ class Manager
      */
     public function loadProjectsDirs($projectsDirsName = null, $projectsDirsPath = null, $projectsDirTemplate = null)
     {
+        $result = [];
+
         if($projectsDirsPath != null) {
 
             $associatedProjectsDirName = $this->configurator->getConfig()->getProjectsDirName($projectsDirsPath);
@@ -521,6 +523,8 @@ class Manager
                 }
             }
         }
+
+        return $result;
     }
 
     /**
