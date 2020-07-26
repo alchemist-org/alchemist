@@ -22,7 +22,9 @@
     "symfony/console": "dev-master",
     "curl/curl": "dev-master",
     "ldrahnik/url-matcher": "dev-master",
-    "nette/utils": "dev-master"
+    "nette/utils": "dev-master",
+    "knplabs/github-api": "^2.15",
+    "php-http/guzzle6-adapter": "^1.1"
   },
   "require-dev": {
     "nette/caching": "@dev",

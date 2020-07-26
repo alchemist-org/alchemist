@@ -47,7 +47,7 @@ class Config
                     "bash -c 'cd <project-dir> && git config user.email <email>'"
                 )
             ),
-            'projects-dirs' => array()
+            'projects-dirs' => array(),
         ),
         'distant-sources' => array(
             DistantSource::DEFAULT_DISTANT_SOURCE => array()

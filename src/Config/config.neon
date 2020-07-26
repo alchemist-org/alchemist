@@ -3,6 +3,7 @@ services:
     - Alchemist\Manager
     - Alchemist\Configurator
     - Alchemist\TemplateLoader
+    - Alchemist\DistantSource\GithubSourceManager
 
     application:
         class: Symfony\Component\Console\Application
@@ -14,7 +15,8 @@ services:
                 @removeProjectCommand,
                 @selfUpdateCommand,
                 @loadProjectsDirsCommand,
-                @whichCommand
+                @whichCommand,
+                @loadGithubSourcesCommand,
             ])
             - setDefaultCommand(
                 'touch'
@@ -34,3 +36,6 @@ services:
         class: Alchemist\Console\Command\LoadProjectsDirsCommand
     whichCommand:
         class: Alchemist\Console\Command\WhichCommand
+    loadGithubSourcesCommand:
+        class: Alchemist\Console\Command\LoadGithubSourcesCommand
+

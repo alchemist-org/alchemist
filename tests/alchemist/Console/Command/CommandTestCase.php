@@ -31,7 +31,7 @@ abstract class CommandTestCase extends TestCase
 {
 
     /** @var string */
-    const PROJECTS_DIR_NAME = 'defaultt';
+    const PROJECTS_DIR_NAME = 'default'; // TODO: renamed from defaultt, idk why
     /** @var string */
     const APP_DATA_DIR = __DIR__ . '/../../../../data';
     /** @var string */

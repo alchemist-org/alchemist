@@ -171,44 +171,47 @@ class Manager
         // load template
         $templateName = null;
         $distantSources = $this->configurator->getConfig()->getDistantSources();
-        foreach ($distantSources as $distantSource) {
-            foreach ($distantSource as $distantSourceProjectName => $projectData) {
-                if ($distantSourceProjectName == $projectName) {
-                    $templateName = isset($projectData['core']['template']) ? $projectData['core']['template'] : [];
+        if(is_array($distantSources)) {
+            foreach ($distantSources as $distantSource) {
+                foreach ($distantSource as $distantSourceProjectName => $projectData) {
+                    if ($distantSourceProjectName == $projectName) {
+                        $templateName = isset($projectData['core']['template']) ? $projectData['core']['template'] : [];
 
-                    // load default template
-                    $templates = $templateName;
+                        // load default template
+                        $templates = $templateName;
 
-                    if (is_array($templates)) {
-                        foreach ($templates as $template) {
-                            $result[] = $this->templateLoader->getTemplate($template);
-                        }
-                    } else {
-                        $result[] = $this->templateLoader->getTemplate($templates);
-                    }
-
-                    if (empty($result)) {
-                        $projectsDirName = isset($projectData['parameters']['projects-dir']) ? $projectData['parameters']['projects-dir'] : null;
-                        if ($projectsDirName) {
-                            $projectsDirTemplate = $this->configurator->getConfig()
-                                ->getProjectsDirTemplate($projectsDirName);
-                            if ($projectsDirTemplate) {
-                                $result[] = $this->templateLoader->getTemplate($projectsDirTemplate);
+                        if (is_array($templates)) {
+                            foreach ($templates as $template) {
+                                $result[] = $this->templateLoader->getTemplate($template);
                             }
+                        } else {
+                            $result[] = $this->templateLoader->getTemplate($templates);
                         }
-                    }
 
-                    if (empty($result)) {
-                        $templateDefaultName = $this->configurator->getConfig()->getTemplateName();
-                        $result[] = $this->templateLoader->getTemplate($templateDefaultName);
+                        if (empty($result)) {
+                            $projectsDirName = isset($projectData['parameters']['projects-dir']) ? $projectData['parameters']['projects-dir'] : null;
+                            if ($projectsDirName) {
+                                $projectsDirTemplate = $this->configurator->getConfig()->getProjectsDirTemplate($projectsDirName);
+                               if ($projectsDirTemplate) {
+                                   $result[] = $this->templateLoader->getTemplate($projectsDirTemplate);
+                               }
+                           }
+                       }
+
+                       // set default template
+                       if (empty($result)) {
+                           $templateDefaultName = $this->configurator->getConfig()->getTemplateName();
+                           $result = [$this->templateLoader->getTemplate($templateDefaultName)];
+                       }
                     }
                 }
             }
         }
 
         // set default template
-        if (is_array($result) && !count($result)) {
-            $result = $this->templateLoader->getTemplate($this->configurator->getConfig()->getTemplateName());
+        if (empty($result)) {
+            $templateDefaultName = $this->configurator->getConfig()->getTemplateName();
+            $result = [$this->templateLoader->getTemplate($templateDefaultName)];
         }
 
         return $result;
@@ -301,7 +304,8 @@ class Manager
         $isFirst = true;
         if (is_array($templates) && count($templates)) {
             foreach ($templates as $key => $templateName) {
-                $results[] = $this->createProjectInternal($projectName,
+                $results[] = $this->createProjectInternal(
+                    $projectName,
                     $templateName,
                     $parameters,
                     $save,
@@ -313,7 +317,8 @@ class Manager
                 }
             }
         } else {
-            $results[] = $this->createProjectInternal($projectName,
+            $results[] = $this->createProjectInternal(
+                $projectName,
                 $templates,
                 $parameters,
                 $save,
@@ -342,15 +347,11 @@ class Manager
         $templates = $this->loadTemplatePerProject($projectName);
 
         $isFirst = true;
-        if (is_array($templates) && count($templates)) {
-            foreach ($templates as $key => $template) {
-                $results[] = $this->removeProjectInternal($projectName, $template, $parameters, $save, $isFirst);
-                if ($isFirst) {
-                    $isFirst = false;
-                }
+        foreach ($templates as $key => $template) {
+            $results[] = $this->removeProjectInternal($projectName, $template, $parameters, $save, $isFirst);
+            if ($isFirst) {
+                $isFirst = false;
             }
-        } else {
-            $results[] = $this->removeProjectInternal($projectName, null, $parameters, $save, $isFirst);
         }
 
         return $result;
@@ -484,7 +485,7 @@ class Manager
                         $email = exec("cd $projectDir && git config user.email");
                         $name = exec("cd $projectDir && git config user.name");
 
-                        // origin source
+                        // add distant source
                         $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
                         $distantSourceData[$projectName] = [
                             'parameters' => [
@@ -886,7 +887,7 @@ class Manager
         // used when is called more templates in row, only first create projectDir
         if ($isFirstCreating) {
             if (!is_readable($projectDir)) {
-                throw new \Exception("Project '$projectName' can not be removed.");
+                throw new \Exception("Project '$projectName' can not be removed. Is not readable '$projectDir'.");
             }
         }
 
