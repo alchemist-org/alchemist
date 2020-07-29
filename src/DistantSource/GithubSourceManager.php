@@ -51,7 +51,19 @@ class GithubSourceManager
         $result = [];
 
         $client = new Client();
-        $repos = $client->api('user')->repositories($githubUsername);
+
+        $token = null;
+        if(isset($this->configurator->getConfig()->getConfig()['core']['sources']['github'][$githubUsername]['token'])) {
+            $token = $this->configurator->getConfig()->getConfig()['core']['sources']['github'][$githubUsername]['token'];
+        }
+
+        $repos = [];
+        if($token) {
+            $client->authenticate($token, null, Client::AUTH_ACCESS_TOKEN);
+            $repos = $client->currentUser()->repositories('all');
+        } else {
+            $repos = $client->api('user')->repositories($githubUsername);
+        }
 
         // add distant sources
         foreach($repos as $repo) {

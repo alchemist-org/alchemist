@@ -78,6 +78,10 @@ parameters:
 	name: 'Lukáš Drahník'
 	email: ldrahnik@gmail.com
 core:
+	sources:
+		github:
+			ldrahnik:
+				token: XY
 	source-types:
 		git:
 			- 'git clone --depth=50 <value> <project-dir>' # --depth=50 is not included by default 
