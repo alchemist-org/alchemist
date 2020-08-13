@@ -87,8 +87,8 @@ class GithubSourceManager
             $replacementParameters['project-name'] = $projectName;
             $replacementParameters['project-dir'] = $projectsDirName;
 
-            $email = $replacementParameters['name'];
-            $name = $replacementParameters['email'];
+            $email = isset($replacementParameters['name']) ? $replacementParameters['name'] : null; 
+            $name = isset($replacementParameters['email']) ? $replacementParameters['email'] : null;
 
             // add distant source
             $distantSourceData = $config->getDistantSource(DistantSource::DEFAULT_DISTANT_SOURCE);
