@@ -124,7 +124,11 @@ class Config
             if(is_string($this->getProjectsDirs()[$name])) {
                 return null;
             } else {
-                return $this->getProjectsDirs()[$name]['template'];
+                if (isset($this->getProjectsDirs()[$name]['template'])) {
+                    return $this->getProjectsDirs()[$name]['template'];
+                } else {
+                    return null;
+                }
             }
         }
         return null;
