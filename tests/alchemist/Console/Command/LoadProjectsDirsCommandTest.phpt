@@ -36,7 +36,7 @@ class LoadProjectsDirsCommandTest extends CommandTestCase
         $this->runCommand(
             $this->getCommand(LoadProjectsDirsCommand::class),
             [
-                'name' => $projectsDirName
+                '--name' => $projectsDirName
             ]
         );
 
@@ -58,7 +58,7 @@ class LoadProjectsDirsCommandTest extends CommandTestCase
         $this->runCommand(
             $this->getCommand(LoadProjectsDirsCommand::class),
             [
-                'path' => TEST_PROJECTS_DIR
+                '--path' => TEST_PROJECTS_DIR
             ]
         );
 
@@ -83,8 +83,8 @@ class LoadProjectsDirsCommandTest extends CommandTestCase
         $this->runCommand(
             $this->getCommand(LoadProjectsDirsCommand::class),
             [
-                'name' => $newProjectsDirName,
-                'template' => $newProjectsDirTemplate
+                '--name' => $newProjectsDirName,
+                '--template' => $newProjectsDirTemplate
             ]
         );
 
@@ -107,8 +107,8 @@ class LoadProjectsDirsCommandTest extends CommandTestCase
         $this->runCommand(
             $this->getCommand(LoadProjectsDirsCommand::class),
             [
-                'name' => $projectsDirName,
-                'template' => $changeTemplateTo
+                '--name' => $projectsDirName,
+                '--template' => $changeTemplateTo
             ]
         );
 
@@ -137,7 +137,7 @@ class LoadProjectsDirsCommandTest extends CommandTestCase
         $this->runCommand(
             $this->getCommand(LoadProjectsDirsCommand::class),
             [
-                'path' => TEST_PROJECTS_DIR
+                '--path' => TEST_PROJECTS_DIR
             ]
         );
 

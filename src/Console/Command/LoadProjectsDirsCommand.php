@@ -14,7 +14,7 @@ namespace Alchemist\Console\Command;
 use Alchemist\Console\Utils\ConsoleUtils;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\Command;
 use Alchemist\Manager;
 
@@ -44,9 +44,9 @@ class LoadProjectsDirsCommand extends Command
             ->setName('load-projects-dirs')
             ->setDescription('Load projects dirs')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'Projects dir name'),
-                new InputArgument('path', InputArgument::OPTIONAL, 'Projects dir path'),
-                new InputArgument('template', InputArgument::OPTIONAL, 'Projects dir template name(s)'),
+                new InputOption('name', 'name', InputOption::VALUE_REQUIRED, 'Projects dir name'),
+                new InputOption('path', 'path', InputOption::VALUE_REQUIRED, 'Projects dir path'),
+                new InputOption('template', 'template', InputOption::VALUE_REQUIRED, 'Projects dir template name(s)'),
             ));
     }
 
@@ -54,9 +54,9 @@ class LoadProjectsDirsCommand extends Command
     {
         $manager = $this->manager;
 
-        $name = $input->getArgument('name');
-        $path = $input->getArgument('path');
-        $template = $input->getArgument('template');
+        $name = $input->getOption('name');
+        $path = $input->getOption('path');
+        $template = $input->getOption('template');
  
         $result = $manager->loadProjectsDirs($name, $path, $template);
 

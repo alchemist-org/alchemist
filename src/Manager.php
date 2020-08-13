@@ -945,4 +945,4 @@ class Manager
 
         return $results;
     }
-}
+}   
