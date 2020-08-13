@@ -48,10 +48,12 @@ class LoadGithubSourcesCommand extends Command
             ->setDefinition(array(
                 new InputArgument('username', InputArgument::REQUIRED, 'Github username'),
                 new InputOption('template', 't', InputOption::VALUE_REQUIRED, 'Template name'),
+                new InputOption('token', 'token', InputOption::VALUE_REQUIRED, 'Github token associated with given username'),
                 new InputOption('projects-dir', 'd', InputOption::VALUE_REQUIRED, 'Projects dir'),
                 new InputOption('install', 'i', InputOption::VALUE_NONE, 'Install projects'),
                 new InputOption('force', 'f', InputOption::VALUE_NONE, 'Re-create alredy existing project'),
-                new InputOption('suppress', 's', InputOption::VALUE_NONE, 'Suppress re-create already existing projects')
+                new InputOption('suppress', 's', InputOption::VALUE_NONE, 'Suppress re-create already existing projects'),
+                new InputOption('save', 'save', InputOption::VALUE_NONE, 'Save given github username, token'),
             ));
     }
 
@@ -65,12 +67,14 @@ class LoadGithubSourcesCommand extends Command
         $install = $input->getOption('install');
         $force = $input->getOption('force');
         $suppress = $input->getOption('suppress');
+        $save = $input->getOption('save');
+        $token = $input->getOption('token');
 
         if($force && $suppress) {
             throw new \InvalidArgumentException("Option -f [force] & -s [suppress] can not be set up together.");
         }
 
-        $result = $manager->loadGithubSources($username, $projectsDir, $template, $install, $force, $suppress);
+        $result = $manager->loadGithubSources($username, $token, $projectsDir, $template, $install, $force, $suppress, $save);
 
         ConsoleUtils::writeln($result, $output);
 

@@ -298,4 +298,16 @@ class Config
         return $defaultValue ? $value === $defaultValue : false;
     }
 
+    public function setGithubSource($username, $token)
+    {
+        $this->config['core']['sources']['github'][$username]['token'] = $token;
+    }
+
+    public function getGithubSourceToken($username)
+    {
+        if(isset($this->config['core']['sources']['github'][$username]['token'])) {
+            return $this->config['core']['sources']['github'][$username]['token'];
+        }
+    }
+
 }

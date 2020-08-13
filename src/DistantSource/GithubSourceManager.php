@@ -46,21 +46,27 @@ class GithubSourceManager
         $this->templateLoader = $templateLoader;
     }
 
-    public function loadGithubSources($githubUsername, $projectsDirName, $templateName, $install, $force, $suppress) 
+    public function loadGithubSources($githubUsername, $token, $projectsDirName, $templateName, $install, $force, $suppress, $save) 
     {
         $result = [];
 
         $client = new Client();
 
-        $token = null;
-        if(isset($this->configurator->getConfig()->getConfig()['core']['sources']['github'][$githubUsername]['token'])) {
-            $token = $this->configurator->getConfig()->getConfig()['core']['sources']['github'][$githubUsername]['token'];
+        if($token && $save) {
+            $config = $this->configurator->getConfig();
+            $config->setGithubSource($githubUsername, $token);
+            $this->configurator->setConfig($config);
+        } else {
+            // have token in config is not required
+            $token = $this->configurator->getConfig()->getGithubSourceToken($githubUsername);
         }
 
+        // when is token given or mentioned in config, load private repositories too
         $repos = [];
         if($token) {
             $client->authenticate($token, null, Client::AUTH_ACCESS_TOKEN);
             $repos = $client->currentUser()->repositories('all');
+        // if not, load only public
         } else {
             $repos = $client->api('user')->repositories($githubUsername);
         }

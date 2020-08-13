@@ -9,11 +9,16 @@ Alchemist helps you create, manage and work with your projects, easy to configur
 
 ![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/alchemist.png)
 
-## Example of usage
+## Example of usage (after installation and minimal set up (created `config.local.neon` file))
 
 - i want reinstall and after that i want immediately again work on projects (see link below)
 - i have repositories which i want install to someone (e.g. newbie in company)
 - i want to have overview over my all projects (uncommited changes etc.)
+- i want download all github projects associated with username (for private repositories is token required)
+
+```
+alchemist load-github-sources ldrahnik --token "XY" --save # save token to config.local.neon for next usage
+```
 
 ## Reference
 
@@ -61,7 +66,7 @@ For `<alchemist/location>` you can later use command `$ alchemist which`.
 
 ### Set up
 
-Create and set up `config.local.neon`. For example:
+Minimum set up is create `config.local.neon`. Then for for example:
 
 ```
 parameters:
@@ -185,12 +190,22 @@ Find path for given projects dirs name in `project dirs` block or add new with n
 $ alchemist load-projects-dirs [--name <projects-dir-name>] [--path <projets-dir-path>] [--template <name|names>]
 ```
 
+### Load github projects
+
+```sh
+$ alchemist load-github-sources <username> [--token] [-t|--template] [--d|--projects-dir] [-i|--install] [-f|--force] [--s|suppress] [--save]
+```
+
 Name | Comment
 ------------ | -------------
-Name | Project name
---name | Find name in config projects-dirs block
---path | If not found in config projects-dirs block add with name basename(path) 
+username | Github username
+--token | Github token (allow load private repositories
 --template <name> | Template name or names
+--projects-dir <dir> | Projects dir
+--install | Not only save projects to config but even install
+--force | Re-create already existing projects
+--suppress | Suppress re-create already existing projects
+--save | Save given github username, token to config
 
 ![ScreenShot](https://raw.github.com/alchemist-org/alchemist/master/examples/alchemist_config.local.neon.png)
 
@@ -199,3 +214,4 @@ Name | Project name
 ```sh
 $ alchemist which
 ```
+
