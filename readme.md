@@ -1,4 +1,4 @@
-ALCHEMIST - Console Project Manager
+ALCHEMIST - GIT Console Project Manager
 ===========
 
 Alchemist helps you create, manage and work with your projects, easy to configure and fast to use anywhere, configuration is portable.
